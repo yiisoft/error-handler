@@ -1,23 +1,25 @@
 {
-    "name": "yiisoft/_____",
+    "name": "yiisoft/error-handler",
     "type": "library",
-    "description": "_____",
+    "description": "error-handler",
     "keywords": [
-        "_____"
+        "yiisoft",
+        "error-handler"
     ],
     "homepage": "https://www.yiiframework.com/",
     "license": "BSD-3-Clause",
     "support": {
-        "issues": "https://github.com/yiisoft/_____/issues?state=open",
+        "issues": "https://github.com/yiisoft/error-handler/issues?state=open",
         "forum": "https://www.yiiframework.com/forum/",
         "wiki": "https://www.yiiframework.com/wiki/",
         "irc": "irc://irc.freenode.net/yii",
-        "source": "https://github.com/yiisoft/_____"
+        "source": "https://github.com/yiisoft/error-handler"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^7.4|^8.0"
+        "php": "^7.4|^8.0",
+        "psr/http-message": "^1.0"
     },
     "require-dev": {
         "infection/infection": "^0.19.2",
@@ -26,17 +28,20 @@
     },
     "autoload": {
         "psr-4": {
-            "Yiisoft\\_____\\": "src"
+            "Yiisoft\\ErrorHandler\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Yiisoft\\_____\\Tests\\": "tests"
+            "Yiisoft\\ErrorHandler\\Tests\\": "tests"
         }
     },
     "extra": {
         "branch-alias": {
             "dev-master": "3.0.x-dev"
+        },
+        "config-plugin": {
+            "common": "config/common.php"
         }
     },
     "config": {
