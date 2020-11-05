@@ -13,7 +13,7 @@ return [
     HtmlRenderer::class => [
         '__class' => HtmlRenderer::class,
         '__construct()' => [
-            $params['yiisoft/yii-web']['htmlRenderer']['templates'],
+            $params['yiisoft/error-handler']['htmlRenderer']['templates'],
         ],
     ],
 
