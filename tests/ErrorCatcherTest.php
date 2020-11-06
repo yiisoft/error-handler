@@ -8,12 +8,10 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Log\LoggerInterface;
 use Yiisoft\Di\Container;
-use Yiisoft\Log\Logger;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\ErrorCatcher;
-use Yiisoft\Yii\Web\Tests\Middleware\Mock\MockRequestHandler;
-use Yiisoft\Yii\Web\Tests\Middleware\Mock\MockThrowableRenderer;
 
 class ErrorCatcherTest extends TestCase
 {
@@ -139,7 +137,8 @@ class ErrorCatcherTest extends TestCase
 
     private function getErrorHandler(): ErrorHandler
     {
-        return new ErrorHandler(new Logger(), new MockThrowableRenderer(self::DEFAULT_RENDERER_RESPONSE));
+        $logger = $this->createMock(LoggerInterface::class);
+        return new ErrorHandler($logger, new MockThrowableRenderer(self::DEFAULT_RENDERER_RESPONSE));
     }
 
     private function getFactory(): ResponseFactoryInterface
