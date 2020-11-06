@@ -12,7 +12,6 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Yiisoft\Http\Header;
 use Yiisoft\Http\Status;
-use Yiisoft\Yii\Web\Helper\HeaderHelper;
 
 /**
  * ErrorCatcher catches all throwables from the next middlewares and renders it
