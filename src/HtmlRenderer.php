@@ -179,7 +179,7 @@ final class HtmlRenderer extends ThrowableRenderer
      */
     public function isCoreFile(?string $file): bool
     {
-        return $file === null || strpos(realpath($file), Info::frameworkPath() . DIRECTORY_SEPARATOR) === 0;
+        return $file === null || strpos((string)realpath($file), Info::frameworkPath() . DIRECTORY_SEPARATOR) === 0;
     }
 
     /**
