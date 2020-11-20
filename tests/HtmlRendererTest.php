@@ -21,7 +21,7 @@ class HtmlRendererTest extends TestCase
             'callStackItem',
             'error',
             'exception',
-            'previousException'
+            'previousException',
         ],
         'path' => __DIR__ . '/../templates',
     ];
@@ -91,7 +91,7 @@ class HtmlRendererTest extends TestCase
         $exampleNonExistingFile = '_not_found_.php';
 
         $templates = [
-            'error' => $exampleNonExistingFile
+            'error' => $exampleNonExistingFile,
         ];
         $templates = array_merge(self::DEFAULT_TEMPLATES, $templates);
 
@@ -116,7 +116,7 @@ class HtmlRendererTest extends TestCase
     private function getServerRequestMock(): ServerRequestInterface
     {
         $acceptHeader = [
-            'text/html'
+            'text/html',
         ];
         $serverRequestMock = $this->createMock(ServerRequestInterface::class);
         $serverRequestMock
@@ -128,7 +128,7 @@ class HtmlRendererTest extends TestCase
             ->method('getHeaders')
             ->willReturn(
                 [
-                    'Accept' => $acceptHeader
+                    'Accept' => $acceptHeader,
                 ]
             );
 

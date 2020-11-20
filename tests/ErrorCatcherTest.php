@@ -10,8 +10,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Di\Container;
-use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\ErrorCatcher;
+use Yiisoft\ErrorHandler\ErrorHandler;
 
 class ErrorCatcherTest extends TestCase
 {
@@ -130,7 +130,7 @@ class ErrorCatcherTest extends TestCase
     {
         return new Container(
             [
-                $id => new MockThrowableRenderer($expectedOutput)
+                $id => new MockThrowableRenderer($expectedOutput),
             ]
         );
     }
