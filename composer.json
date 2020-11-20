@@ -32,7 +32,7 @@
         "nyholm/psr7": "^1.0",
         "infection/infection": "^0.19.2",
         "phpunit/phpunit": "^9.4",
-        "vimeo/psalm": "^4.1",
+        "vimeo/psalm": "^4.2",
         "yiisoft/di": "^3.0@dev"
     },
     "autoload": {
