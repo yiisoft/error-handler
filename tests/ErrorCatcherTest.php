@@ -12,6 +12,7 @@ use Psr\Log\LoggerInterface;
 use Yiisoft\Di\Container;
 use Yiisoft\ErrorHandler\ErrorCatcher;
 use Yiisoft\ErrorHandler\ErrorHandler;
+use Yiisoft\Http\Header;
 
 class ErrorCatcherTest extends TestCase
 {
@@ -24,7 +25,7 @@ class ErrorCatcherTest extends TestCase
         $container = $this->getContainerWithThrowableRenderer($containerId, $expectedRendererOutput);
         $mimeType = 'test/test';
         $catcher = $this->getErrorCatcher($container)->withRenderer($mimeType, $containerId);
-        $requestHandler = (new MockRequestHandler())->setHandleExcaption(new \RuntimeException());
+        $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
         $response = $catcher->process(new ServerRequest('GET', '/', ['Accept' => [$mimeType]]), $requestHandler);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
@@ -55,7 +56,7 @@ class ErrorCatcherTest extends TestCase
     {
         $container = new Container();
         $catcher = $this->getErrorCatcher($container)->withoutRenderers();
-        $requestHandler = (new MockRequestHandler())->setHandleExcaption(new \RuntimeException());
+        $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
         $response = $catcher->process(new ServerRequest('GET', '/', ['Accept' => ['test/html']]), $requestHandler);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
@@ -66,7 +67,7 @@ class ErrorCatcherTest extends TestCase
     {
         $container = new Container();
         $catcher = $this->getErrorCatcher($container)->withoutRenderers('*/*');
-        $requestHandler = (new MockRequestHandler())->setHandleExcaption(new \RuntimeException());
+        $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
         $response = $catcher->process(new ServerRequest('GET', '/', ['Accept' => ['test/html']]), $requestHandler);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
@@ -80,7 +81,7 @@ class ErrorCatcherTest extends TestCase
         $container = $this->getContainerWithThrowableRenderer($containerId, $expectedRendererOutput);
         $mimeType = 'text/html;version=2';
         $catcher = $this->getErrorCatcher($container)->withRenderer($mimeType, $containerId);
-        $requestHandler = (new MockRequestHandler())->setHandleExcaption(new \RuntimeException());
+        $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
         $response = $catcher->process(
             new ServerRequest('GET', '/', ['Accept' => ['text/html', $mimeType]]),
             $requestHandler
@@ -97,7 +98,7 @@ class ErrorCatcherTest extends TestCase
         $container = $this->getContainerWithThrowableRenderer($containerId, $expectedRendererOutput);
         $catcher = $this->getErrorCatcher($container)
             ->withRenderer('*/*', $containerId);
-        $requestHandler = (new MockRequestHandler())->setHandleExcaption(new \RuntimeException());
+        $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
         $response = $catcher->process(
             new ServerRequest('GET', '/', ['Accept' => ['test/test']]),
             $requestHandler
@@ -108,15 +109,28 @@ class ErrorCatcherTest extends TestCase
         $this->assertSame($expectedRendererOutput, $content);
     }
 
+    public function testComplicatedAcceptHeader(): void
+    {
+        $container = new Container();
+        $catcher = $this->getErrorCatcher($container);
+        $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
+        $response = $catcher->process(
+            new ServerRequest('GET', '/', ['Accept' => ['text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8']]),
+            $requestHandler
+        );
+        $response->getHeader(Header::CONTENT_TYPE);
+        $this->assertSame('text/html', $response->getHeaderLine(Header::CONTENT_TYPE));
+    }
+
     public function testForceContentType(): void
     {
         $catcher = $this->getErrorCatcher(new Container())->forceContentType('application/json');
         $response = $catcher->process(
             new ServerRequest('GET', '/', ['Accept' => ['text/xml']]),
-            (new MockRequestHandler())->setHandleExcaption(new \RuntimeException())
+            (new MockRequestHandler())->setHandleException(new \RuntimeException())
         );
         $response->getBody()->rewind();
-        $this->assertSame('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertSame('application/json', $response->getHeaderLine(Header::CONTENT_TYPE));
     }
 
     public function testForceContentTypeSetInvalidType(): void
