@@ -29,13 +29,12 @@
         "yiisoft/http": "^1.0"
     },
     "require-dev": {
-        "infection/infection": "^0.19.2",
         "nyholm/psr7": "^1.0",
         "phpunit/phpunit": "^9.4",
         "roave/infection-static-analysis-plugin": "^1.5",
         "spatie/phpunit-watcher": "^1.23",
         "vimeo/psalm": "^4.2",
-        "yiisoft/di": "^3.0@dev"
+        "yiisoft/di": "dev-master"
     },
     "autoload": {
         "psr-4": {
