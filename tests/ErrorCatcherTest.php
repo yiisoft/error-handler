@@ -109,19 +109,6 @@ class ErrorCatcherTest extends TestCase
         $this->assertSame($expectedRendererOutput, $content);
     }
 
-    public function testComplicatedAcceptHeader(): void
-    {
-        $container = new Container();
-        $catcher = $this->getErrorCatcher($container);
-        $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
-        $response = $catcher->process(
-            new ServerRequest('GET', '/', ['Accept' => ['text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8']]),
-            $requestHandler
-        );
-        $response->getHeader(Header::CONTENT_TYPE);
-        $this->assertSame('text/html', $response->getHeaderLine(Header::CONTENT_TYPE));
-    }
-
     public function testForceContentType(): void
     {
         $catcher = $this->getErrorCatcher(new Container())->forceContentType('application/json');
