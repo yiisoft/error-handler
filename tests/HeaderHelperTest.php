@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\ErrorHandler\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -169,7 +171,7 @@ class HeaderHelperTest extends TestCase
             'semicolonAtEnd' => ['a=b;', null, null, null, \InvalidArgumentException::class],
             'comma' => ['a=test,test', null, null, null, \InvalidArgumentException::class],
 
-            # true syntax
+            // true syntax
             'spaces2' => [' a = b ; c = "d" ', null, null, ['a' => 'b', 'c' => 'd']],
             'case' => ['A=TEST;TEST=B', true, false, ['a' => 'TEST', 'test' => 'B']],
             'case2' => ['A=TEST;TEST=B', false, false, ['A' => 'TEST', 'TEST' => 'B']],
@@ -178,19 +180,19 @@ class HeaderHelperTest extends TestCase
             'spaces3' => ['a=b c', null, null, null, \InvalidArgumentException::class],
             'percent' => ['a=%1;b="foo-%32-bar"', null, null, ['a' => '%1', 'b' => 'foo-%32-bar']],
 
-            # Invalid syntax but most browsers take a first parameter
+            // Invalid syntax but most browsers take a first parameter
             'sameName' => ['a=T1;a="T2"', true, false, ['a' => 'T1']],
             'sameNameCase' => ['aa=T1;Aa="T2"', true, false, ['aa' => 'T1']],
 
-            # Invalid syntax but most browsers accept the unquoted value with warn
-            # What is better for us to do?
+            // Invalid syntax but most browsers accept the unquoted value with warn
+            // What is better for us to do?
             'brokenToken' => ['a=foo[1](2).html', null, null, null, \InvalidArgumentException::class],
 
             'brokenSyntax1' => ['a==b', null, null, null, \InvalidArgumentException::class],
             'brokenSyntax2' => ['a *=b', null, null, null, \InvalidArgumentException::class],
-            # Invalid syntax but most browsers accept the umlaut with warn
+            // Invalid syntax but most browsers accept the umlaut with warn
             'brokenToken2' => ['a=foo-ä.html', null, null, ['a' => 'foo-ä.html']],
-            # Invalid syntax but most browsers accept the umlaut with warn
+            // Invalid syntax but most browsers accept the umlaut with warn
             'brokenToken3' => ['a=foo-Ã¤.html', null, null, ['a' => 'foo-ã¤.html']],
         ];
     }
