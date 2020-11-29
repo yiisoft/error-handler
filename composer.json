@@ -29,7 +29,7 @@
         "yiisoft/http": "^1.0"
     },
     "require-dev": {
-        "infection/infection": "^0.19.2",
+        "infection/infection": "^0.20.2",
         "nyholm/psr7": "^1.0",
         "phpunit/phpunit": "^9.4",
         "roave/infection-static-analysis-plugin": "^1.5",
