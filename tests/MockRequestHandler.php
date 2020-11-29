@@ -20,7 +20,7 @@ class MockRequestHandler implements RequestHandlerInterface
         $this->responseStatus = $responseStatus;
     }
 
-    public function setHandleExcaption(?\Throwable $throwable): self
+    public function setHandleException(?\Throwable $throwable): self
     {
         $this->handleException = $throwable;
         return $this;
