@@ -110,17 +110,18 @@ final class HeaderHelper
      */
     public static function getSortedValueAndParameters($values, bool $lowerCaseValue = true, bool $lowerCaseParameter = true, bool $lowerCaseParameterValue = true): array
     {
-        if (is_string($values)) {
-            $values = preg_split('/\s*,\s*/', trim($values), -1, PREG_SPLIT_NO_EMPTY);
+        if (!is_array($values) && !is_string($values)) {
+            throw new \InvalidArgumentException('Values are neither array nor string.');
         }
-        if (!is_array($values)) {
-            throw new \InvalidArgumentException('Values ​​are neither array nor string');
+        $list = [];
+        foreach ((array)$values as $headerValue) {
+            $list = [...$list, ...preg_split('/\s*,\s*/', trim($headerValue), -1, PREG_SPLIT_NO_EMPTY)];
         }
-        if (count($values) === 0) {
+        if (count($list) === 0) {
             return [];
         }
         $output = [];
-        foreach ($values as $value) {
+        foreach ($list as $value) {
             $parse = self::getValueAndParameters($value, $lowerCaseValue, $lowerCaseParameter, $lowerCaseParameterValue);
             // case-insensitive "q" parameter
             $q = $parse['q'] ?? $parse['Q'] ?? 1.0;
