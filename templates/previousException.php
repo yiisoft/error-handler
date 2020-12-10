@@ -4,11 +4,13 @@
 ?>
 <div class="previous">
     <span class="arrow">&crarr;</span>
-    <h2>
-        <span>Caused by:</span>
-        <span><?= $this->htmlEncode(get_class($throwable)) ?></span>
-    </h2>
-    <h3><?= nl2br($this->htmlEncode($throwable->getMessage())) ?></h3>
-    <p>in <span class="file"><?= $throwable->getFile() ?></span> at line <span class="line"><?= $throwable->getLine() ?></span></p>
-    <?= $this->renderPreviousExceptions($throwable) ?>
+    <div class="flex-1">
+        <h2>
+            <span>Caused by:</span>
+            <span><?= $this->htmlEncode(get_class($throwable)) ?></span>
+        </h2>
+        <h3><?= nl2br($this->htmlEncode($throwable->getMessage())) ?></h3>
+        <p>in <span class="file"><?= $throwable->getFile() ?></span> at line <span class="line"><?= $throwable->getLine() ?></span></p>
+        <?= $this->renderPreviousExceptions($throwable) ?>
+    </div>
 </div>

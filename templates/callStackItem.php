@@ -20,24 +20,29 @@ HTML;
 <li class="<?= ($index === 1 || !$this->isCoreFile($file)) ? 'application' : '' ?> call-stack-item"
     data-line="<?= (int) ($line - $begin) ?>">
     <div class="element-wrap">
-        <div class="element">
-            <span class="item-number"><?= (int) $index ?>.</span>
-            <span class="text"><?= $file !== null ? 'in ' . $this->htmlEncode($file) : '' ?></span>
+        <div class="flex-1">
+            <?php if ($file !== null): ?>
+                <span class="file-name">
+                    <?= sprintf('%d. %s', (int) $index, 'in ' . $this->htmlEncode($file))  ?>
+                </span>
+            <?php endif ?>
+
             <?php if ($this->traceLine !== '{html}') : ?>
                 <span> &ndash; </span>
                 <?= strtr($this->traceLine, ['{file}' => $file, '{line}' => $line + 1, '{html}' => $html]) ?>
             <?php endif; ?>
-            <span class="at">
-                <?= $line !== null ? 'at line' : '' ?>
-                <span class="line"><?= $line !== null ? $line + 1 : '' ?></span>
-            </span>
+
             <?php if ($method !== null) : ?>
-                <span class="call">
+                <span>
                     <?= $file !== null ? '&ndash;' : '' ?>
                     <?= ($class !== null ? $this->addTypeLinks("$class::$method") : $this->htmlEncode($method)) . '(' . $this->argumentsToString($args) . ')' ?>
                 </span>
             <?php endif; ?>
         </div>
+
+        <?php if ($line !== null): ?>
+            <div><?= sprintf('at line %d', $line + 1) ?></div>
+        <?php endif ?>
     </div>
     <?php if (!empty($lines)) : ?>
         <div class="code-wrap">
