@@ -70,7 +70,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
         /* header */
         header {
-            padding: 100px 100px 270px 100px;
+            padding: 65px 100px 270px 100px;
             background: #EDEDED;
         }
 
@@ -80,7 +80,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
         }
 
         header .tools a {
-            margin-left: 40px;
+            margin-left: 45px;
         }
 
         header .exception-card {
@@ -166,17 +166,9 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
             float: left;
             height: 25px;
             padding: 5px;
+            margin-right: 5px;
         }
         /* end header */
-
-        /*corresponds to min-width of 860px for some elements (.header .footer .element ...)*/
-        @media screen and (min-width: 960px) {
-
-            html,
-            body {
-                overflow-x: hidden;
-            }
-        }
 
         main {
             margin-left: 100px;
@@ -311,8 +303,11 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
         /* footer */
         .footer {
-            padding-top: 40px;
-            padding-bottom: 40px;
+            display: flex;
+        }
+
+        .footer div {
+            align-self: center;
         }
 
         .footer .timestamp {
@@ -328,6 +323,10 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
         .footer p a:hover {
             color: #000;
+        }
+
+        .footer svg {
+            margin-right: -50px;
         }
         /* end footer */
 
@@ -388,13 +387,24 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
             </g>
         </symbol>
     </svg>
+
     <header>
         <div class="tools">
+            <a href="#" title="Dark Mode">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M27.0597 19.06C24.5285 20.0421 21.7663 20.2669 19.1096 19.7072C16.4528 19.1474 14.0162 17.8273 12.0963 15.9074C10.1765 13.9876 8.85629 11.5509 8.29655 8.89416C7.73681 6.23742 7.96166 3.47524 8.94373 0.944C5.90328 2.1289 3.37198 4.33824 1.78688 7.19057C0.201778 10.0429 -0.337628 13.3592 0.26179 16.5668C0.861209 19.7745 2.56183 22.6721 5.07003 24.7596C7.57822 26.847 10.7366 27.9931 13.9997 28C16.8243 28.0007 19.583 27.1473 21.9138 25.5519C24.2445 23.9564 26.0383 21.6934 27.0597 19.06Z" fill="#787878"/>
+                </svg>
+            </a>
+
             <a href="https://stackoverflow.com/search?<?= http_build_query(['q' => $throwable->getMessage()]) ?>" title="Search error on Stackoverflow" target="_blank">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAZCAYAAADaILXQAAAABGdBTUEAALGPC/xhBQAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAc9JREFUSMe11MuLzlEcx/GXuTQpCzQYl3EL0UxNNDRNsWAht40UC7OzkT9BsrCQkI2ysJeSknssRsl9lFyGGrkUjRqDlEth2HzU0+SZeeZ5PN86nfP7ds7n+z3v7/f8qMw6MFEVbDt6cKTYhtoKxOuxAXPxFQ8rFa/D76z7s27PuIWBSlDsxmGMz3cNjgXPWUwoV3gh7kboBJrib8SV+A+Ui+UDHmEVpmMtHuAV+rAO8/ERveUwf4Nr6Ezm6/E2vnosxQpcx2Ap4u059BJD+IRLaEUzVifJ49k7E8txrhTxfdiGjRF/ji+4HN6LsSxIDgXXTdyoLaH15qWYk4JjMxrC+WoCdUS8DTtxEb9GEx/CbZzOQ1mQIO3YmvUZ3MPK3Kb77+FxYyxoAzahK2zhZ0TP437BIxuxW6ZhP2bn0XwOgl6cSgvOwlQswkm8H860mLWGcWeBrx9P8DjzjnBux7PhAoVYmjO/w49kvAYtCdRYpCYv0iU9mBEaA/heKN6TeUuuPNymJEhLxpKCf0kXnoZ7E3bhTt0YijmQTuguuPWcBOor1sfF7Gj6txS78C9njSraSJnvTV9XRXywGpnvwbcy9SaPJt5WDeYH/2MtX8Mf2fhjE3QWPKAAAAAASUVORK5CYII=" alt="Search Stackoverflow"/>
+                <svg width="28" height="32" viewBox="0 0 28 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M23.312 29.151V20.615H26.161V32H0.458008V20.615H3.29701V29.151H23.312ZM6.14501 26.307H20.469V23.459H6.14501V26.307ZM6.49501 19.839L20.47 22.755L21.069 19.995L7.10001 17.083L6.49501 19.839ZM8.30701 13.099L21.246 19.136L22.449 16.536L9.51201 10.495L8.30801 13.079L8.30701 13.099ZM11.927 6.719L22.88 15.86L24.693 13.697L13.74 4.562L11.937 6.713L11.927 6.719ZM19 0L16.672 1.724L25.213 13.197L27.541 11.473L19 0Z" fill="black"/>
+                </svg>
             </a>
             <a href="https://www.google.com/search?<?= http_build_query(['q' => $throwable->getMessage()]) ?>" title="Search error on Google" target="_blank">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAZCAYAAAAxFw7TAAAABGdBTUEAALGPC/xhBQAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAZZJREFUOMvl1T9IlVEYBvCf37301+iPFgYtBhUYQUIQiGaEgVCDELg11l5jo2MNgTg5NYiTNN2GIKJIA0MwGlIMFQoirAjRoUiq5XxwOHz33rrq1APf8pznPO/7nu897+G/Q1ONtYPoxVkcxk58wxJe4g1+/41hK25gAKUaAecxjFcxmW44h1F0IqtTXSuuBN1MTpYjQRfu18mqCF+KSj6GMTQn4qd4iHdYx1FcxHXswxAqRVHuhbTz7zku1MjqCLqr/eWTGE/4W3jRSNtk6Eu4x42a5YbnE25iM41dRlvCva2irRRoU6xk2B8R6/ixiQQPZViNiOZwxRrFRhmf0BKRHZgtEE+E3ouxG4Nxk5cxjdMRea2K4YMC7lJiuJDhSSLqr9a0CXbgZsJNlfAVJ9AeLfRgEe9rmN0Noy3HGobyQTCHq0GYb+jH8SD8jo1wly+HO3wmCTKC2aYtmDYwidv4FW/+gNeh3F3/YPYMd/CzaMB+xCPswak6Q/ZzqGg4HEfdN+VAeFM6w5uyN5znchj703lW24o/8/BJk5VnLk0AAAAASUVORK5CYII=" alt="Search Google"/>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M23.5313 9.825H12.2407V14.4656H18.6907C18.4126 15.9656 17.5688 17.2344 16.297 18.0844C15.222 18.8031 13.8501 19.2281 12.2376 19.2281C9.11572 19.2281 6.4751 17.1187 5.53135 14.2844C5.29385 13.5656 5.15635 12.7969 5.15635 12.0063C5.15635 11.2156 5.29385 10.4469 5.53135 9.72812C6.47822 6.89687 9.11885 4.7875 12.2407 4.7875C14.0001 4.7875 15.5782 5.39375 16.822 6.58125L20.2595 3.14062C18.1813 1.20312 15.472 0.015625 12.2407 0.015625C7.55635 0.015625 3.50322 2.70312 1.53135 6.62187C0.718848 8.24062 0.256348 10.0719 0.256348 12.0094C0.256348 13.9469 0.718848 15.775 1.53135 17.3937C3.50322 21.3125 7.55635 24 12.2407 24C15.4782 24 18.1907 22.925 20.172 21.0938C22.4376 19.0063 23.747 15.9313 23.747 12.2781C23.747 11.4281 23.672 10.6125 23.5313 9.825Z" fill="#787878"/>
+                </svg>
             </a>
         </div>
 
@@ -425,9 +435,11 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
             <div>
                 <textarea id="clipboard"><?= $this->htmlEncode($throwable) ?></textarea>
                 <span id="copied">Copied!</span>
-                <!-- Icon Credit: Font Awesome by Dave Gandy - http://fontawesome.io ; fa-clipboard, fa-stackoverflow, fa-google-->
+
                 <a href="#" id="copy-stacktrace" title="Copy the stacktrace for use in a bug report or pastebin">
-                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAZCAYAAAArK+5dAAAABGdBTUEAALGPC/xhBQAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAR1JREFUSMftlTFKxEAYhb8n2c7CarGR9RAWHkFsvMIqCy4iVpZ6AS9gIXqDbbdYLEUstLPwBt5AXQw+mxTDkkyymWwh+CAQMsP/zZt/XkbAEbAPiOVlYGr7rmqCgCcgo71y27tVg9lC8Wvbt3UVJV0CB0ENYoBQG5K2Gqx6vak9Ac8kyvZO1dgaK1YnAEnDpj2I6azk2wXQB04l9WzftAbYfixZ+Wfx+gocS2IR0lUPToCXAjLqHGD7o9jCB2AcQjo7RbbnwDlwH0Ky1LpFLyYluzKW9J7qYAbkwCB4wj/BYeMkx9JakY0JMPgbSf4HJAPeVgnIgBGwHXFzBWy2Btj+irmQNE91UKfvAtTmas1luy6Re8AQ6C1Z/AeY/gK6sUu5CuQ0NQAAAABJRU5ErkJggg==" alt="Copy Stacktrace" />
+                    <svg width="26" height="30" viewBox="0 0 26 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.9998 0.333344H3.33317C1.8665 0.333344 0.666504 1.53334 0.666504 3.00001V20.3333C0.666504 21.0667 1.2665 21.6667 1.99984 21.6667C2.73317 21.6667 3.33317 21.0667 3.33317 20.3333V4.33334C3.33317 3.60001 3.93317 3.00001 4.6665 3.00001H17.9998C18.7332 3.00001 19.3332 2.40001 19.3332 1.66668C19.3332 0.933343 18.7332 0.333344 17.9998 0.333344ZM23.3332 5.66668H8.6665C7.19984 5.66668 5.99984 6.86668 5.99984 8.33334V27C5.99984 28.4667 7.19984 29.6667 8.6665 29.6667H23.3332C24.7998 29.6667 25.9998 28.4667 25.9998 27V8.33334C25.9998 6.86668 24.7998 5.66668 23.3332 5.66668ZM21.9998 27H9.99984C9.26651 27 8.6665 26.4 8.6665 25.6667V9.66668C8.6665 8.93334 9.26651 8.33334 9.99984 8.33334H21.9998C22.7332 8.33334 23.3332 8.93334 23.3332 9.66668V25.6667C23.3332 26.4 22.7332 27 21.9998 27Z" fill="#787878"/>
+                    </svg>
                 </a>
             </div>
         </div>
@@ -444,15 +456,45 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
             <?= $this->renderCurl() ?>
         </div>
         <div class="footer">
-            <p class="timestamp">
-                <?= date('Y-m-d, H:i:s') ?>
-            </p>
-            <p>
-                <?= $this->createServerInformationLink() ?>
-            </p>
-            <p><a href="http://yiiframework.com/">Yii Framework</a>/
-                <?= $this->createFrameworkVersionLink() ?>
-            </p>
+            <div class="flex-1">
+                <p class="timestamp">
+                    <?= date('Y-m-d, H:i:s') ?>
+                </p>
+                <p>
+                    <?= $this->createServerInformationLink() ?>
+                </p>
+                <p><a href="http://yiiframework.com/">Yii Framework</a>/
+                    <?= $this->createFrameworkVersionLink() ?>
+                </p>
+            </div>
+
+            <svg width="256" height="224" viewBox="0 0 256 224" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g opacity="0.54">
+                    <path d="M221.829 0.00415039C240.43 9.48202 256.405 34.3532 255.604 68.1036C253.173 109.689 223.022 145.528 190.217 178.548C188.38 138.279 179.625 112.616 165.953 76.5289C153.045 40.1613 190.783 1.16824 221.829 0.00415039Z" fill="url(#paint0_linear)"/>
+                    <path d="M121.218 177.132C131.205 164.708 138.284 153.644 143.224 143.648C177.065 161.341 169.08 158.037 185.401 176.888C185.456 177.475 185.508 178.06 185.557 178.643C186.91 204.781 167.843 265.207 92.7634 273.488C87.5663 232.885 104.462 198.251 121.218 177.132Z" fill="url(#paint1_linear)"/>
+                    <path d="M0.391188 25.2468C53.8858 4.07847 111.459 25.7628 144.698 70.9437C147.913 75.3135 150.962 79.8532 153.838 84.5259C159.032 117.681 155.072 136.094 144.962 145.855C138.315 142.501 131.224 139.527 123.653 136.777C106.051 130.383 89.8076 126.151 66.6083 119.282C11.5203 104.248 -2.06497 57.0117 0.391188 25.2468Z" fill="url(#paint2_linear)"/>
+                    <path d="M151.793 81.2802C152.144 81.825 152.491 82.3658 152.834 82.9148L153.255 83.5918C154.113 84.9706 154.955 86.3576 155.785 87.7611L155.925 87.9964L156.148 88.3762L156.351 88.7271L156.945 89.7467L156.986 89.821L157.791 91.2327L157.816 91.274C158.398 92.3019 158.972 93.3339 159.537 94.3741L159.608 94.5062L160.235 95.6703L160.252 95.6992L160.941 96.9954L161.139 97.3752L161.523 98.1141L161.994 99.0264L162.448 99.9098C162.91 100.826 163.368 101.743 163.818 102.659L163.934 102.886C164.747 104.55 165.535 106.217 166.307 107.897L166.894 109.181L166.951 109.309L167.327 110.143L167.765 111.13L168.012 111.699L168.408 112.612L168.693 113.268L169.292 114.68L169.333 114.779L169.973 116.314L170.051 116.5C170.733 118.16 171.393 119.819 172.033 121.491L172.095 121.644L172.623 123.043L172.656 123.121L172.962 123.947C173.3 124.863 173.635 125.78 173.965 126.7L174.093 127.06C174.456 128.087 174.815 129.119 175.162 130.147L175.273 130.473C175.599 131.439 175.913 132.405 176.227 133.371L176.38 133.846L176.417 133.957L176.912 135.522L176.933 135.592L177.391 137.086L177.849 138.626L177.862 138.659L178.241 139.96L178.361 140.381L178.592 141.186C178.852 142.114 179.108 143.039 179.356 143.968L179.542 144.661L179.901 146.032L179.917 146.098C180.355 147.782 180.768 149.466 181.16 151.146L181.197 151.32L181.238 151.497C181.75 153.714 182.221 155.923 182.654 158.123L182.695 158.342C183.364 161.764 183.938 165.165 184.413 168.538L184.421 168.583C184.57 169.623 184.706 170.659 184.834 171.696L184.887 172.141L185.061 173.623V173.627L185.209 174.998L185.259 175.452L185.366 176.538L185.408 176.975L185.424 177.153L185.556 178.643C173.738 163.423 159.62 152.934 142.679 144.727C156.351 117.697 154.431 98.4361 151.793 81.2802Z" fill="url(#paint3_linear)"/>
+                </g>
+                <defs>
+                    <linearGradient id="paint0_linear" x1="209.492" y1="0.00415039" x2="209.492" y2="178.548" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#73B723"/>
+                        <stop offset="1" stop-color="#D8EE61"/>
+                    </linearGradient>
+                    <linearGradient id="paint1_linear" x1="171.417" y1="177.732" x2="82.6039" y2="244.133" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#98C9EA"/>
+                        <stop offset="0.688649" stop-color="#026FB2"/>
+                        <stop offset="1" stop-color="#086EB6"/>
+                    </linearGradient>
+                    <linearGradient id="paint2_linear" x1="0.119629" y1="25.2237" x2="115.057" y2="128.362" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#D73721"/>
+                        <stop offset="1" stop-color="#F7D768"/>
+                    </linearGradient>
+                    <linearGradient id="paint3_linear" x1="155.954" y1="111.456" x2="193.631" y2="126.545" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#D4C883"/>
+                        <stop offset="1" stop-color="#A1D1A7"/>
+                    </linearGradient>
+                </defs>
+            </svg>
         </div>
     </main>
 
