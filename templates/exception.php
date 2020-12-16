@@ -463,7 +463,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
                 <p>
                     <?= $this->createServerInformationLink() ?>
                 </p>
-                <p><a href="http://yiiframework.com/">Yii Framework</a>/
+                <p><a href="https://www.yiiframework.com/">Yii Framework</a>/
                     <?= $this->createFrameworkVersionLink() ?>
                 </p>
             </div>

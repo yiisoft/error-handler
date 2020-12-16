@@ -10,7 +10,7 @@
             <span><?= $this->htmlEncode(get_class($throwable)) ?></span>
         </h2>
         <h3><?= nl2br($this->htmlEncode($throwable->getMessage())) ?></h3>
-        <p>in <span class="file"><?= $throwable->getFile() ?></span> at line <span class="line"><?= $throwable->getLine() ?></span></p>
+        <p>in <span class="file"><?= $this->htmlEncode($throwable->getFile()) ?></span> at line <span class="line"><?= $throwable->getLine() ?></span></p>
         <?= $this->renderPreviousExceptions($throwable) ?>
     </div>
 </div>
