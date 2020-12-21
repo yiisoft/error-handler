@@ -166,6 +166,10 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
             height: 150px;
         }
 
+        #copy-stacktrace:hover svg path {
+            fill: #000;
+        }
+
         #copied {
             display: none;
             float: left;
