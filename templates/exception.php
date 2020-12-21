@@ -84,6 +84,10 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
             text-decoration: none;
         }
 
+        header .tools a:hover svg path {
+            fill: #000;
+        }
+
         header .exception-card {
             display: flex;
             background: #FAFAFA;
@@ -399,7 +403,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
             <a href="https://stackoverflow.com/search?<?= http_build_query(['q' => $throwable->getMessage()]) ?>" title="Search error on Stackoverflow" target="_blank">
                 <svg width="28" height="32" viewBox="0 0 28 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M23.312 29.151V20.615H26.161V32H0.458008V20.615H3.29701V29.151H23.312ZM6.14501 26.307H20.469V23.459H6.14501V26.307ZM6.49501 19.839L20.47 22.755L21.069 19.995L7.10001 17.083L6.49501 19.839ZM8.30701 13.099L21.246 19.136L22.449 16.536L9.51201 10.495L8.30801 13.079L8.30701 13.099ZM11.927 6.719L22.88 15.86L24.693 13.697L13.74 4.562L11.937 6.713L11.927 6.719ZM19 0L16.672 1.724L25.213 13.197L27.541 11.473L19 0Z" fill="black"/>
+                    <path d="M23.312 29.151V20.615H26.161V32H0.458008V20.615H3.29701V29.151H23.312ZM6.14501 26.307H20.469V23.459H6.14501V26.307ZM6.49501 19.839L20.47 22.755L21.069 19.995L7.10001 17.083L6.49501 19.839ZM8.30701 13.099L21.246 19.136L22.449 16.536L9.51201 10.495L8.30801 13.079L8.30701 13.099ZM11.927 6.719L22.88 15.86L24.693 13.697L13.74 4.562L11.937 6.713L11.927 6.719ZM19 0L16.672 1.724L25.213 13.197L27.541 11.473L19 0Z" fill="#787878"/>
                 </svg>
             </a>
             <a href="https://www.google.com/search?<?= http_build_query(['q' => $throwable->getMessage()]) ?>" title="Search error on Google" target="_blank">
