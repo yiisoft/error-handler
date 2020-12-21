@@ -4,6 +4,8 @@
 
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
+$theme = $_COOKIE['yii-exception-theme'] ?? '';
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -454,10 +456,11 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
         .dark-theme .request {
             background: #1E1E1E;
             border: none;
+            box-shadow: 0px 13px 20px rgba(0, 0, 0, 0.25);
         }
 
         .dark-theme .call-stack ul li .error-line {
-            background-color: #501414;
+            background-color: #422C2C;
         }
 
         .dark-theme .call-stack ul li .hover-line.hover,
@@ -554,7 +557,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
         }
     </style>
 </head>
-<body>
+<body class="<?= $theme; ?>">
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" display="none">
         <symbol id="new-window" viewBox="0 0 24 24">
             <g transform="scale(0.0234375 0.0234375)">
@@ -1130,7 +1133,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
             document.body.classList.add('dark-theme');
 
-            setCookie('theme', 'dark-theme');
+            setCookie('yii-exception-theme', 'dark-theme');
         }
 
         document.getElementById('light-mode').onclick = function(e) {
@@ -1138,7 +1141,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
             document.body.classList.remove('dark-theme');
 
-            eraseCookie('theme');
+            eraseCookie('yii-exception-theme');
         }
     };
 
@@ -1146,11 +1149,13 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
     document.onmousedown = function() { document.getElementsByTagName('body')[0].classList.add('mousedown'); }
     document.onmouseup = function() { document.getElementsByTagName('body')[0].classList.remove('mousedown'); }
 
-    var theme = getCookie('theme');
+    <?php if (empty($theme)): ?>
+        var theme = getCookie('yii-exception-theme');
 
-    if (theme) {
-        document.body.classList.add(theme);
-    }
+        if (theme) {
+            document.body.classList.add(theme);
+        }
+    <?php endif; ?>
 
     function setCookie(name, value) {
         var date = new Date(2100, 0, 1);
