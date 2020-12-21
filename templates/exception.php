@@ -627,12 +627,22 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
         <div class="call-stack">
             <?= $this->renderCallStack($throwable) ?>
         </div>
+        <?php
+            $requestInfo = $this->renderRequest();
+        ?>
+        <?php if ($requestInfo !== ''): ?>
         <div class="request">
-            <?= $this->renderRequest() ?>
+            <?= $requestInfo ?>
         </div>
+        <?php endif ?>
+        <?php
+            $curlInfo = $this->renderCurl();
+        ?>
+        <?php if ($curlInfo !== 'curl'): ?>
         <div class="request">
             <?= $this->renderCurl() ?>
         </div>
+        <?php endif ?>
         <div class="footer">
             <div class="flex-1">
                 <p class="timestamp">
@@ -641,7 +651,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
                 <p>
                     <?= $this->createServerInformationLink() ?>
                 </p>
-                <p><a href="https://www.yiiframework.com/">Yii Framework</a>/
+                <p><a href="https://www.yiiframework.com/">Yii Framework</a> /
                     <?= $this->createFrameworkVersionLink() ?>
                 </p>
             </div>
