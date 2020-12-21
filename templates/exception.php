@@ -1124,16 +1124,21 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
             }
         }
 
+        // handle theme change
         document.getElementById('dark-mode').onclick = function(e) {
             e.preventDefault();
 
             document.body.classList.add('dark-theme');
+
+            setCookie('theme', 'dark-theme');
         }
 
         document.getElementById('light-mode').onclick = function(e) {
             e.preventDefault();
 
             document.body.classList.remove('dark-theme');
+
+            eraseCookie('theme');
         }
     };
 
@@ -1141,6 +1146,35 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
     document.onmousedown = function() { document.getElementsByTagName('body')[0].classList.add('mousedown'); }
     document.onmouseup = function() { document.getElementsByTagName('body')[0].classList.remove('mousedown'); }
 
+    var theme = getCookie('theme');
+
+    if (theme) {
+        document.body.classList.add(theme);
+    }
+
+    function setCookie(name, value) {
+        var date = new Date(2100, 0, 1);
+        var expires = "; expires=" + date.toUTCString();
+
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+
+        for (var i=0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+
+        return null;
+    }
+
+    function eraseCookie(name) {
+        document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
     </script>
 </body>
 
