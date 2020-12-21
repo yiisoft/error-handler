@@ -81,6 +81,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
         header .tools a {
             margin-left: 45px;
+            text-decoration: none;
         }
 
         header .exception-card {
