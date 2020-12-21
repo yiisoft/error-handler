@@ -275,7 +275,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
             line-height: 20px;
             font-size: 12px;
             margin-top: 1px;
-            font-family: Consolas, monospace;
+            font-family: JetBrains Mono, Consolas, monospace;
         }
 
         .call-stack ul li .code pre {
@@ -284,7 +284,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
             left: 50px;
             line-height: 20px;
             font-size: 12px;
-            font-family: Consolas, monospace;
+            font-family: JetBrains Mono, Consolas, monospace;
             display: inline;
         }
 
@@ -300,7 +300,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
             padding: 20px 30px;
             font-size: 14px;
             line-height: 18px;
-            font-family: Consolas, monospace;
+            font-family: JetBrains Mono, Consolas, monospace;
         }
         /* end request */
 
@@ -1080,13 +1080,19 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
             var textarea = document.getElementById('clipboard');
             textarea.focus();
             textarea.select();
+
+            var succeeded;
             try {
                 succeeded = document.execCommand('copy');
             } catch (err) {
                 succeeded = false;
             }
             if (succeeded) {
-                document.getElementById('copied').style.display = 'block';
+                var hint = document.getElementById('copied');
+                hint.style.display = 'block';
+                setTimeout(function () {
+                    hint.style.display = 'none';
+                }, 2000);
             } else {
                 // fallback: show textarea if browser does not support copying directly
                 textarea.style.top = 0;
