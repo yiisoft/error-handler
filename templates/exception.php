@@ -447,7 +447,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         .dark-theme .call-stack ul li,
         .dark-theme .request {
             background: #1E1E1E;
-            border: none;
+            border: 2px solid transparent;
             box-shadow: 0px 13px 20px rgba(0, 0, 0, 0.25);
         }
 
