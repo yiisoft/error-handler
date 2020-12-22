@@ -104,11 +104,11 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             font-weight: 500;
             font-size: 36px;
             line-height: 42px;
-            color: #D73721;
+            color: #E79185;
         }
 
         header .exception-class a {
-            color: #e57373;
+            color: #E57373;
         }
 
         header .exception-message {
@@ -119,7 +119,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
         header .exception-class span,
         header .exception-class span a {
-            color: #e51717;
+            color: #E51717;
         }
 
         header .solution {
@@ -135,14 +135,14 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             display: inline-block;
             transform: scale(-1, 1);
             font-size: 26px;
-            color: #e51717;
+            color: #E51717;
             margin-top: -5px;
             margin-right: 10px;
         }
 
         header .previous h2 {
             font-size: 20px;
-            color: #e57373;
+            color: #E57373;
             margin-bottom: 10px;
         }
 
@@ -154,11 +154,6 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             font-size: 14px;
             margin: 10px 0;
         }
-
-        /*header .previous p {
-            font-size: 14px;
-            color: #aaa;
-        }*/
 
         #clipboard {
             position: absolute;
@@ -221,19 +216,16 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         }
 
         .call-stack ul li .element-wrap .file-name {
-            color: #086EB6;
+            color: #4B4B4B;
         }
 
-        .call-stack ul li:first-child .element-wrap .file-name {
-            color: #4B4B4B;
+        .call-stack ul li .element-wrap:hover .file-name,
+        .call-stack ul li .code-wrap .lines-item:hover {
+            color: #086EB6;
         }
 
         .call-stack ul li.application .element-wrap {
             border-bottom: 1px solid #D0D0D0;
-        }
-
-        .call-stack ul li .element-wrap:hover {
-            background-color: #edf9ff;
         }
 
         .call-stack ul li a {
@@ -255,7 +247,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
         .call-stack ul li .error-line,
         .call-stack ul li .hover-line {
-            background-color: #ffebeb;
+            background-color: #FFEBEB;
             position: absolute;
             width: 100%;
             z-index: 100;
@@ -268,7 +260,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
         .call-stack ul li .hover-line.hover,
         .call-stack ul li .hover-line:hover {
-            background: #edf9ff !important;
+            background: #EDF9FF !important;
         }
 
         .call-stack ul li .code {
@@ -464,8 +456,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         }
 
         .dark-theme .call-stack ul li .hover-line.hover,
-        .dark-theme .call-stack ul li .hover-line:hover,
-        .dark-theme .call-stack ul li .element-wrap:hover {
+        .dark-theme .call-stack ul li .hover-line:hover {
             background: #3b3b3b !important;
         }
 
@@ -476,6 +467,11 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         .dark-theme .element-wrap,
         .dark-theme .element-wrap .file-name {
             color: #FFFFFF !important;
+        }
+
+        .dark-theme .element-wrap:hover .file-name,
+        .dark-theme .call-stack ul li .code-wrap .lines-item:hover {
+            color: #9CDCFE !important;
         }
 
         .dark-theme header .tools a:hover svg path,
@@ -555,6 +551,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         .dark-theme .hljs-addition {
             color: #76c490;
         }
+        /* end dark-theme */
     </style>
 </head>
 <body class="<?= $theme; ?>">
@@ -605,7 +602,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
                 <div class="exception-class">
                     <?php if ($throwable instanceof FriendlyExceptionInterface): ?>
                         <span><?= $this->htmlEncode($throwable->getName())?></span>
-                        <span> &mdash; </span>
+                        &mdash;
                         <?= $this->addTypeLinks(get_class($throwable)) ?>
                     <?php else: ?>
                         <span><?= $this->addTypeLinks(get_class($throwable)) ?></span>
