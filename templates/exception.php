@@ -456,7 +456,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
         .dark-theme .call-stack ul li .hover-line.hover,
         .dark-theme .call-stack ul li .hover-line:hover {
-            background: #3b3b3b !important;
+            background: #292929 !important;
         }
 
         .dark-theme .element-wrap {
