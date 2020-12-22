@@ -634,7 +634,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         ?>
         <?php if ($curlInfo !== 'curl'): ?>
         <div class="request">
-            <?= $this->renderCurl() ?>
+            <?= $curlInfo ?>
         </div>
         <?php endif ?>
         <div class="footer">
