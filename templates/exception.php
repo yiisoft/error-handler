@@ -198,11 +198,10 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         .call-stack ul li,
         .request {
             border: 2px solid #D0D0D0;
-            box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.05);
             background: #fff;
             margin-bottom: 20px;
             border-radius: 3px;
-            box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.05);
         }
 
         .call-stack ul li .element-wrap {
@@ -414,16 +413,16 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         /* start dark-theme */
         .dark-theme {
             background: rgba(46,46,46, 0.9);
-            color: #FFFFFF;
+            color: #fff;
         }
 
         .dark-theme header {
-            background: #2E2E2E;
+            background: #2e2e2e;
         }
 
         .dark-theme .exception-card {
-            background: #222222;
-            border: 3px solid #591E15;
+            background: #222;
+            border: 3px solid #591e15;
         }
 
         .dark-theme .exception-class,
@@ -435,7 +434,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         .dark-theme .exception-class span a,
         .dark-theme .previous .arrow,
         .dark-theme .previous h2 span {
-            color: #FFFFFF;
+            color: #fff;
         }
 
         .dark-theme .exception-message,
@@ -446,13 +445,13 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
         .dark-theme .call-stack ul li,
         .dark-theme .request {
-            background: #1E1E1E;
+            background: #1e1e1e;
             border: 2px solid transparent;
-            box-shadow: 0px 13px 20px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 13px 20px rgba(0, 0, 0, 0.25);
         }
 
         .dark-theme .call-stack ul li .error-line {
-            background-color: #422C2C;
+            background-color: #422c2c;
         }
 
         .dark-theme .call-stack ul li .hover-line.hover,
@@ -466,12 +465,12 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
         .dark-theme .element-wrap,
         .dark-theme .element-wrap .file-name {
-            color: #FFFFFF !important;
+            color: #fff !important;
         }
 
         .dark-theme .element-wrap:hover .file-name,
         .dark-theme .call-stack ul li .code-wrap .lines-item:hover {
-            color: #9CDCFE !important;
+            color: #9cdcfe !important;
         }
 
         .dark-theme header .tools a:hover svg path,
@@ -493,11 +492,11 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         }
 
         .dark-theme .hljs {
-            color: #ffffff;
+            color: #fff;
         }
 
         .dark-theme .hljs-comment {
-            color: #999999;
+            color: #999;
         }
 
         .dark-theme .hljs-keyword,
@@ -513,7 +512,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         }
 
         .dark-theme .hljs-attribute {
-            color: v#c59bc1;
+            color: #c59bc1;
         }
 
         .dark-theme .hljs-name,
