@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Yiisoft\ErrorHandler\ExceptionResponder;
-use Yiisoft\ErrorHandler\HtmlRenderer;
+use Yiisoft\ErrorHandler\Middleware\ExceptionResponder;
+use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
 /**

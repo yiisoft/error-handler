@@ -7,9 +7,9 @@ namespace Yiisoft\ErrorHandler\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
-use Yiisoft\ErrorHandler\HtmlRenderer;
+use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 
-class HtmlRendererTest extends TestCase
+final class HtmlRendererTest extends TestCase
 {
     private const CUSTOM_TEMPLATES = [
         'exception' => __DIR__ . '/test-template-verbose.php',

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Di\Container;
-use Yiisoft\ErrorHandler\ErrorCatcher;
+use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\Http\Header;
 

@@ -2,10 +2,51 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\ErrorHandler;
+namespace Yiisoft\ErrorHandler\Renderer;
 
 use Alexkart\CurlBuilder\Command;
+use ReflectionClass;
+use RuntimeException;
+use Throwable;
+use Yiisoft\ErrorHandler\Info;
+use Yiisoft\ErrorHandler\ThrowableRenderer;
 
+use function array_values;
+use function dirname;
+use function extract;
+use function file;
+use function file_exists;
+use function func_get_arg;
+use function get_class;
+use function htmlspecialchars;
+use function implode;
+use function is_array;
+use function is_bool;
+use function is_object;
+use function is_resource;
+use function is_string;
+use function ksort;
+use function mb_strlen;
+use function mb_substr;
+use function ob_clean;
+use function ob_get_clean;
+use function ob_get_level;
+use function ob_end_clean;
+use function ob_implicit_flush;
+use function ob_start;
+use function preg_match;
+use function realpath;
+use function rtrim;
+use function str_replace;
+use function strncmp;
+use function stripos;
+use function strpos;
+use function strtolower;
+use function substr_compare;
+
+/**
+ * Formats exception into HTML string.
+ */
 final class HtmlRenderer extends ThrowableRenderer
 {
     private int $maxSourceLines = 19;
@@ -46,14 +87,14 @@ final class HtmlRenderer extends ThrowableRenderer
         return $new;
     }
 
-    public function render(\Throwable $t): string
+    public function render(Throwable $t): string
     {
         return $this->renderTemplate($this->errorTemplate, [
             'throwable' => $t,
         ]);
     }
 
-    public function renderVerbose(\Throwable $t): string
+    public function renderVerbose(Throwable $t): string
     {
         return $this->renderTemplate($this->exceptionTemplate, [
             'throwable' => $t,
@@ -68,7 +109,7 @@ final class HtmlRenderer extends ThrowableRenderer
     private function renderTemplate(string $path, array $params): string
     {
         if (!file_exists($path)) {
-            throw new \RuntimeException("Template not found at $path");
+            throw new RuntimeException("Template not found at $path");
         }
 
         $renderer = function (): void {
@@ -79,10 +120,11 @@ final class HtmlRenderer extends ThrowableRenderer
         $obInitialLevel = ob_get_level();
         ob_start();
         PHP_VERSION_ID >= 80000 ? ob_implicit_flush(false) : ob_implicit_flush(0);
+
         try {
             $renderer->bindTo($this)($path, $params);
             return ob_get_clean();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             while (ob_get_level() > $obInitialLevel) {
                 if (!@ob_end_clean()) {
                     ob_clean();
@@ -95,19 +137,19 @@ final class HtmlRenderer extends ThrowableRenderer
     /**
      * Renders the previous exception stack for a given Exception.
      *
-     * @param \Throwable $t the exception whose precursors should be rendered.
+     * @param Throwable $t the exception whose precursors should be rendered.
      *
-     * @throws \Throwable
+     * @throws Throwable
      *
-     * @return string HTML content of the rendered previous exceptions.
-     * Empty string if there are none.
+     * @return string HTML content of the rendered previous exceptions. Empty string if there are none.
      */
-    public function renderPreviousExceptions(\Throwable $t): string
+    public function renderPreviousExceptions(Throwable $t): string
     {
         if (($previous = $t->getPrevious()) !== null) {
             $templatePath = $this->templatePath . '/previousException.php';
             return $this->renderTemplate($templatePath, ['throwable' => $previous]);
         }
+
         return '';
     }
 
@@ -121,7 +163,7 @@ final class HtmlRenderer extends ThrowableRenderer
      * @param array $args array of method arguments.
      * @param int $index number of the call stack element.
      *
-     * @throws \Throwable
+     * @throws Throwable
      *
      * @return string HTML content of the rendered call stack element.
      */
@@ -129,6 +171,7 @@ final class HtmlRenderer extends ThrowableRenderer
     {
         $lines = [];
         $begin = $end = 0;
+
         if ($file !== null && $line !== null) {
             $line--; // adjust line number from one-based to zero-based
             $lines = @file($file);
@@ -139,7 +182,9 @@ final class HtmlRenderer extends ThrowableRenderer
             $begin = $line - $half > 0 ? $line - $half : 0;
             $end = $line + $half < $lineCount ? $line + $half : $lineCount - 1;
         }
+
         $templatePath = $this->templatePath . '/callStackItem.php';
+
         return $this->renderTemplate($templatePath, [
             'file' => $file,
             'line' => $line,
@@ -156,16 +201,17 @@ final class HtmlRenderer extends ThrowableRenderer
     /**
      * Renders call stack.
      *
-     * @param \Throwable $t exception to get call stack from
+     * @param Throwable $t exception to get call stack from
      *
-     * @throws \Throwable
+     * @throws Throwable
      *
      * @return string HTML content of the rendered call stack.
      */
-    public function renderCallStack(\Throwable $t): string
+    public function renderCallStack(Throwable $t): string
     {
         $out = '<ul>';
         $out .= $this->renderCallStackItem($t->getFile(), $t->getLine(), null, null, [], 1);
+
         for ($i = 0, $trace = $t->getTrace(), $length = count($trace); $i < $length; ++$i) {
             $file = !empty($trace[$i]['file']) ? $trace[$i]['file'] : null;
             $line = !empty($trace[$i]['line']) ? $trace[$i]['line'] : null;
@@ -177,6 +223,7 @@ final class HtmlRenderer extends ThrowableRenderer
             $args = !empty($trace[$i]['args']) ? $trace[$i]['args'] : [];
             $out .= $this->renderCallStackItem($file, $line, $class, $function, $args, $i + 2);
         }
+
         $out .= '</ul>';
         return $out;
     }
@@ -190,7 +237,7 @@ final class HtmlRenderer extends ThrowableRenderer
      */
     public function isCoreFile(?string $file): bool
     {
-        return $file === null || strpos((string)realpath($file), Info::frameworkPath() . DIRECTORY_SEPARATOR) === 0;
+        return $file === null || strpos((string) realpath($file), Info::frameworkPath() . DIRECTORY_SEPARATOR) === 0;
     }
 
     /**
@@ -211,27 +258,32 @@ final class HtmlRenderer extends ThrowableRenderer
             $method = null;
             $text = $title ? $this->htmlEncode($title) : $this->htmlEncode($class);
         }
+
         $url = null;
         $shouldGenerateLink = true;
+
         if ($method !== null && substr_compare($method, '{closure}', -9) !== 0) {
             try {
-                $reflection = new \ReflectionClass($class);
+                $reflection = new ReflectionClass($class);
                 if ($reflection->hasMethod($method)) {
                     $reflectionMethod = $reflection->getMethod($method);
                     $shouldGenerateLink = $reflectionMethod->isPublic() || $reflectionMethod->isProtected();
                 } else {
                     $shouldGenerateLink = false;
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $shouldGenerateLink = false;
             }
         }
+
         if ($shouldGenerateLink) {
             $url = $this->getTypeUrl($class, $method);
         }
+
         if ($url === null) {
             return $text;
         }
+
         return '<a href="' . $url . '" target="_blank">' . $text . '</a>';
     }
 
@@ -250,11 +302,14 @@ final class HtmlRenderer extends ThrowableRenderer
         if (strncmp($class, 'Yiisoft\\', 8) !== 0) {
             return null;
         }
+
         $page = $this->htmlEncode(strtolower(str_replace('\\', '-', $class)));
         $url = "http://www.yiiframework.com/doc-3.0/$page.html";
+
         if ($method) {
             $url .= "#$method()-detail";
         }
+
         return $url;
     }
 
@@ -269,8 +324,10 @@ final class HtmlRenderer extends ThrowableRenderer
     {
         $count = 0;
         $isAssoc = $args !== array_values($args);
+
         foreach ($args as $key => $value) {
             $count++;
+
             if ($count >= 5) {
                 if ($count > 5) {
                     unset($args[$key]);
@@ -279,6 +336,7 @@ final class HtmlRenderer extends ThrowableRenderer
                 }
                 continue;
             }
+
             if (is_object($value)) {
                 $args[$key] = '<span class="title">' . $this->htmlEncode(get_class($value)) . '</span>';
             } elseif (is_bool($value)) {
@@ -301,6 +359,7 @@ final class HtmlRenderer extends ThrowableRenderer
             } else {
                 $args[$key] = '<span class="number">' . $value . '</span>';
             }
+
             if (is_string($key)) {
                 $args[$key] = '<span class="string">\'' . $this->htmlEncode($key) . "'</span> => $args[$key]";
             } elseif ($isAssoc) {
@@ -345,7 +404,7 @@ final class HtmlRenderer extends ThrowableRenderer
     {
         try {
             $output = (new Command())->setRequest($this->request)->build();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $output = 'Error generating curl command: ' . $e->getMessage();
         }
 
@@ -364,8 +423,8 @@ final class HtmlRenderer extends ThrowableRenderer
             return '';
         }
 
-
         $serverSoftware = $this->request->getServerParams()['SERVER_SOFTWARE'] ?? null;
+
         if ($serverSoftware === null) {
             return '';
         }
@@ -386,6 +445,7 @@ final class HtmlRenderer extends ThrowableRenderer
                 }
             }
         }
+
         return '';
     }
 

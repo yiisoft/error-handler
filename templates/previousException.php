@@ -1,6 +1,6 @@
 <?php
 /* @var $throwable \Throwable */
-/* @var $this \Yiisoft\ErrorHandler\HtmlRenderer */
+/* @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer */
 ?>
 <div class="previous">
     <span class="arrow">&crarr;</span>

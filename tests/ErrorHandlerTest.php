@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
-class ErrorHandlerTest extends TestCase
+final class ErrorHandlerTest extends TestCase
 {
     private ErrorHandler $errorHandler;
     private LoggerInterface $loggerMock;

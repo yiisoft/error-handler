@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\ErrorHandler;
+namespace Yiisoft\ErrorHandler\Middleware;
 
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -15,7 +15,7 @@ use Yiisoft\Injector\Injector;
 use function is_int;
 use function is_callable;
 
-class ExceptionResponder implements MiddlewareInterface
+final class ExceptionResponder implements MiddlewareInterface
 {
     private array $exceptionMap;
     private ResponseFactoryInterface $responseFactory;

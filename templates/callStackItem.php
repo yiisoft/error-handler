@@ -8,7 +8,7 @@
 /* @var $begin int */
 /* @var $end int */
 /* @var $args array */
-/* @var $this \Yiisoft\ErrorHandler\HtmlRenderer */
+/* @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer */
 
 $html = <<<HTML
 IDE

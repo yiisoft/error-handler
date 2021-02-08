@@ -4,6 +4,30 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler;
 
+use InvalidArgumentException;
+
+use function array_shift;
+use function asort;
+use function count;
+use function explode;
+use function implode;
+use function is_array;
+use function is_string;
+use function mb_strtolower;
+use function mb_strpos;
+use function mb_substr;
+use function preg_match;
+use function preg_split;
+use function preg_replace;
+use function preg_replace_callback;
+use function reset;
+use function rtrim;
+use function strtolower;
+use function strpos;
+use function substr;
+use function trim;
+use function usort;
+
 final class HeaderHelper
 {
     /**
@@ -45,14 +69,18 @@ final class HeaderHelper
     public static function getValueAndParameters(string $headerValue, bool $lowerCaseValue = true, bool $lowerCaseParameter = true, bool $lowerCaseParameterValue = true): array
     {
         $headerValue = trim($headerValue);
+
         if ($headerValue === '') {
             return [];
         }
+
         $parts = explode(';', $headerValue, 2);
         $output = [$lowerCaseValue ? strtolower($parts[0]) : $parts[0]];
+
         if (count($parts) === 1) {
             return $output;
         }
+
         return $output + self::getParameters($parts[1], $lowerCaseParameter, $lowerCaseParameterValue);
     }
 
@@ -64,13 +92,17 @@ final class HeaderHelper
     public static function getParameters(string $headerValue, bool $lowerCaseParameter = true, bool $lowerCaseValue = true): array
     {
         $headerValue = trim($headerValue);
+
         if ($headerValue === '') {
             return [];
         }
+
         if (rtrim($headerValue, ';') !== $headerValue) {
-            throw new \InvalidArgumentException('Cannot end with a semicolon.');
+            throw new InvalidArgumentException('Cannot end with a semicolon.');
         }
+
         $output = [];
+
         do {
             /** @psalm-suppress InvalidArgument */
             $headerValue = preg_replace_callback(
@@ -93,9 +125,10 @@ final class HeaderHelper
                 $count
             );
             if ($count !== 1) {
-                throw new \InvalidArgumentException('Invalid input: ' . $headerValue);
+                throw new InvalidArgumentException('Invalid input: ' . $headerValue);
             }
         } while ($headerValue !== '');
+
         return $output;
     }
 
@@ -111,7 +144,7 @@ final class HeaderHelper
     public static function getSortedValueAndParameters($values, bool $lowerCaseValue = true, bool $lowerCaseParameter = true, bool $lowerCaseParameterValue = true): array
     {
         if (!is_array($values) && !is_string($values)) {
-            throw new \InvalidArgumentException('Values are neither array nor string.');
+            throw new InvalidArgumentException('Values are neither array nor string.');
         }
         $list = [];
         foreach ((array)$values as $headerValue) {
@@ -128,7 +161,7 @@ final class HeaderHelper
 
             // min 0.000 max 1.000, max 3 digits, without digits allowed
             if (is_string($q) && preg_match('/^(?:0(?:\.\d{1,3})?|1(?:\.0{1,3})?)$/', $q) === 0) {
-                throw new \InvalidArgumentException('Invalid q factor');
+                throw new InvalidArgumentException('Invalid q factor');
             }
             $parse['q'] = (float)$q;
             unset($parse['Q']);

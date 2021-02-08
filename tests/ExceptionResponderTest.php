@@ -14,7 +14,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Yiisoft\Di\Container;
-use Yiisoft\ErrorHandler\ExceptionResponder;
+use Yiisoft\ErrorHandler\Middleware\ExceptionResponder;
 use Yiisoft\Http\Method;
 use Yiisoft\Http\Status;
 use Yiisoft\Injector\Injector;

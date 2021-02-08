@@ -9,7 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class MockRequestHandler implements RequestHandlerInterface
+final class MockRequestHandler implements RequestHandlerInterface
 {
     public ServerRequestInterface $processedRequest;
     private int $responseStatus;
