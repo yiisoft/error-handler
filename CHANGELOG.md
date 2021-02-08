@@ -1,5 +1,3 @@
-# _____ Change Log
+# Yii Error Handling Library Change Log
 
-## 1.0.0 under development
-
-- Initial release.
+1.0.0 under development
