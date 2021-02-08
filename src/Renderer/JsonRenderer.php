@@ -4,22 +4,25 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Renderer;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\ThrowableRenderer;
+
+use function json_encode;
 
 /**
  * Formats exception into JSON string.
  */
 final class JsonRenderer extends ThrowableRenderer
 {
-    public function render(Throwable $t): string
+    public function render(Throwable $t, ServerRequestInterface $request = null): string
     {
         return json_encode([
             'message' => 'An internal server error occurred',
         ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
-    public function renderVerbose(Throwable $t): string
+    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): string
     {
         return json_encode([
             'type' => get_class($t),

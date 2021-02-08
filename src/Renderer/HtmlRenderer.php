@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Yiisoft\ErrorHandler\Renderer;
 
 use Alexkart\CurlBuilder\Command;
+use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
 use RuntimeException;
 use Throwable;
-use Yiisoft\ErrorHandler\Info;
 use Yiisoft\ErrorHandler\ThrowableRenderer;
 
 use function array_values;
@@ -35,12 +35,10 @@ use function ob_end_clean;
 use function ob_implicit_flush;
 use function ob_start;
 use function preg_match;
-use function realpath;
 use function rtrim;
 use function str_replace;
 use function strncmp;
 use function stripos;
-use function strpos;
 use function strtolower;
 use function substr_compare;
 
@@ -61,7 +59,7 @@ final class HtmlRenderer extends ThrowableRenderer
 
     public function __construct(array $templates = [])
     {
-        $this->templatePath = $templates['path'] ?? dirname(__DIR__) . '/templates';
+        $this->templatePath = $templates['path'] ?? dirname(__DIR__, 2) . '/templates';
         $this->errorTemplate = $templates['error'] ?? $this->templatePath . '/error.php';
         $this->exceptionTemplate = $templates['exception'] ?? $this->templatePath . '/exception.php';
     }
@@ -87,16 +85,18 @@ final class HtmlRenderer extends ThrowableRenderer
         return $new;
     }
 
-    public function render(Throwable $t): string
+    public function render(Throwable $t, ServerRequestInterface $request = null): string
     {
         return $this->renderTemplate($this->errorTemplate, [
+            'request' => $request,
             'throwable' => $t,
         ]);
     }
 
-    public function renderVerbose(Throwable $t): string
+    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): string
     {
         return $this->renderTemplate($this->exceptionTemplate, [
+            'request' => $request,
             'throwable' => $t,
         ]);
     }
@@ -143,7 +143,7 @@ final class HtmlRenderer extends ThrowableRenderer
      *
      * @return string HTML content of the rendered previous exceptions. Empty string if there are none.
      */
-    public function renderPreviousExceptions(Throwable $t): string
+    private function renderPreviousExceptions(Throwable $t): string
     {
         if (($previous = $t->getPrevious()) !== null) {
             $templatePath = $this->templatePath . '/previousException.php';
@@ -151,6 +151,36 @@ final class HtmlRenderer extends ThrowableRenderer
         }
 
         return '';
+    }
+
+    /**
+     * Renders call stack.
+     *
+     * @param Throwable $t exception to get call stack from
+     *
+     * @throws Throwable
+     *
+     * @return string HTML content of the rendered call stack.
+     */
+    private function renderCallStack(Throwable $t): string
+    {
+        $out = '<ul>';
+        $out .= $this->renderCallStackItem($t->getFile(), $t->getLine(), null, null, [], 1);
+
+        for ($i = 0, $trace = $t->getTrace(), $length = count($trace); $i < $length; ++$i) {
+            $file = !empty($trace[$i]['file']) ? $trace[$i]['file'] : null;
+            $line = !empty($trace[$i]['line']) ? $trace[$i]['line'] : null;
+            $class = !empty($trace[$i]['class']) ? $trace[$i]['class'] : null;
+            $function = null;
+            if (!empty($trace[$i]['function']) && $trace[$i]['function'] !== 'unknown') {
+                $function = $trace[$i]['function'];
+            }
+            $args = !empty($trace[$i]['args']) ? $trace[$i]['args'] : [];
+            $out .= $this->renderCallStackItem($file, $line, $class, $function, $args, $i + 2);
+        }
+
+        $out .= '</ul>';
+        return $out;
     }
 
     /**
@@ -196,48 +226,6 @@ final class HtmlRenderer extends ThrowableRenderer
             'end' => $end,
             'args' => $args,
         ]);
-    }
-
-    /**
-     * Renders call stack.
-     *
-     * @param Throwable $t exception to get call stack from
-     *
-     * @throws Throwable
-     *
-     * @return string HTML content of the rendered call stack.
-     */
-    public function renderCallStack(Throwable $t): string
-    {
-        $out = '<ul>';
-        $out .= $this->renderCallStackItem($t->getFile(), $t->getLine(), null, null, [], 1);
-
-        for ($i = 0, $trace = $t->getTrace(), $length = count($trace); $i < $length; ++$i) {
-            $file = !empty($trace[$i]['file']) ? $trace[$i]['file'] : null;
-            $line = !empty($trace[$i]['line']) ? $trace[$i]['line'] : null;
-            $class = !empty($trace[$i]['class']) ? $trace[$i]['class'] : null;
-            $function = null;
-            if (!empty($trace[$i]['function']) && $trace[$i]['function'] !== 'unknown') {
-                $function = $trace[$i]['function'];
-            }
-            $args = !empty($trace[$i]['args']) ? $trace[$i]['args'] : [];
-            $out .= $this->renderCallStackItem($file, $line, $class, $function, $args, $i + 2);
-        }
-
-        $out .= '</ul>';
-        return $out;
-    }
-
-    /**
-     * Determines whether given name of the file belongs to the framework.
-     *
-     * @param string|null $file name to be checked.
-     *
-     * @return bool whether given name of the file belongs to the framework.
-     */
-    public function isCoreFile(?string $file): bool
-    {
-        return $file === null || strpos((string) realpath($file), Info::frameworkPath() . DIRECTORY_SEPARATOR) === 0;
     }
 
     /**
@@ -320,7 +308,7 @@ final class HtmlRenderer extends ThrowableRenderer
      *
      * @return string string representation of the arguments array
      */
-    public function argumentsToString(array $args): string
+    private function argumentsToString(array $args): string
     {
         $count = 0;
         $isAssoc = $args !== array_values($args);
@@ -374,15 +362,12 @@ final class HtmlRenderer extends ThrowableRenderer
     /**
      * Renders the information about request.
      *
+     * @param ServerRequestInterface $request
+     *
      * @return string the rendering result
      */
-    public function renderRequest(): string
+    private function renderRequest(ServerRequestInterface $request): string
     {
-        if ($this->request === null) {
-            return '';
-        }
-
-        $request = $this->request;
         $output = $request->getMethod() . ' ' . $request->getUri() . "\n";
 
         foreach ($request->getHeaders() as $name => $values) {
@@ -400,10 +385,10 @@ final class HtmlRenderer extends ThrowableRenderer
         return '<pre>' . $this->htmlEncode(rtrim($output, "\n")) . '</pre>';
     }
 
-    public function renderCurl(): string
+    private function renderCurl(ServerRequestInterface $request): string
     {
         try {
-            $output = (new Command())->setRequest($this->request)->build();
+            $output = (new Command())->setRequest($request)->build();
         } catch (Throwable $e) {
             $output = 'Error generating curl command: ' . $e->getMessage();
         }
@@ -415,15 +400,12 @@ final class HtmlRenderer extends ThrowableRenderer
      * Creates string containing HTML link which refers to the home page of determined web-server software
      * and its full name.
      *
+     * @param ServerRequestInterface $request
      * @return string server software information hyperlink.
      */
-    public function createServerInformationLink(): string
+    private function createServerInformationLink(ServerRequestInterface $request): string
     {
-        if ($this->request === null) {
-            return '';
-        }
-
-        $serverSoftware = $this->request->getServerParams()['SERVER_SOFTWARE'] ?? null;
+        $serverSoftware = $request->getServerParams()['SERVER_SOFTWARE'] ?? null;
 
         if ($serverSoftware === null) {
             return '';
@@ -447,16 +429,5 @@ final class HtmlRenderer extends ThrowableRenderer
         }
 
         return '';
-    }
-
-    /**
-     * Creates string containing HTML link which refers to the page with the current version
-     * of the framework and version number text.
-     *
-     * @return string framework version information hyperlink.
-     */
-    public function createFrameworkVersionLink(): string
-    {
-        return '<a href="http://github.com/yiisoft/app/" target="_blank">' . $this->htmlEncode(Info::frameworkVersion()) . '</a>';
     }
 }

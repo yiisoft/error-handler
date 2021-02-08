@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
@@ -24,10 +23,8 @@ use function set_error_handler;
 use function set_exception_handler;
 use function str_repeat;
 
-final class ErrorHandler implements LoggerAwareInterface
+final class ErrorHandler
 {
-    use LoggerAwareTrait;
-
     /**
      * @var int the size of the reserved memory. A portion of memory is pre-allocated so that
      * when an out-of-memory issue occurs, the error handler is able to handle the error with
@@ -36,8 +33,9 @@ final class ErrorHandler implements LoggerAwareInterface
      */
     private int $memoryReserveSize = 262_144;
     private string $memoryReserve = '';
-    private bool $exposeDetails = true;
+    private bool $exposeDetails = false;
 
+    private LoggerInterface $logger;
     private ThrowableRendererInterface $defaultRenderer;
 
     public function __construct(LoggerInterface $logger, ThrowableRendererInterface $defaultRenderer)
@@ -73,18 +71,22 @@ final class ErrorHandler implements LoggerAwareInterface
      *
      * @param Throwable $t
      * @param ThrowableRendererInterface|null $renderer
+     * @param ServerRequestInterface|null $request
      *
      * @return string
      */
-    public function handleCaughtThrowable(Throwable $t, ThrowableRendererInterface $renderer = null): string
-    {
+    public function handleCaughtThrowable(
+        Throwable $t,
+        ThrowableRendererInterface $renderer = null,
+        ServerRequestInterface $request = null
+    ): string {
         if ($renderer === null) {
             $renderer = $this->defaultRenderer;
         }
 
         try {
-            $this->log($t);
-            return $this->exposeDetails ? $renderer->renderVerbose($t) : $renderer->render($t);
+            $this->log($t, $request);
+            return $this->exposeDetails ? $renderer->renderVerbose($t, $request) : $renderer->render($t, $request);
         } catch (Throwable $t) {
             return (string) $t;
         }
@@ -98,7 +100,9 @@ final class ErrorHandler implements LoggerAwareInterface
     public function handleThrowable(Throwable $t): void
     {
         // disable error capturing to avoid recursive errors while handling exceptions
+        $exposeDetails = $this->exposeDetails;
         $this->unregister();
+        $this->exposeDetails = $exposeDetails;
 
         // set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent
         http_response_code(Status::INTERNAL_SERVER_ERROR);
@@ -109,10 +113,14 @@ final class ErrorHandler implements LoggerAwareInterface
 
     /**
      * Register this error handler.
+     *
+     * @param bool $exposeDetails
      */
-    public function register(): void
+    public function register(bool $exposeDetails = false): void
     {
+        $this->exposeDetails = $exposeDetails;
         $this->disableDisplayErrors();
+
         set_exception_handler([$this, 'handleThrowable']);
         /** @psalm-suppress InvalidArgument */
         set_error_handler([$this, 'handleError']);
@@ -124,13 +132,6 @@ final class ErrorHandler implements LoggerAwareInterface
         register_shutdown_function([$this, 'handleFatalError']);
     }
 
-    private function disableDisplayErrors(): void
-    {
-        if (function_exists('ini_set')) {
-            ini_set('display_errors', '0');
-        }
-    }
-
     /**
      * Unregisters this error handler by restoring the PHP error and exception handlers.
      */
@@ -138,6 +139,7 @@ final class ErrorHandler implements LoggerAwareInterface
     {
         restore_error_handler();
         restore_exception_handler();
+        $this->exposeDetails = false;
     }
 
     public function handleFatalError(): void
@@ -159,34 +161,20 @@ final class ErrorHandler implements LoggerAwareInterface
         }
     }
 
-    private function log(Throwable $t/*, ServerRequestInterface $request*/): void
+    private function log(Throwable $t, ServerRequestInterface $request = null): void
     {
         $renderer = new PlainTextRenderer();
+
         $this->logger->error(
-            $renderer->renderVerbose($t),
-            [
-                'throwable' => $t,
-                //'request' => $request,
-            ]
+            $renderer->renderVerbose($t, $request),
+            ['throwable' => $t]
         );
     }
 
-    public function withExposedDetails(): self
+    private function disableDisplayErrors(): void
     {
-        $new = clone $this;
-        $new->exposeDetails = true;
-        return $new;
-    }
-
-    public function withoutExposedDetails(): self
-    {
-        $new = clone $this;
-        $new->exposeDetails = false;
-        return $new;
-    }
-
-    public function setRenderer(ThrowableRendererInterface $defaultRenderer): void
-    {
-        $this->defaultRenderer = $defaultRenderer;
+        if (function_exists('ini_set')) {
+            ini_set('display_errors', '0');
+        }
     }
 }

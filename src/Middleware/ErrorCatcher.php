@@ -105,14 +105,20 @@ final class ErrorCatcher implements MiddlewareInterface
         return $new;
     }
 
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        try {
+            return $handler->handle($request);
+        } catch (Throwable $e) {
+            return $this->handleException($e, $request);
+        }
+    }
+
     private function handleException(Throwable $e, ServerRequestInterface $request): ResponseInterface
     {
         $contentType = $this->contentType ?? $this->getContentType($request);
         $renderer = $this->getRenderer(strtolower($contentType));
-        if ($renderer !== null) {
-            $renderer->setRequest($request);
-        }
-        $content = $this->errorHandler->handleCaughtThrowable($e, $renderer);
+        $content = $this->errorHandler->handleCaughtThrowable($e, $renderer, $request);
         $response = $this->responseFactory->createResponse(Status::INTERNAL_SERVER_ERROR)
             ->withHeader(Header::CONTENT_TYPE, $contentType);
         $response->getBody()->write($content);
@@ -139,15 +145,6 @@ final class ErrorCatcher implements MiddlewareInterface
             // The Accept header contains an invalid q factor
         }
         return '*/*';
-    }
-
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-    {
-        try {
-            return $handler->handle($request);
-        } catch (Throwable $e) {
-            return $this->handleException($e, $request);
-        }
     }
 
     /**

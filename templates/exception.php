@@ -1,11 +1,13 @@
 <?php
 /* @var $throwable \Throwable */
+/* @var $request \Psr\Http\Message\ServerRequestInterface|null */
 /* @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer */
 
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
-$theme = $_COOKIE['yii-exception-theme'] ?? '';
-
+if ($request && isset($request->getCookieParams()['yii-exception-theme'])) {
+    $theme = $request->getCookieParams()['yii-exception-theme'];
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -553,7 +555,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         /* end dark-theme */
     </style>
 </head>
-<body class="<?= $theme ?>">
+<body<?= !empty($theme) ? "class=\"{$this->htmlEncode($theme)}\"" : '' ?>>
     <header>
         <div class="tools">
             <a href="#" title="Dark Mode" id="dark-mode">
@@ -621,18 +623,12 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         <div class="call-stack">
             <?= $this->renderCallStack($throwable) ?>
         </div>
-        <?php
-            $requestInfo = $this->renderRequest();
-        ?>
-        <?php if ($requestInfo !== ''): ?>
+        <?php if ($request && ($requestInfo = $this->renderRequest($request)) !== ''): ?>
         <div class="request">
             <?= $requestInfo ?>
         </div>
         <?php endif ?>
-        <?php
-            $curlInfo = $this->renderCurl();
-        ?>
-        <?php if ($curlInfo !== 'curl'): ?>
+        <?php if ($request && ($curlInfo = $this->renderCurl($request)) !== 'curl'): ?>
         <div class="request">
             <?= $curlInfo ?>
         </div>
@@ -642,11 +638,13 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
                 <p class="timestamp">
                     <?= date('Y-m-d, H:i:s') ?>
                 </p>
+                <?php if ($request): ?>
                 <p>
-                    <?= $this->createServerInformationLink() ?>
+                    <?= $this->createServerInformationLink($request) ?>
                 </p>
-                <p><a href="https://www.yiiframework.com/">Yii Framework</a> /
-                    <?= $this->createFrameworkVersionLink() ?>
+                <?php endif ?>
+                <p>
+                    <a href="https://www.yiiframework.com/">Yii Framework</a>
                 </p>
             </div>
 

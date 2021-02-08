@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
@@ -29,11 +30,10 @@ final class HtmlRendererTest extends TestCase
     public function testNonVerboseOutput(): void
     {
         $renderer = new HtmlRenderer(self::DEFAULT_TEMPLATES);
-        $request = $this->getServerRequestMock();
-        $renderer->setRequest($request);
         $exceptionMessage = 'exception-test-message';
-        $exception = new \RuntimeException($exceptionMessage);
-        $renderedOutput = $renderer->render($exception);
+        $exception = new RuntimeException($exceptionMessage);
+        $renderedOutput = $renderer->render($exception, $this->getServerRequestMock());
+
         $this->assertStringContainsString('<html', $renderedOutput);
         $this->assertStringNotContainsString(RuntimeException::class, $renderedOutput);
         $this->assertStringNotContainsString($exceptionMessage, $renderedOutput);
@@ -42,11 +42,10 @@ final class HtmlRendererTest extends TestCase
     public function testVerboseOutput(): void
     {
         $renderer = new HtmlRenderer(self::DEFAULT_TEMPLATES);
-        $request = $this->getServerRequestMock();
-        $renderer->setRequest($request);
         $exceptionMessage = 'exception-test-message';
-        $exception = new \RuntimeException($exceptionMessage);
-        $renderedOutput = $renderer->renderVerbose($exception);
+        $exception = new RuntimeException($exceptionMessage);
+        $renderedOutput = $renderer->renderVerbose($exception, $this->getServerRequestMock());
+
         $this->assertStringContainsString('<html', $renderedOutput);
         $this->assertStringContainsString(RuntimeException::class, $renderedOutput);
         $this->assertStringContainsString($exceptionMessage, $renderedOutput);
@@ -59,13 +58,11 @@ final class HtmlRendererTest extends TestCase
 
         $templates = $this->getTemplateConfigParamsForCustomTemplates();
         $renderer = new HtmlRenderer($templates);
-        $request = $this->getServerRequestMock();
-        $renderer->setRequest($request);
 
         $exceptionMessage = 'exception-test-message';
-        $exception = new \RuntimeException($exceptionMessage);
+        $exception = new RuntimeException($exceptionMessage);
 
-        $renderedOutput = $renderer->render($exception);
+        $renderedOutput = $renderer->render($exception, $this->getServerRequestMock());
         $this->assertStringContainsString("<html>$exceptionMessage</html>", $renderedOutput);
     }
 
@@ -76,13 +73,11 @@ final class HtmlRendererTest extends TestCase
 
         $templates = $this->getTemplateConfigParamsForCustomTemplates();
         $renderer = new HtmlRenderer($templates);
-        $request = $this->getServerRequestMock();
-        $renderer->setRequest($request);
 
         $exceptionMessage = 'exception-test-message';
-        $exception = new \RuntimeException($exceptionMessage);
+        $exception = new RuntimeException($exceptionMessage);
 
-        $renderedOutput = $renderer->renderVerbose($exception);
+        $renderedOutput = $renderer->renderVerbose($exception, $this->getServerRequestMock());
         $this->assertStringContainsString("<html>$exceptionMessage</html>", $renderedOutput);
     }
 
@@ -96,11 +91,10 @@ final class HtmlRendererTest extends TestCase
         $templates = array_merge(self::DEFAULT_TEMPLATES, $templates);
 
         $renderer = new HtmlRenderer($templates);
-        $request = $this->getServerRequestMock();
-        $renderer->setRequest($request);
-        $exception = new \Exception();
+        $exception = new Exception();
+
         $this->expectException(RuntimeException::class);
-        $renderer->render($exception);
+        $renderer->render($exception, $this->getServerRequestMock());
     }
 
     public function tearDown(): void

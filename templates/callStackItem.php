@@ -17,7 +17,7 @@ IDE
 </svg>
 HTML;
 ?>
-<li class="<?= ($index === 1 || !$this->isCoreFile($file)) ? 'application' : '' ?> call-stack-item"
+<li class="<?=!empty($lines) ? 'application' : '' ?> call-stack-item"
     data-line="<?= (int) ($line - $begin) ?>">
     <div class="element-wrap">
         <div class="flex-1">
