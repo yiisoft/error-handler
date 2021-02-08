@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\ErrorHandler\Tests;
 
 use DomainException;
+use HttpSoft\Message\ResponseFactory;
+use HttpSoft\Message\ServerRequestFactory;
 use InvalidArgumentException;
-use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -53,7 +54,7 @@ final class ExceptionResponderTest extends TestCase
     private function process(ExceptionResponder $middleware): ResponseInterface
     {
         return $middleware->process(
-            (new Psr17Factory())->createServerRequest(Method::GET, 'http://example.com'),
+            (new ServerRequestFactory())->createServerRequest(Method::GET, 'http://example.com'),
             new class() implements RequestHandlerInterface {
                 public function handle(ServerRequestInterface $request): ResponseInterface
                 {
@@ -67,10 +68,10 @@ final class ExceptionResponderTest extends TestCase
     {
         return new ExceptionResponder(
             $exceptionMap,
-            new Psr17Factory(),
+            new ResponseFactory(),
             new Injector(
                 new Container([
-                    ResponseFactoryInterface::class => Psr17Factory::class,
+                    ResponseFactoryInterface::class => ResponseFactory::class,
                 ]),
             ),
         );
