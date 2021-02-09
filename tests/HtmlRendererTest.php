@@ -12,24 +12,14 @@ use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 
 final class HtmlRendererTest extends TestCase
 {
-    private const CUSTOM_TEMPLATES = [
-        'exception' => __DIR__ . '/test-template-verbose.php',
-        'error' => __DIR__ . '/test-template-non-verbose.php',
-    ];
-
-    private const DEFAULT_TEMPLATES = [
-        'default' => [
-            'callStackItem',
-            'error',
-            'exception',
-            'previousException',
-        ],
-        'path' => __DIR__ . '/../templates',
+    private const CUSTOM_SETTING = [
+        'verboseTemplate' => __DIR__ . '/test-template-verbose.php',
+        'template' => __DIR__ . '/test-template-non-verbose.php',
     ];
 
     public function testNonVerboseOutput(): void
     {
-        $renderer = new HtmlRenderer(self::DEFAULT_TEMPLATES);
+        $renderer = new HtmlRenderer();
         $exceptionMessage = 'exception-test-message';
         $exception = new RuntimeException($exceptionMessage);
         $renderedOutput = $renderer->render($exception, $this->getServerRequestMock());
@@ -41,7 +31,7 @@ final class HtmlRendererTest extends TestCase
 
     public function testVerboseOutput(): void
     {
-        $renderer = new HtmlRenderer(self::DEFAULT_TEMPLATES);
+        $renderer = new HtmlRenderer();
         $exceptionMessage = 'exception-test-message';
         $exception = new RuntimeException($exceptionMessage);
         $renderedOutput = $renderer->renderVerbose($exception, $this->getServerRequestMock());
@@ -54,11 +44,9 @@ final class HtmlRendererTest extends TestCase
     public function testNonVerboseOutputWithCustomTemplate(): void
     {
         $templateFileContents = '<html><?php echo $throwable->getMessage();?></html>';
-        $this->createTestTemplate(self::CUSTOM_TEMPLATES['error'], $templateFileContents);
+        $this->createTestTemplate(self::CUSTOM_SETTING['template'], $templateFileContents);
 
-        $templates = $this->getTemplateConfigParamsForCustomTemplates();
-        $renderer = new HtmlRenderer($templates);
-
+        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
         $exceptionMessage = 'exception-test-message';
         $exception = new RuntimeException($exceptionMessage);
 
@@ -69,11 +57,9 @@ final class HtmlRendererTest extends TestCase
     public function testVerboseOutputWithCustomTemplate(): void
     {
         $templateFileContents = '<html><?php echo $throwable->getMessage();?></html>';
-        $this->createTestTemplate(self::CUSTOM_TEMPLATES['exception'], $templateFileContents);
+        $this->createTestTemplate(self::CUSTOM_SETTING['verboseTemplate'], $templateFileContents);
 
-        $templates = $this->getTemplateConfigParamsForCustomTemplates();
-        $renderer = new HtmlRenderer($templates);
-
+        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
         $exceptionMessage = 'exception-test-message';
         $exception = new RuntimeException($exceptionMessage);
 
@@ -83,14 +69,7 @@ final class HtmlRendererTest extends TestCase
 
     public function testRenderTemplateThrowsExceptionWhenTemplateFileNotExists(): void
     {
-        $exampleNonExistingFile = '_not_found_.php';
-
-        $templates = [
-            'error' => $exampleNonExistingFile,
-        ];
-        $templates = array_merge(self::DEFAULT_TEMPLATES, $templates);
-
-        $renderer = new HtmlRenderer($templates);
+        $renderer = new HtmlRenderer(['template' => '_not_found_.php']);
         $exception = new Exception();
 
         $this->expectException(RuntimeException::class);
@@ -100,7 +79,7 @@ final class HtmlRendererTest extends TestCase
     public function tearDown(): void
     {
         parent::tearDown();
-        foreach (self::CUSTOM_TEMPLATES as $template) {
+        foreach (self::CUSTOM_SETTING as $template) {
             if (file_exists($template)) {
                 $this->removeTestTemplate($template);
             }
@@ -131,11 +110,6 @@ final class HtmlRendererTest extends TestCase
             ->willReturn('GET');
 
         return $serverRequestMock;
-    }
-
-    private function getTemplateConfigParamsForCustomTemplates(): array
-    {
-        return array_merge(self::CUSTOM_TEMPLATES, self::DEFAULT_TEMPLATES);
     }
 
     private function createTestTemplate(string $path, string $templateContents): void

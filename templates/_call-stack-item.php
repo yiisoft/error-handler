@@ -2,40 +2,28 @@
 /* @var $file string|null */
 /* @var $line int|null */
 /* @var $class string|null */
-/* @var $method string|null */
+/* @var $function string|null */
 /* @var $index int */
 /* @var $lines string[] */
 /* @var $begin int */
 /* @var $end int */
 /* @var $args array */
 /* @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer */
-
-$html = <<<HTML
-IDE
-<svg class="icon icon--new-window" focusable="false" aria-hidden="true" width="16" height="16">
-    <use href="#new-window"></use>
-</svg>
-HTML;
 ?>
-<li class="<?=!empty($lines) ? 'application' : '' ?> call-stack-item"
-    data-line="<?= (int) ($line - $begin) ?>">
+<li class="<?=!empty($lines) ? 'application' : '' ?> call-stack-item" data-line="<?= (int) ($line - $begin) ?>">
     <div class="element-wrap">
         <div class="flex-1">
             <?php if ($file !== null): ?>
                 <span class="file-name">
-                    <?= sprintf('%d. %s', (int) $index, 'in ' . $this->htmlEncode($file))  ?>
+                    <?= "{$index}. in {$this->htmlEncode($file)}" ?>
                 </span>
             <?php endif ?>
 
-            <?php if ($this->traceLine !== '{html}') : ?>
-                <span> &ndash; </span>
-                <?= strtr($this->traceLine, ['{file}' => $file, '{line}' => $line + 1, '{html}' => $html]) ?>
-            <?php endif; ?>
-
-            <?php if ($method !== null) : ?>
-                <span>
-                    <?= $file !== null ? '&ndash;' : '' ?>
-                    <?= ($class !== null ? $this->addTypeLinks("$class::$method") : $this->htmlEncode($method)) . '(' . $this->argumentsToString($args) . ')' ?>
+            <?php if ($function !== null) : ?>
+                <span class="function-info">
+                    <?= $file === null ? "{$index}." : '&ndash;' ?>
+                    <?php $function = $class === null ? $function : "$class::$function" ?>
+                    <?= "{$this->htmlEncode($function)}({$this->argumentsToString($args)})" ?>
                 </span>
             <?php endif; ?>
         </div>

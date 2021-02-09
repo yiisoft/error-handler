@@ -225,6 +225,10 @@ if ($request && isset($request->getCookieParams()['yii-exception-theme'])) {
             color: #086eb6;
         }
 
+        .call-stack ul li .element-wrap .function-info {
+            display: inline-block;
+        }
+
         .call-stack ul li.application .element-wrap {
             border-bottom: 1px solid #d0d0d0;
         }
@@ -320,7 +324,8 @@ if ($request && isset($request->getCookieParams()['yii-exception-theme'])) {
             align-self: center;
         }
 
-        .footer .timestamp {
+        .footer .timestamp,
+        .footer .server {
             margin-bottom: 20px;
         }
 
@@ -588,9 +593,9 @@ if ($request && isset($request->getCookieParams()['yii-exception-theme'])) {
                     <?php if ($throwable instanceof FriendlyExceptionInterface): ?>
                         <span><?= $this->htmlEncode($throwable->getName())?></span>
                         &mdash;
-                        <?= $this->addTypeLinks(get_class($throwable)) ?>
+                        <?= get_class($throwable) ?>
                     <?php else: ?>
-                        <span><?= $this->addTypeLinks(get_class($throwable)) ?></span>
+                        <span><?= get_class($throwable) ?></span>
                     <?php endif ?>
                 </div>
 
@@ -639,12 +644,14 @@ if ($request && isset($request->getCookieParams()['yii-exception-theme'])) {
                     <?= date('Y-m-d, H:i:s') ?>
                 </p>
                 <?php if ($request): ?>
-                <p>
+                <p class="server">
                     <?= $this->createServerInformationLink($request) ?>
                 </p>
                 <?php endif ?>
                 <p>
-                    <a href="https://www.yiiframework.com/">Yii Framework</a>
+                    <a href="https://www.yiiframework.com/" target="_blank" rel="noopener noreferrer">Yii Framework</a>
+                    /
+                    <a href="https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md" target="_blank" rel="noopener noreferrer">Error Handling Guide</a>
                 </p>
             </div>
 

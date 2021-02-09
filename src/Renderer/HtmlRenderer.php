@@ -6,7 +6,6 @@ namespace Yiisoft\ErrorHandler\Renderer;
 
 use Alexkart\CurlBuilder\Command;
 use Psr\Http\Message\ServerRequestInterface;
-use ReflectionClass;
 use RuntimeException;
 use Throwable;
 use Yiisoft\ErrorHandler\ThrowableRenderer;
@@ -34,60 +33,62 @@ use function ob_get_level;
 use function ob_end_clean;
 use function ob_implicit_flush;
 use function ob_start;
-use function preg_match;
 use function rtrim;
-use function str_replace;
-use function strncmp;
 use function stripos;
-use function strtolower;
-use function substr_compare;
 
 /**
  * Formats exception into HTML string.
  */
 final class HtmlRenderer extends ThrowableRenderer
 {
-    private int $maxSourceLines = 19;
-    private int $maxTraceLines = 13;
+    /**
+     * @var string The full path to the default template directory.
+     */
+    private string $defaultTemplatePath;
 
-    private string $traceLine = '{html}';
+    /**
+     * @var string The full path of the template file for rendering exceptions without call stack information.
+     *
+     * This template should be used in production.
+     */
+    private string $template;
 
-    private string $templatePath;
+    /**
+     * @var string The full path of the template file for rendering exceptions with call stack information.
+     *
+     * This template should be used in development.
+     */
+    private string $verboseTemplate;
 
-    private string $errorTemplate;
-    private string $exceptionTemplate;
+    /**
+     * @var int The maximum number of source code lines to be displayed. Defaults to 19.
+     */
+    private int $maxSourceLines;
 
-    public function __construct(array $templates = [])
+    /**
+     * @var int The maximum number of trace source code lines to be displayed. Defaults to 13.
+     */
+    private int $maxTraceLines;
+
+    /**
+     * @param array $settings Settings can have the following keys:
+     * - template: string, full path of the template file for rendering exceptions without call stack information.
+     * - verboseTemplate: string, full path of the template file for rendering exceptions with call stack information.
+     * - maxSourceLines: int, maximum number of source code lines to be displayed. Defaults to 19.
+     * - maxTraceLines: int, maximum number of trace source code lines to be displayed. Defaults to 13.
+     */
+    public function __construct(array $settings = [])
     {
-        $this->templatePath = $templates['path'] ?? dirname(__DIR__, 2) . '/templates';
-        $this->errorTemplate = $templates['error'] ?? $this->templatePath . '/error.php';
-        $this->exceptionTemplate = $templates['exception'] ?? $this->templatePath . '/exception.php';
-    }
-
-    public function withMaxSourceLines(int $maxSourceLines): self
-    {
-        $new = clone $this;
-        $new->maxSourceLines = $maxSourceLines;
-        return $new;
-    }
-
-    public function withMaxTraceLines(int $maxTraceLines): self
-    {
-        $new = clone $this;
-        $new->maxTraceLines = $maxTraceLines;
-        return $new;
-    }
-
-    public function withTraceLine(string $traceLine): self
-    {
-        $new = clone $this;
-        $new->traceLine = $traceLine;
-        return $new;
+        $this->defaultTemplatePath = dirname(__DIR__, 2) . '/templates';
+        $this->template = $settings['template'] ?? $this->defaultTemplatePath . '/production.php';
+        $this->verboseTemplate = $settings['verboseTemplate'] ?? $this->defaultTemplatePath . '/development.php';
+        $this->maxSourceLines = $settings['maxSourceLines']  ?? 19;
+        $this->maxTraceLines = $settings['maxTraceLines']  ?? 13;
     }
 
     public function render(Throwable $t, ServerRequestInterface $request = null): string
     {
-        return $this->renderTemplate($this->errorTemplate, [
+        return $this->renderTemplate($this->template, [
             'request' => $request,
             'throwable' => $t,
         ]);
@@ -95,18 +96,35 @@ final class HtmlRenderer extends ThrowableRenderer
 
     public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): string
     {
-        return $this->renderTemplate($this->exceptionTemplate, [
+        return $this->renderTemplate($this->verboseTemplate, [
             'request' => $request,
             'throwable' => $t,
         ]);
     }
 
-    private function htmlEncode(string $text): string
+    /**
+     * Encodes special characters into HTML entities for use as a content.
+     *
+     * @param string $content The content to be encoded.
+     *
+     * @return string Encoded content.
+     */
+    private function htmlEncode(string $content): string
     {
-        return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+        return htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
     }
 
-    private function renderTemplate(string $path, array $params): string
+    /**
+     * Renders a template.
+     *
+     * @param string $path The full path of the template file for rendering.
+     * @param array $parameters The name-value pairs that will be extracted and made available in the template file.
+     *
+     * @throws Throwable
+     *
+     * @return string The rendering result.
+     */
+    private function renderTemplate(string $path, array $parameters): string
     {
         if (!file_exists($path)) {
             throw new RuntimeException("Template not found at $path");
@@ -122,7 +140,7 @@ final class HtmlRenderer extends ThrowableRenderer
         PHP_VERSION_ID >= 80000 ? ob_implicit_flush(false) : ob_implicit_flush(0);
 
         try {
-            $renderer->bindTo($this)($path, $params);
+            $renderer->bindTo($this)($path, $parameters);
             return ob_get_clean();
         } catch (Throwable $e) {
             while (ob_get_level() > $obInitialLevel) {
@@ -137,7 +155,7 @@ final class HtmlRenderer extends ThrowableRenderer
     /**
      * Renders the previous exception stack for a given Exception.
      *
-     * @param Throwable $t the exception whose precursors should be rendered.
+     * @param Throwable $t The exception whose precursors should be rendered.
      *
      * @throws Throwable
      *
@@ -146,7 +164,7 @@ final class HtmlRenderer extends ThrowableRenderer
     private function renderPreviousExceptions(Throwable $t): string
     {
         if (($previous = $t->getPrevious()) !== null) {
-            $templatePath = $this->templatePath . '/previousException.php';
+            $templatePath = $this->defaultTemplatePath . '/_previous-exception.php';
             return $this->renderTemplate($templatePath, ['throwable' => $previous]);
         }
 
@@ -156,7 +174,7 @@ final class HtmlRenderer extends ThrowableRenderer
     /**
      * Renders call stack.
      *
-     * @param Throwable $t exception to get call stack from
+     * @param Throwable $t The exception to get call stack from.
      *
      * @throws Throwable
      *
@@ -186,18 +204,18 @@ final class HtmlRenderer extends ThrowableRenderer
     /**
      * Renders a single call stack element.
      *
-     * @param string|null $file name where call has happened.
-     * @param int|null $line number on which call has happened.
-     * @param string|null $class called class name.
-     * @param string|null $method called function/method name.
-     * @param array $args array of method arguments.
-     * @param int $index number of the call stack element.
+     * @param string|null $file The name where call has happened.
+     * @param int|null $line The number on which call has happened.
+     * @param string|null $class The called class name.
+     * @param string|null $function The called function/method name.
+     * @param array $args The array of method arguments.
+     * @param int $index The number of the call stack element.
      *
      * @throws Throwable
      *
      * @return string HTML content of the rendered call stack element.
      */
-    private function renderCallStackItem(?string $file, ?int $line, ?string $class, ?string $method, array $args, int $index): string
+    private function renderCallStackItem(?string $file, ?int $line, ?string $class, ?string $function, array $args, int $index): string
     {
         $lines = [];
         $begin = $end = 0;
@@ -208,18 +226,16 @@ final class HtmlRenderer extends ThrowableRenderer
             if ($line < 0 || $lines === false || ($lineCount = count($lines)) < $line) {
                 return '';
             }
-            $half = (int)(($index === 1 ? $this->maxSourceLines : $this->maxTraceLines) / 2);
+            $half = (int) (($index === 1 ? $this->maxSourceLines : $this->maxTraceLines) / 2);
             $begin = $line - $half > 0 ? $line - $half : 0;
             $end = $line + $half < $lineCount ? $line + $half : $lineCount - 1;
         }
 
-        $templatePath = $this->templatePath . '/callStackItem.php';
-
-        return $this->renderTemplate($templatePath, [
+        return $this->renderTemplate($this->defaultTemplatePath . '/_call-stack-item.php', [
             'file' => $file,
             'line' => $line,
             'class' => $class,
-            'method' => $method,
+            'function' => $function,
             'index' => $index,
             'lines' => $lines,
             'begin' => $begin,
@@ -229,84 +245,11 @@ final class HtmlRenderer extends ThrowableRenderer
     }
 
     /**
-     * Adds informational links to the given PHP type/class.
-     *
-     * @param string $code type/class name to be linkified.
-     * @param string|null $title custom title to use
-     *
-     * @return string linkified with HTML type/class name.
-     */
-    private function addTypeLinks(string $code, string $title = null): string
-    {
-        if (preg_match('/(.*?)::([^(]+)/', $code, $matches)) {
-            [, $class, $method] = $matches;
-            $text = $title ? $this->htmlEncode($title) : $this->htmlEncode($class) . '::' . $this->htmlEncode($method);
-        } else {
-            $class = $code;
-            $method = null;
-            $text = $title ? $this->htmlEncode($title) : $this->htmlEncode($class);
-        }
-
-        $url = null;
-        $shouldGenerateLink = true;
-
-        if ($method !== null && substr_compare($method, '{closure}', -9) !== 0) {
-            try {
-                $reflection = new ReflectionClass($class);
-                if ($reflection->hasMethod($method)) {
-                    $reflectionMethod = $reflection->getMethod($method);
-                    $shouldGenerateLink = $reflectionMethod->isPublic() || $reflectionMethod->isProtected();
-                } else {
-                    $shouldGenerateLink = false;
-                }
-            } catch (Throwable $e) {
-                $shouldGenerateLink = false;
-            }
-        }
-
-        if ($shouldGenerateLink) {
-            $url = $this->getTypeUrl($class, $method);
-        }
-
-        if ($url === null) {
-            return $text;
-        }
-
-        return '<a href="' . $url . '" target="_blank">' . $text . '</a>';
-    }
-
-    /**
-     * Returns the informational link URL for a given PHP type/class.
-     *
-     * @param string|null $class the type or class name.
-     * @param string|null $method the method name.
-     *
-     * @return string|null the informational link URL.
-     *
-     * @see addTypeLinks()
-     */
-    private function getTypeUrl(?string $class, ?string $method): ?string
-    {
-        if (strncmp($class, 'Yiisoft\\', 8) !== 0) {
-            return null;
-        }
-
-        $page = $this->htmlEncode(strtolower(str_replace('\\', '-', $class)));
-        $url = "http://www.yiiframework.com/doc-3.0/$page.html";
-
-        if ($method) {
-            $url .= "#$method()-detail";
-        }
-
-        return $url;
-    }
-
-    /**
      * Converts arguments array to its string representation.
      *
      * @param array $args arguments array to be converted
      *
-     * @return string string representation of the arguments array
+     * @return string The string representation of the arguments array.
      */
     private function argumentsToString(array $args): string
     {
@@ -364,7 +307,7 @@ final class HtmlRenderer extends ThrowableRenderer
      *
      * @param ServerRequestInterface $request
      *
-     * @return string the rendering result
+     * @return string The rendering result.
      */
     private function renderRequest(ServerRequestInterface $request): string
     {
@@ -385,6 +328,13 @@ final class HtmlRenderer extends ThrowableRenderer
         return '<pre>' . $this->htmlEncode(rtrim($output, "\n")) . '</pre>';
     }
 
+    /**
+     * Renders the information about curl request.
+     *
+     * @param ServerRequestInterface $request
+     *
+     * @return string The rendering result.
+     */
     private function renderCurl(ServerRequestInterface $request): string
     {
         try {
@@ -397,11 +347,12 @@ final class HtmlRenderer extends ThrowableRenderer
     }
 
     /**
-     * Creates string containing HTML link which refers to the home page of determined web-server software
-     * and its full name.
+     * Creates string containing HTML link which refers to the home page
+     * of determined web-server software and its full name.
      *
      * @param ServerRequestInterface $request
-     * @return string server software information hyperlink.
+     *
+     * @return string The server software information hyperlink.
      */
     private function createServerInformationLink(ServerRequestInterface $request): string
     {
@@ -412,18 +363,18 @@ final class HtmlRenderer extends ThrowableRenderer
         }
 
         $serverUrls = [
-            'http://httpd.apache.org/' => ['apache'],
-            'http://nginx.org/' => ['nginx'],
-            'http://lighttpd.net/' => ['lighttpd'],
-            'http://gwan.com/' => ['g-wan', 'gwan'],
-            'http://iis.net/' => ['iis', 'services'],
-            'https://secure.php.net/manual/en/features.commandline.webserver.php' => ['development'],
+            'https://httpd.apache.org/' => ['apache'],
+            'https://nginx.org/' => ['nginx'],
+            'https://lighttpd.net/' => ['lighttpd'],
+            'https://iis.net/' => ['iis', 'services'],
+            'https://www.php.net/manual/en/features.commandline.webserver.php' => ['development'],
         ];
 
         foreach ($serverUrls as $url => $keywords) {
             foreach ($keywords as $keyword) {
                 if (stripos($serverSoftware, $keyword) !== false) {
-                    return '<a href="' . $url . '" target="_blank">' . $this->htmlEncode($serverSoftware) . '</a>';
+                    return '<a href="' . $url . '" target="_blank" rel="noopener noreferrer">'
+                        . $this->htmlEncode($serverSoftware) . '</a>';
                 }
             }
         }
