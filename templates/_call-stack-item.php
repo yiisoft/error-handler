@@ -25,38 +25,38 @@ HTML;
             <?php if ($file !== null): ?>
                 <span class="file-name">
                     <?= "{$index}. in {$this->htmlEncode($file)}" ?>
-                    <?php if ($this->traceHeaderLine !== null) : ?>
+                    <?php if ($this->traceHeaderLine !== null): ?>
                         <?= strtr($this->traceHeaderLine, ['{file}' => $file, '{line}' => $line + 1, '{icon}' => $icon]) ?>
-                    <?php endif; ?>
+                    <?php endif ?>
                 </span>
             <?php endif ?>
 
-            <?php if ($function !== null) : ?>
+            <?php if ($function !== null): ?>
                 <span class="function-info">
                     <?= $file === null ? "{$index}." : '&ndash;' ?>
                     <?php $function = $class === null ? $function : "$class::$function" ?>
                     <?= "{$this->htmlEncode($function)}({$this->argumentsToString($args)})" ?>
                 </span>
-            <?php endif; ?>
+            <?php endif ?>
         </div>
 
         <?php if ($line !== null): ?>
             <div><?= sprintf('at line %d', $line + 1) ?></div>
         <?php endif ?>
     </div>
-    <?php if (!empty($lines)) : ?>
+    <?php if (!empty($lines)): ?>
         <div class="code-wrap">
             <div class="error-line"></div>
-            <?php for ($i = $begin; $i <= $end; ++$i) : ?><div class="hover-line"></div><?php endfor; ?>
+            <?php for ($i = $begin; $i <= $end; ++$i): ?><div class="hover-line"></div><?php endfor ?>
             <div class="code">
-                <?php for ($i = $begin; $i <= $end; ++$i) : ?><span class="lines-item"><?= (int) ($i + 1) ?></span><?php endfor; ?>
+                <?php for ($i = $begin; $i <= $end; ++$i): ?><span class="lines-item"><?= (int) ($i + 1) ?></span><?php endfor ?>
                 <pre><?php
-                    // fill empty lines with a whitespace to avoid rendering problems in opera
+                    // Fill empty lines with a whitespace to avoid rendering problems in Opera.
                     for ($i = $begin; $i <= $end; ++$i) {
                         echo (trim($lines[$i]) === '') ? " \n" : $this->htmlEncode($lines[$i]);
                     }
                     ?></pre>
             </div>
         </div>
-    <?php endif; ?>
+    <?php endif ?>
 </li>

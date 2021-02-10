@@ -109,9 +109,9 @@ final class ErrorHandler
     }
 
     /**
-     * Enables and disables debugging mode.
+     * Enables and disables debug mode.
      *
-     * Debug mode need to enable in the design, and to disable in production.
+     * Ensure that is is disabled in production environment since debug mode exposes sensitive details.
      *
      * @param bool $enable Enable/disable debugging mode.
      */
