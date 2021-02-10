@@ -33,7 +33,7 @@ final class ErrorHandler
      */
     private int $memoryReserveSize = 262_144;
     private string $memoryReserve = '';
-    private bool $exposeDetails = false;
+    private bool $debug = false;
 
     private LoggerInterface $logger;
     private ThrowableRendererInterface $defaultRenderer;
@@ -86,7 +86,7 @@ final class ErrorHandler
 
         try {
             $this->log($t, $request);
-            return $this->exposeDetails ? $renderer->renderVerbose($t, $request) : $renderer->render($t, $request);
+            return $this->debug ? $renderer->renderVerbose($t, $request) : $renderer->render($t, $request);
         } catch (Throwable $t) {
             return (string) $t;
         }
@@ -100,10 +100,7 @@ final class ErrorHandler
     public function handleThrowable(Throwable $t): void
     {
         // disable error capturing to avoid recursive errors while handling exceptions
-        $exposeDetails = $this->exposeDetails;
         $this->unregister();
-        $this->exposeDetails = $exposeDetails;
-
         // set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent
         http_response_code(Status::INTERNAL_SERVER_ERROR);
 
@@ -112,13 +109,22 @@ final class ErrorHandler
     }
 
     /**
-     * Register this error handler.
+     * Enables and disables debugging mode.
      *
-     * @param bool $exposeDetails
+     * Debug mode need to enable in the design, and to disable in production.
+     *
+     * @param bool $enable Enable/disable debugging mode.
      */
-    public function register(bool $exposeDetails = false): void
+    public function debug(bool $enable = true): void
     {
-        $this->exposeDetails = $exposeDetails;
+        $this->debug = $enable;
+    }
+
+    /**
+     * Register this error handler.
+     */
+    public function register(): void
+    {
         $this->disableDisplayErrors();
 
         set_exception_handler([$this, 'handleThrowable']);
@@ -139,7 +145,6 @@ final class ErrorHandler
     {
         restore_error_handler();
         restore_exception_handler();
-        $this->exposeDetails = false;
     }
 
     public function handleFatalError(): void
