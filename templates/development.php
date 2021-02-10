@@ -1093,6 +1093,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
                 if (typeof code !== 'undefined') {
                     code.style.display = window.getComputedStyle(code).display === 'block' ? 'none' : 'block';
+                    this.style.borderBottom = code.style.display === 'block' ? '1px solid #d0d0d0' : 'none';
                     refreshCallStackItemCode(callStackItem);
                 }
             });
