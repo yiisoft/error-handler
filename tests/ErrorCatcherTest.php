@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests;
 
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7\ServerRequest;
+use HttpSoft\Message\ResponseFactory;
+use HttpSoft\Message\ServerRequest;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Di\Container;
-use Yiisoft\ErrorHandler\ErrorCatcher;
+use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\Http\Header;
 
-class ErrorCatcherTest extends TestCase
+final class ErrorCatcherTest extends TestCase
 {
     private const DEFAULT_RENDERER_RESPONSE = 'default-renderer-test';
 
@@ -22,11 +22,11 @@ class ErrorCatcherTest extends TestCase
     {
         $expectedRendererOutput = 'expectedRendererOutput';
         $containerId = 'testRenderer';
-        $container = $this->getContainerWithThrowableRenderer($containerId, $expectedRendererOutput);
+        $container = $this->createContainerWithThrowableRenderer($containerId, $expectedRendererOutput);
         $mimeType = 'test/test';
-        $catcher = $this->getErrorCatcher($container)->withRenderer($mimeType, $containerId);
+        $catcher = $this->createErrorCatcher($container)->withRenderer($mimeType, $containerId);
         $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
-        $response = $catcher->process(new ServerRequest('GET', '/', ['Accept' => [$mimeType]]), $requestHandler);
+        $response = $catcher->process($this->createServerRequest('GET', ['Accept' => [$mimeType]]), $requestHandler);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
         $this->assertNotSame(self::DEFAULT_RENDERER_RESPONSE, $content);
@@ -38,26 +38,26 @@ class ErrorCatcherTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectErrorMessage('The renderer "InvalidRendererClass" cannot be found.');
 
-        $this->getErrorCatcher(new Container())->withRenderer('test/test', \InvalidRendererClass::class);
+        $this->createErrorCatcher(new Container())->withRenderer('test/test', \InvalidRendererClass::class);
     }
 
     public function testThrownExceptionWithInvalidMimeType()
     {
         $containerId = 'testRenderer';
-        $container = $this->getContainerWithThrowableRenderer($containerId, '');
+        $container = $this->createContainerWithThrowableRenderer($containerId, '');
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectErrorMessage('Invalid mime type.');
 
-        $this->getErrorCatcher($container)->withRenderer('test invalid mimeType', $containerId);
+        $this->createErrorCatcher($container)->withRenderer('test invalid mimeType', $containerId);
     }
 
     public function testWithoutRenderers(): void
     {
         $container = new Container();
-        $catcher = $this->getErrorCatcher($container)->withoutRenderers();
+        $catcher = $this->createErrorCatcher($container)->withoutRenderers();
         $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
-        $response = $catcher->process(new ServerRequest('GET', '/', ['Accept' => ['test/html']]), $requestHandler);
+        $response = $catcher->process($this->createServerRequest('GET', ['Accept' => ['test/html']]), $requestHandler);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
         $this->assertSame(self::DEFAULT_RENDERER_RESPONSE, $content);
@@ -66,9 +66,9 @@ class ErrorCatcherTest extends TestCase
     public function testWithoutRenderer(): void
     {
         $container = new Container();
-        $catcher = $this->getErrorCatcher($container)->withoutRenderers('*/*');
+        $catcher = $this->createErrorCatcher($container)->withoutRenderers('*/*');
         $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
-        $response = $catcher->process(new ServerRequest('GET', '/', ['Accept' => ['test/html']]), $requestHandler);
+        $response = $catcher->process($this->createServerRequest('GET', ['Accept' => ['test/html']]), $requestHandler);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
         $this->assertSame(self::DEFAULT_RENDERER_RESPONSE, $content);
@@ -78,12 +78,12 @@ class ErrorCatcherTest extends TestCase
     {
         $containerId = 'testRenderer';
         $expectedRendererOutput = 'expectedRendererOutput';
-        $container = $this->getContainerWithThrowableRenderer($containerId, $expectedRendererOutput);
+        $container = $this->createContainerWithThrowableRenderer($containerId, $expectedRendererOutput);
         $mimeType = 'text/html;version=2';
-        $catcher = $this->getErrorCatcher($container)->withRenderer($mimeType, $containerId);
+        $catcher = $this->createErrorCatcher($container)->withRenderer($mimeType, $containerId);
         $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
         $response = $catcher->process(
-            new ServerRequest('GET', '/', ['Accept' => ['text/html', $mimeType]]),
+            $this->createServerRequest('GET', ['Accept' => ['text/html', $mimeType]]),
             $requestHandler
         );
         $response->getBody()->rewind();
@@ -95,12 +95,12 @@ class ErrorCatcherTest extends TestCase
     {
         $expectedRendererOutput = 'expectedRendererOutput';
         $containerId = 'testRenderer';
-        $container = $this->getContainerWithThrowableRenderer($containerId, $expectedRendererOutput);
-        $catcher = $this->getErrorCatcher($container)
+        $container = $this->createContainerWithThrowableRenderer($containerId, $expectedRendererOutput);
+        $catcher = $this->createErrorCatcher($container)
             ->withRenderer('*/*', $containerId);
         $requestHandler = (new MockRequestHandler())->setHandleException(new \RuntimeException());
         $response = $catcher->process(
-            new ServerRequest('GET', '/', ['Accept' => ['test/test']]),
+            $this->createServerRequest('GET', ['Accept' => ['test/test']]),
             $requestHandler
         );
         $response->getBody()->rewind();
@@ -111,9 +111,9 @@ class ErrorCatcherTest extends TestCase
 
     public function testForceContentType(): void
     {
-        $catcher = $this->getErrorCatcher(new Container())->forceContentType('application/json');
+        $catcher = $this->createErrorCatcher(new Container())->forceContentType('application/json');
         $response = $catcher->process(
-            new ServerRequest('GET', '/', ['Accept' => ['text/xml']]),
+            $this->createServerRequest('GET', ['Accept' => ['text/xml']]),
             (new MockRequestHandler())->setHandleException(new \RuntimeException())
         );
         $response->getBody()->rewind();
@@ -124,10 +124,10 @@ class ErrorCatcherTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectErrorMessage('The renderer for image/gif is not set.');
-        $this->getErrorCatcher(new Container())->forceContentType('image/gif');
+        $this->createErrorCatcher(new Container())->forceContentType('image/gif');
     }
 
-    private function getContainerWithThrowableRenderer(string $id, string $expectedOutput): Container
+    private function createContainerWithThrowableRenderer(string $id, string $expectedOutput): Container
     {
         return new Container(
             [
@@ -136,19 +136,19 @@ class ErrorCatcherTest extends TestCase
         );
     }
 
-    private function getErrorHandler(): ErrorHandler
+    private function createErrorHandler(): ErrorHandler
     {
         $logger = $this->createMock(LoggerInterface::class);
         return new ErrorHandler($logger, new MockThrowableRenderer(self::DEFAULT_RENDERER_RESPONSE));
     }
 
-    private function getFactory(): ResponseFactoryInterface
+    private function createServerRequest(string $method, array $headers = []): ServerRequestInterface
     {
-        return new Psr17Factory();
+        return new ServerRequest([], [], [], [], [], $method, '/', $headers);
     }
 
-    private function getErrorCatcher(Container $container): ErrorCatcher
+    private function createErrorCatcher(Container $container): ErrorCatcher
     {
-        return new ErrorCatcher($this->getFactory(), $this->getErrorHandler(), $container);
+        return new ErrorCatcher(new ResponseFactory(), $this->createErrorHandler(), $container);
     }
 }

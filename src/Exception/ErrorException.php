@@ -2,10 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\ErrorHandler;
+namespace Yiisoft\ErrorHandler\Exception;
 
+use Exception;
+use ReflectionProperty;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
+
 use function array_slice;
+use function in_array;
 use function function_exists;
 
 /**
@@ -31,7 +35,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         E_USER_DEPRECATED => 'PHP User Deprecated Warning',
     ];
 
-    public function __construct($message = '', $code = 0, $severity = 1, $filename = __FILE__, $lineno = __LINE__, \Exception $previous = null)
+    public function __construct($message = '', $code = 0, $severity = 1, $filename = __FILE__, $lineno = __LINE__, Exception $previous = null)
     {
         parent::__construct($message, $code, $severity, $filename, $lineno, $previous);
         $this->addXDebugTraceToFatalIfAvailable();
@@ -60,8 +64,6 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
     /**
      * Fatal errors normally do not provide any trace making it harder to debug. In case XDebug is installed, we
      * can get a trace using xdebug_get_function_stack().
-     *
-     * @suppress PhanUndeclaredFunction
      */
     private function addXDebugTraceToFatalIfAvailable(): void
     {
@@ -70,6 +72,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
             // @see https://github.com/yiisoft/yii2/pull/11723
             $xDebugTrace = array_slice(array_reverse(xdebug_get_function_stack()), 1, -1);
             $trace = [];
+
             foreach ($xDebugTrace as $frame) {
                 if (!isset($frame['function'])) {
                     $frame['function'] = 'unknown';
@@ -89,7 +92,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
                 $trace[] = $frame;
             }
 
-            $ref = new \ReflectionProperty('Exception', 'trace');
+            $ref = new ReflectionProperty('Exception', 'trace');
             $ref->setAccessible(true);
             $ref->setValue($this, $trace);
         }
@@ -107,6 +110,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
 
         // check for Xdebug being installed to ensure origin of xdebug_get_function_stack()
         $version = phpversion('xdebug');
+
         if ($version === false) {
             return false;
         }

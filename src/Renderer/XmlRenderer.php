@@ -2,14 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\ErrorHandler;
+namespace Yiisoft\ErrorHandler\Renderer;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
+use Yiisoft\ErrorHandler\ThrowableRenderer;
 
 /**
- * Formats exception into XML string
+ * Formats exception into XML string.
  */
 final class XmlRenderer extends ThrowableRenderer
 {
-    public function render(\Throwable $t): string
+    public function render(Throwable $t, ServerRequestInterface $request = null): string
     {
         $out = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
         $out .= "<error>\n";
@@ -18,7 +22,7 @@ final class XmlRenderer extends ThrowableRenderer
         return $out;
     }
 
-    public function renderVerbose(\Throwable $t): string
+    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): string
     {
         $out = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
         $out .= "<error>\n";

@@ -1,7 +1,7 @@
 {
     "name": "yiisoft/error-handler",
     "type": "library",
-    "description": "error-handler",
+    "description": "Yii Error Handling Library",
     "keywords": [
         "yiisoft",
         "error-handler"
@@ -30,12 +30,12 @@
         "yiisoft/injector": "^1.0"
     },
     "require-dev": {
-        "nyholm/psr7": "^1.0",
+        "httpsoft/http-message": "^1.0.7",
         "phpunit/phpunit": "^9.4",
-        "roave/infection-static-analysis-plugin": "^1.5",
+        "roave/infection-static-analysis-plugin": "^1.6",
         "spatie/phpunit-watcher": "^1.23",
-        "vimeo/psalm": "^4.2",
-        "yiisoft/di": "dev-master"
+        "vimeo/psalm": "^4.4",
+        "yiisoft/di": "^3.0@dev"
     },
     "autoload": {
         "psr-4": {

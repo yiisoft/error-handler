@@ -7,7 +7,7 @@ namespace Yiisoft\ErrorHandler\Tests;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\ErrorHandler\HeaderHelper;
 
-class HeaderHelperTest extends TestCase
+final class HeaderHelperTest extends TestCase
 {
     public function valueAndParametersDataProvider(): array
     {

@@ -2,16 +2,32 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\ErrorHandler;
+namespace Yiisoft\ErrorHandler\Middleware;
 
+use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
+use Yiisoft\ErrorHandler\ErrorHandler;
+use Yiisoft\ErrorHandler\HeaderHelper;
+use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
+use Yiisoft\ErrorHandler\Renderer\JsonRenderer;
+use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
+use Yiisoft\ErrorHandler\Renderer\XmlRenderer;
+use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\Http\Header;
 use Yiisoft\Http\Status;
+
+use function array_key_exists;
+use function count;
+use function sprintf;
+use function strpos;
+use function strtolower;
+use function trim;
 
 /**
  * ErrorCatcher catches all throwables from the next middlewares and renders it
@@ -75,13 +91,13 @@ final class ErrorCatcher implements MiddlewareInterface
      *
      * @param string $contentType
      *
-     * @return $this
+     * @return self
      */
     public function forceContentType(string $contentType): self
     {
         $this->validateMimeType($contentType);
         if (!isset($this->renderers[$contentType])) {
-            throw new \InvalidArgumentException(sprintf('The renderer for %s is not set.', $contentType));
+            throw new InvalidArgumentException(sprintf('The renderer for %s is not set.', $contentType));
         }
 
         $new = clone $this;
@@ -89,14 +105,20 @@ final class ErrorCatcher implements MiddlewareInterface
         return $new;
     }
 
-    private function handleException(\Throwable $e, ServerRequestInterface $request): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        try {
+            return $handler->handle($request);
+        } catch (Throwable $e) {
+            return $this->handleException($e, $request);
+        }
+    }
+
+    private function handleException(Throwable $e, ServerRequestInterface $request): ResponseInterface
     {
         $contentType = $this->contentType ?? $this->getContentType($request);
         $renderer = $this->getRenderer(strtolower($contentType));
-        if ($renderer !== null) {
-            $renderer->setRequest($request);
-        }
-        $content = $this->errorHandler->handleCaughtThrowable($e, $renderer);
+        $content = $this->errorHandler->handleCaughtThrowable($e, $renderer, $request);
         $response = $this->responseFactory->createResponse(Status::INTERNAL_SERVER_ERROR)
             ->withHeader(Header::CONTENT_TYPE, $contentType);
         $response->getBody()->write($content);
@@ -119,28 +141,19 @@ final class ErrorCatcher implements MiddlewareInterface
                     return $header;
                 }
             }
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             // The Accept header contains an invalid q factor
         }
         return '*/*';
     }
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-    {
-        try {
-            return $handler->handle($request);
-        } catch (\Throwable $e) {
-            return $this->handleException($e, $request);
-        }
-    }
-
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function validateMimeType(string $mimeType): void
     {
         if (strpos($mimeType, '/') === false) {
-            throw new \InvalidArgumentException('Invalid mime type.');
+            throw new InvalidArgumentException('Invalid mime type.');
         }
     }
 
@@ -152,11 +165,11 @@ final class ErrorCatcher implements MiddlewareInterface
     private function validateRenderer(string $rendererClass): void
     {
         if (trim($rendererClass) === '') {
-            throw new \InvalidArgumentException('The renderer class cannot be an empty string.');
+            throw new InvalidArgumentException('The renderer class cannot be an empty string.');
         }
 
         if ($this->container->has($rendererClass) === false) {
-            throw new \InvalidArgumentException("The renderer \"$rendererClass\" cannot be found.");
+            throw new InvalidArgumentException("The renderer \"$rendererClass\" cannot be found.");
         }
     }
 }

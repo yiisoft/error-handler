@@ -4,36 +4,26 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
-use Yiisoft\ErrorHandler\HtmlRenderer;
+use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 
-class HtmlRendererTest extends TestCase
+final class HtmlRendererTest extends TestCase
 {
-    private const CUSTOM_TEMPLATES = [
-        'exception' => __DIR__ . '/test-template-verbose.php',
-        'error' => __DIR__ . '/test-template-non-verbose.php',
-    ];
-
-    private const DEFAULT_TEMPLATES = [
-        'default' => [
-            'callStackItem',
-            'error',
-            'exception',
-            'previousException',
-        ],
-        'path' => __DIR__ . '/../templates',
+    private const CUSTOM_SETTING = [
+        'verboseTemplate' => __DIR__ . '/test-template-verbose.php',
+        'template' => __DIR__ . '/test-template-non-verbose.php',
     ];
 
     public function testNonVerboseOutput(): void
     {
-        $renderer = new HtmlRenderer(self::DEFAULT_TEMPLATES);
-        $request = $this->getServerRequestMock();
-        $renderer->setRequest($request);
+        $renderer = new HtmlRenderer();
         $exceptionMessage = 'exception-test-message';
-        $exception = new \RuntimeException($exceptionMessage);
-        $renderedOutput = $renderer->render($exception);
+        $exception = new RuntimeException($exceptionMessage);
+        $renderedOutput = $renderer->render($exception, $this->getServerRequestMock());
+
         $this->assertStringContainsString('<html', $renderedOutput);
         $this->assertStringNotContainsString(RuntimeException::class, $renderedOutput);
         $this->assertStringNotContainsString($exceptionMessage, $renderedOutput);
@@ -41,12 +31,11 @@ class HtmlRendererTest extends TestCase
 
     public function testVerboseOutput(): void
     {
-        $renderer = new HtmlRenderer(self::DEFAULT_TEMPLATES);
-        $request = $this->getServerRequestMock();
-        $renderer->setRequest($request);
+        $renderer = new HtmlRenderer();
         $exceptionMessage = 'exception-test-message';
-        $exception = new \RuntimeException($exceptionMessage);
-        $renderedOutput = $renderer->renderVerbose($exception);
+        $exception = new RuntimeException($exceptionMessage);
+        $renderedOutput = $renderer->renderVerbose($exception, $this->getServerRequestMock());
+
         $this->assertStringContainsString('<html', $renderedOutput);
         $this->assertStringContainsString(RuntimeException::class, $renderedOutput);
         $this->assertStringContainsString($exceptionMessage, $renderedOutput);
@@ -55,58 +44,42 @@ class HtmlRendererTest extends TestCase
     public function testNonVerboseOutputWithCustomTemplate(): void
     {
         $templateFileContents = '<html><?php echo $throwable->getMessage();?></html>';
-        $this->createTestTemplate(self::CUSTOM_TEMPLATES['error'], $templateFileContents);
+        $this->createTestTemplate(self::CUSTOM_SETTING['template'], $templateFileContents);
 
-        $templates = $this->getTemplateConfigParamsForCustomTemplates();
-        $renderer = new HtmlRenderer($templates);
-        $request = $this->getServerRequestMock();
-        $renderer->setRequest($request);
-
+        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
         $exceptionMessage = 'exception-test-message';
-        $exception = new \RuntimeException($exceptionMessage);
+        $exception = new RuntimeException($exceptionMessage);
 
-        $renderedOutput = $renderer->render($exception);
+        $renderedOutput = $renderer->render($exception, $this->getServerRequestMock());
         $this->assertStringContainsString("<html>$exceptionMessage</html>", $renderedOutput);
     }
 
     public function testVerboseOutputWithCustomTemplate(): void
     {
         $templateFileContents = '<html><?php echo $throwable->getMessage();?></html>';
-        $this->createTestTemplate(self::CUSTOM_TEMPLATES['exception'], $templateFileContents);
+        $this->createTestTemplate(self::CUSTOM_SETTING['verboseTemplate'], $templateFileContents);
 
-        $templates = $this->getTemplateConfigParamsForCustomTemplates();
-        $renderer = new HtmlRenderer($templates);
-        $request = $this->getServerRequestMock();
-        $renderer->setRequest($request);
-
+        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
         $exceptionMessage = 'exception-test-message';
-        $exception = new \RuntimeException($exceptionMessage);
+        $exception = new RuntimeException($exceptionMessage);
 
-        $renderedOutput = $renderer->renderVerbose($exception);
+        $renderedOutput = $renderer->renderVerbose($exception, $this->getServerRequestMock());
         $this->assertStringContainsString("<html>$exceptionMessage</html>", $renderedOutput);
     }
 
     public function testRenderTemplateThrowsExceptionWhenTemplateFileNotExists(): void
     {
-        $exampleNonExistingFile = '_not_found_.php';
+        $renderer = new HtmlRenderer(['template' => '_not_found_.php']);
+        $exception = new Exception();
 
-        $templates = [
-            'error' => $exampleNonExistingFile,
-        ];
-        $templates = array_merge(self::DEFAULT_TEMPLATES, $templates);
-
-        $renderer = new HtmlRenderer($templates);
-        $request = $this->getServerRequestMock();
-        $renderer->setRequest($request);
-        $exception = new \Exception();
         $this->expectException(RuntimeException::class);
-        $renderer->render($exception);
+        $renderer->render($exception, $this->getServerRequestMock());
     }
 
     public function tearDown(): void
     {
         parent::tearDown();
-        foreach (self::CUSTOM_TEMPLATES as $template) {
+        foreach (self::CUSTOM_SETTING as $template) {
             if (file_exists($template)) {
                 $this->removeTestTemplate($template);
             }
@@ -137,11 +110,6 @@ class HtmlRendererTest extends TestCase
             ->willReturn('GET');
 
         return $serverRequestMock;
-    }
-
-    private function getTemplateConfigParamsForCustomTemplates(): array
-    {
-        return array_merge(self::CUSTOM_TEMPLATES, self::DEFAULT_TEMPLATES);
     }
 
     private function createTestTemplate(string $path, string $templateContents): void

@@ -6,10 +6,11 @@ namespace Yiisoft\ErrorHandler\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
-class ErrorHandlerTest extends TestCase
+final class ErrorHandlerTest extends TestCase
 {
     private ErrorHandler $errorHandler;
     private LoggerInterface $loggerMock;
@@ -25,12 +26,12 @@ class ErrorHandlerTest extends TestCase
 
     public function testHandleCaughtThrowableCallsDefaultRendererWhenNonePassed(): void
     {
-        $throwable = new \RuntimeException();
+        $throwable = new RuntimeException();
 
         $this
             ->throwableRendererMock
             ->expects($this->once())
-            ->method('renderVerbose')
+            ->method('render')
             ->with($throwable);
 
 
@@ -39,18 +40,18 @@ class ErrorHandlerTest extends TestCase
 
     public function testHandleCaughtThrowableCallsPassedRenderer(): void
     {
-        $throwable = new \RuntimeException();
+        $throwable = new RuntimeException();
         $throwableRendererMock = $this->createMock(ThrowableRendererInterface::class);
 
         $this
             ->throwableRendererMock
             ->expects($this->never())
-            ->method('renderVerbose')
+            ->method('render')
             ->with($throwable);
 
         $throwableRendererMock
             ->expects($this->once())
-            ->method('renderVerbose')
+            ->method('render')
             ->with($throwable);
 
         $this->errorHandler->handleCaughtThrowable($throwable, $throwableRendererMock);
@@ -58,27 +59,27 @@ class ErrorHandlerTest extends TestCase
 
     public function testHandleCaughtThrowableWithExposedDetailsCallsRenderVerbose(): void
     {
-        $throwable = new \RuntimeException();
+        $throwable = new RuntimeException();
         $this
             ->throwableRendererMock
             ->expects($this->once())
             ->method('renderVerbose')
             ->with($throwable);
 
-        $errorHandler = $this->errorHandler->withExposedDetails();
-        $errorHandler->handleCaughtThrowable($throwable);
+        $this->errorHandler->debug();
+        $this->errorHandler->handleCaughtThrowable($throwable);
     }
 
     public function testHandleCaughtThrowableWithoutExposedDetailsCallsRender(): void
     {
-        $throwable = new \RuntimeException();
+        $throwable = new RuntimeException();
         $this
             ->throwableRendererMock
             ->expects($this->once())
             ->method('render')
             ->with($throwable);
 
-        $errorHandler = $this->errorHandler->withoutExposedDetails();
-        $errorHandler->handleCaughtThrowable($throwable);
+        $this->errorHandler->debug(false);
+        $this->errorHandler->handleCaughtThrowable($throwable);
     }
 }

@@ -4,15 +4,27 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
+use Yiisoft\ErrorHandler\Exception\ErrorException;
+use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\Http\Status;
 
-final class ErrorHandler implements LoggerAwareInterface
-{
-    use LoggerAwareTrait;
+use function error_get_last;
+use function error_reporting;
+use function function_exists;
+use function ini_set;
+use function http_response_code;
+use function register_shutdown_function;
+use function restore_error_handler;
+use function restore_exception_handler;
+use function set_error_handler;
+use function set_exception_handler;
+use function str_repeat;
 
+final class ErrorHandler
+{
     /**
      * @var int the size of the reserved memory. A portion of memory is pre-allocated so that
      * when an out-of-memory issue occurs, the error handler is able to handle the error with
@@ -21,8 +33,9 @@ final class ErrorHandler implements LoggerAwareInterface
      */
     private int $memoryReserveSize = 262_144;
     private string $memoryReserve = '';
-    private bool $exposeDetails = true;
+    private bool $debug = false;
 
+    private LoggerInterface $logger;
     private ThrowableRendererInterface $defaultRenderer;
 
     public function __construct(LoggerInterface $logger, ThrowableRendererInterface $defaultRenderer)
@@ -56,35 +69,38 @@ final class ErrorHandler implements LoggerAwareInterface
     /**
      * Handle throwable and return output
      *
-     * @param \Throwable $t
+     * @param Throwable $t
      * @param ThrowableRendererInterface|null $renderer
+     * @param ServerRequestInterface|null $request
      *
      * @return string
      */
-    public function handleCaughtThrowable(\Throwable $t, ThrowableRendererInterface $renderer = null): string
-    {
+    public function handleCaughtThrowable(
+        Throwable $t,
+        ThrowableRendererInterface $renderer = null,
+        ServerRequestInterface $request = null
+    ): string {
         if ($renderer === null) {
             $renderer = $this->defaultRenderer;
         }
 
         try {
-            $this->log($t);
-            return $this->exposeDetails ? $renderer->renderVerbose($t) : $renderer->render($t);
-        } catch (\Throwable $t) {
-            return (string)$t;
+            $this->log($t, $request);
+            return $this->debug ? $renderer->renderVerbose($t, $request) : $renderer->render($t, $request);
+        } catch (Throwable $t) {
+            return (string) $t;
         }
     }
 
     /**
      * Handle throwable, echo output and exit
      *
-     * @param \Throwable $t
+     * @param Throwable $t
      */
-    public function handleThrowable(\Throwable $t): void
+    public function handleThrowable(Throwable $t): void
     {
         // disable error capturing to avoid recursive errors while handling exceptions
         $this->unregister();
-
         // set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent
         http_response_code(Status::INTERNAL_SERVER_ERROR);
 
@@ -93,11 +109,24 @@ final class ErrorHandler implements LoggerAwareInterface
     }
 
     /**
+     * Enables and disables debug mode.
+     *
+     * Ensure that is is disabled in production environment since debug mode exposes sensitive details.
+     *
+     * @param bool $enable Enable/disable debugging mode.
+     */
+    public function debug(bool $enable = true): void
+    {
+        $this->debug = $enable;
+    }
+
+    /**
      * Register this error handler.
      */
     public function register(): void
     {
         $this->disableDisplayErrors();
+
         set_exception_handler([$this, 'handleThrowable']);
         /** @psalm-suppress InvalidArgument */
         set_error_handler([$this, 'handleError']);
@@ -105,14 +134,8 @@ final class ErrorHandler implements LoggerAwareInterface
         if ($this->memoryReserveSize > 0) {
             $this->memoryReserve = str_repeat('x', $this->memoryReserveSize);
         }
-        register_shutdown_function([$this, 'handleFatalError']);
-    }
 
-    private function disableDisplayErrors(): void
-    {
-        if (function_exists('ini_set')) {
-            ini_set('display_errors', '0');
-        }
+        register_shutdown_function([$this, 'handleFatalError']);
     }
 
     /**
@@ -128,6 +151,7 @@ final class ErrorHandler implements LoggerAwareInterface
     {
         unset($this->memoryReserve);
         $error = error_get_last();
+
         if ($error !== null && ErrorException::isFatalError($error)) {
             $exception = new ErrorException(
                 $error['message'],
@@ -136,39 +160,26 @@ final class ErrorHandler implements LoggerAwareInterface
                 $error['file'],
                 $error['line']
             );
+
             $this->handleThrowable($exception);
             exit(1);
         }
     }
 
-    private function log(\Throwable $t/*, ServerRequestInterface $request*/): void
+    private function log(Throwable $t, ServerRequestInterface $request = null): void
     {
         $renderer = new PlainTextRenderer();
+
         $this->logger->error(
-            $renderer->renderVerbose($t),
-            [
-                'throwable' => $t,
-                //'request' => $request,
-            ]
+            $renderer->renderVerbose($t, $request),
+            ['throwable' => $t]
         );
     }
 
-    public function withExposedDetails(): self
+    private function disableDisplayErrors(): void
     {
-        $new = clone $this;
-        $new->exposeDetails = true;
-        return $new;
-    }
-
-    public function withoutExposedDetails(): self
-    {
-        $new = clone $this;
-        $new->exposeDetails = false;
-        return $new;
-    }
-
-    public function setRenderer(ThrowableRendererInterface $defaultRenderer): void
-    {
-        $this->defaultRenderer = $defaultRenderer;
+        if (function_exists('ini_set')) {
+            ini_set('display_errors', '0');
+        }
     }
 }
