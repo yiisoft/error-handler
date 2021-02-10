@@ -561,7 +561,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         /* end dark-theme */
     </style>
 </head>
-<body<?= !empty($theme) ? "class=\"{$this->htmlEncode($theme)}\"" : '' ?>>
+<body<?= !empty($theme) ? " class=\"{$this->htmlEncode($theme)}\"" : '' ?>>
 <header>
     <div class="tools">
         <a href="#" title="Dark Mode" id="dark-mode">
