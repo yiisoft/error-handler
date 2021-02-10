@@ -5,9 +5,7 @@
 
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
-if ($request && isset($request->getCookieParams()['yii-exception-theme'])) {
-    $theme = $request->getCookieParams()['yii-exception-theme'];
-}
+$theme = $_COOKIE['yii-exception-theme'] ?? '';
 ?>
 <!doctype html>
 <html lang="en">
