@@ -75,13 +75,13 @@ final class HtmlRenderer extends ThrowableRenderer
     /**
      * @var string|null The trace header line with placeholders to be be substituted. Defaults to null.
      *
-     * The placeholders are {file}, {line} and {ide}. A typical use case is the creation of IDE-specific links,
+     * The placeholders are {file}, {line} and {icon}. A typical use case is the creation of IDE-specific links,
      * since when you click on a trace header link, it opens directly in the IDE. You can also insert custom content.
      *
      * Example IDE link:
      *
      * ```
-     * <a href="ide://open?file={file}&line={line}">{ide}</a>
+     * <a href="ide://open?file={file}&line={line}">{icon}</a>
      * ```
      */
     private ?string $traceHeaderLine;

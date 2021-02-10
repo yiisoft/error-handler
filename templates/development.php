@@ -242,6 +242,18 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             color: #000;
         }
 
+        .call-stack ul li a .external-link {
+            vertical-align: middle;
+        }
+
+        .call-stack ul li a .external-link:hover path {
+            fill: #000;
+        }
+
+        .call-stack ul li a .external-link path {
+            fill: #505050;
+        }
+
         .call-stack ul li .code-wrap {
             display: none;
             position: relative;
@@ -482,12 +494,14 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         }
 
         .dark-theme header .tools a:hover svg path,
-        .dark-theme #copy-stacktrace:hover svg path {
+        .dark-theme #copy-stacktrace:hover svg path,
+        .dark-theme .call-stack ul li a .external-link:hover path {
             fill: #fff;
         }
 
         .dark-theme #copy-stacktrace svg path,
-        .dark-theme header .tools a svg path  {
+        .dark-theme header .tools a svg path,
+        .dark-theme .call-stack ul li a .external-link path {
             fill: #989898;
         }
 
