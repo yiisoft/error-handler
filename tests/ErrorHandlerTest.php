@@ -66,9 +66,8 @@ final class ErrorHandlerTest extends TestCase
             ->method('renderVerbose')
             ->with($throwable);
 
-        $this->errorHandler->register(true);
+        $this->errorHandler->debug();
         $this->errorHandler->handleCaughtThrowable($throwable);
-        $this->errorHandler->unregister();
     }
 
     public function testHandleCaughtThrowableWithoutExposedDetailsCallsRender(): void
@@ -80,8 +79,7 @@ final class ErrorHandlerTest extends TestCase
             ->method('render')
             ->with($throwable);
 
-        $this->errorHandler->register(false);
+        $this->errorHandler->debug(false);
         $this->errorHandler->handleCaughtThrowable($throwable);
-        $this->errorHandler->unregister();
     }
 }
