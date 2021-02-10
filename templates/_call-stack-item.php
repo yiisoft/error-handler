@@ -9,8 +9,16 @@
 /* @var $end int */
 /* @var $args array */
 /* @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer */
+
+$ide = <<<HTML
+IDE
+<svg class="icon icon--new-window" focusable="false" aria-hidden="true" width="16" height="16">
+    <use href="#new-window"></use>
+</svg>
+HTML;
 ?>
-<li class="<?=!empty($lines) ? 'application' : '' ?> call-stack-item" data-line="<?= (int) ($line - $begin) ?>">
+<li class="<?= (!empty($lines) && ($index === 1 || !$this->isCoreFile($file))) ? 'application' : '' ?> call-stack-item"
+    data-line="<?= (int) ($line - $begin) ?>">
     <div class="element-wrap">
         <div class="flex-1">
             <?php if ($file !== null): ?>
@@ -18,6 +26,11 @@
                     <?= "{$index}. in {$this->htmlEncode($file)}" ?>
                 </span>
             <?php endif ?>
+
+            <?php if ($this->traceHeaderLine !== null) : ?>
+                <span> &ndash; </span>
+                <?= strtr($this->traceHeaderLine, ['{file}' => $file, '{line}' => $line + 1, '{ide}' => $ide]) ?>
+            <?php endif; ?>
 
             <?php if ($function !== null) : ?>
                 <span class="function-info">

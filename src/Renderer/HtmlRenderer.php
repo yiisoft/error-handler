@@ -33,8 +33,10 @@ use function ob_get_level;
 use function ob_end_clean;
 use function ob_implicit_flush;
 use function ob_start;
+use function realpath;
 use function rtrim;
 use function stripos;
+use function strpos;
 
 /**
  * Formats exception into HTML string.
@@ -71,11 +73,26 @@ final class HtmlRenderer extends ThrowableRenderer
     private int $maxTraceLines;
 
     /**
+     * @var string|null The trace header line with placeholders to be be substituted. Defaults to null.
+     *
+     * The placeholders are {file}, {line} and {ide}. A typical use case is the creation of IDE-specific links,
+     * since when you click on a trace header link, it opens directly in the IDE. You can also insert custom content.
+     *
+     * Example IDE link:
+     *
+     * ```
+     * <a href="ide://open?file={file}&line={line}">{ide}</a>
+     * ```
+     */
+    private ?string $traceHeaderLine;
+
+    /**
      * @param array $settings Settings can have the following keys:
      * - template: string, full path of the template file for rendering exceptions without call stack information.
      * - verboseTemplate: string, full path of the template file for rendering exceptions with call stack information.
      * - maxSourceLines: int, maximum number of source code lines to be displayed. Defaults to 19.
      * - maxTraceLines: int, maximum number of trace source code lines to be displayed. Defaults to 13.
+     * - traceHeaderLine: string, trace header line with placeholders to be be substituted. Defaults to null.
      */
     public function __construct(array $settings = [])
     {
@@ -84,6 +101,7 @@ final class HtmlRenderer extends ThrowableRenderer
         $this->verboseTemplate = $settings['verboseTemplate'] ?? $this->defaultTemplatePath . '/development.php';
         $this->maxSourceLines = $settings['maxSourceLines']  ?? 19;
         $this->maxTraceLines = $settings['maxTraceLines']  ?? 13;
+        $this->traceHeaderLine = $settings['traceHeaderLine'] ?? null;
     }
 
     public function render(Throwable $t, ServerRequestInterface $request = null): string
@@ -380,5 +398,17 @@ final class HtmlRenderer extends ThrowableRenderer
         }
 
         return '';
+    }
+
+    /**
+     * Determines whether given name of the file belongs to the framework.
+     *
+     * @param string|null $file The name to be checked.
+     *
+     * @return bool Whether given name of the file belongs to the framework.
+     */
+    public function isCoreFile(?string $file): bool
+    {
+        return $file === null || strpos(realpath($file), dirname(__DIR__, 3)) === 0;
     }
 }
