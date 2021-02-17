@@ -6,6 +6,7 @@ namespace Yiisoft\ErrorHandler\Renderer;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
+use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\ThrowableRenderer;
 
 /**
@@ -13,13 +14,13 @@ use Yiisoft\ErrorHandler\ThrowableRenderer;
  */
 final class PlainTextRenderer extends ThrowableRenderer
 {
-    public function render(Throwable $t, ServerRequestInterface $request = null): string
+    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
-        return 'An internal server error occurred';
+        return new ErrorData('An internal server error occurred');
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): string
+    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
-        return $this->convertThrowableToVerboseString($t);
+        return new ErrorData($this->convertThrowableToVerboseString($t));
     }
 }

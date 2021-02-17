@@ -8,27 +8,27 @@ use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
 /**
- * ThrowableRendererInterface converts throwable into its string representation
+ * ThrowableRendererInterface converts throwable into error data suitable for displaying.
  */
 interface ThrowableRendererInterface
 {
     /**
-     * Convert throwable into its string representation suitable for displaying in production environment
+     * Returns error data suitable for displaying in production environment.
      *
      * @param Throwable $t
      * @param ServerRequestInterface|null $request
      *
-     * @return string
+     * @return ErrorData
      */
-    public function render(Throwable $t, ServerRequestInterface $request = null): string;
+    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData;
 
     /**
-     * Convert throwable into its string representation suitable for displaying in development environment
+     * Returns error data suitable for displaying in development environment.
      *
      * @param Throwable $t
      * @param ServerRequestInterface|null $request
      *
-     * @return string
+     * @return ErrorData
      */
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): string;
+    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData;
 }

@@ -8,6 +8,7 @@ use Alexkart\CurlBuilder\Command;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Throwable;
+use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\ThrowableRenderer;
 
 use function array_values;
@@ -104,20 +105,20 @@ final class HtmlRenderer extends ThrowableRenderer
         $this->traceHeaderLine = $settings['traceHeaderLine'] ?? null;
     }
 
-    public function render(Throwable $t, ServerRequestInterface $request = null): string
+    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
-        return $this->renderTemplate($this->template, [
+        return new ErrorData($this->renderTemplate($this->template, [
             'request' => $request,
             'throwable' => $t,
-        ]);
+        ]));
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): string
+    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
-        return $this->renderTemplate($this->verboseTemplate, [
+        return new ErrorData($this->renderTemplate($this->verboseTemplate, [
             'request' => $request,
             'throwable' => $t,
-        ]);
+        ]));
     }
 
     /**

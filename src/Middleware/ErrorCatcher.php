@@ -24,6 +24,7 @@ use Yiisoft\Http\Status;
 
 use function array_key_exists;
 use function count;
+use function is_subclass_of;
 use function sprintf;
 use function strpos;
 use function strtolower;
@@ -118,11 +119,10 @@ final class ErrorCatcher implements MiddlewareInterface
     {
         $contentType = $this->contentType ?? $this->getContentType($request);
         $renderer = $this->getRenderer(strtolower($contentType));
-        $content = $this->errorHandler->handleCaughtThrowable($e, $renderer, $request);
+        $data = $this->errorHandler->handleCaughtThrowable($e, $renderer, $request);
         $response = $this->responseFactory->createResponse(Status::INTERNAL_SERVER_ERROR)
             ->withHeader(Header::CONTENT_TYPE, $contentType);
-        $response->getBody()->write($content);
-        return $response;
+        return $data->setToResponse($response);
     }
 
     private function getRenderer(string $contentType): ?ThrowableRendererInterface
@@ -168,8 +168,19 @@ final class ErrorCatcher implements MiddlewareInterface
             throw new InvalidArgumentException('The renderer class cannot be an empty string.');
         }
 
+        if (!is_subclass_of($rendererClass, ThrowableRendererInterface::class)) {
+            throw new InvalidArgumentException(sprintf(
+                'Class "%s" does not implement "%s".',
+                $rendererClass,
+                ThrowableRendererInterface::class,
+            ));
+        }
+
         if ($this->container->has($rendererClass) === false) {
-            throw new InvalidArgumentException("The renderer \"$rendererClass\" cannot be found.");
+            throw new InvalidArgumentException(sprintf(
+                'The renderer "%s" cannot be found.',
+                $rendererClass,
+            ));
         }
     }
 }

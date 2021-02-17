@@ -6,6 +6,7 @@ namespace Yiisoft\ErrorHandler\Renderer;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
+use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\ThrowableRenderer;
 
 /**
@@ -13,27 +14,27 @@ use Yiisoft\ErrorHandler\ThrowableRenderer;
  */
 final class XmlRenderer extends ThrowableRenderer
 {
-    public function render(Throwable $t, ServerRequestInterface $request = null): string
+    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
-        $out = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
-        $out .= "<error>\n";
-        $out .= $this->tag('message', 'An internal server error occurred');
-        $out .= '</error>';
-        return $out;
+        $content = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
+        $content .= "<error>\n";
+        $content .= $this->tag('message', 'An internal server error occurred');
+        $content .= '</error>';
+        return new ErrorData($content);
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): string
+    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
-        $out = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
-        $out .= "<error>\n";
-        $out .= $this->tag('type', get_class($t));
-        $out .= $this->tag('message', $this->cdata($t->getMessage()));
-        $out .= $this->tag('code', $this->cdata((string) $t->getCode()));
-        $out .= $this->tag('file', $t->getFile());
-        $out .= $this->tag('line', (string) $t->getLine());
-        $out .= $this->tag('trace', $t->getTraceAsString());
-        $out .= '</error>';
-        return $out;
+        $content = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
+        $content .= "<error>\n";
+        $content .= $this->tag('type', get_class($t));
+        $content .= $this->tag('message', $this->cdata($t->getMessage()));
+        $content .= $this->tag('code', $this->cdata((string) $t->getCode()));
+        $content .= $this->tag('file', $t->getFile());
+        $content .= $this->tag('line', (string) $t->getLine());
+        $content .= $this->tag('trace', $t->getTraceAsString());
+        $content .= '</error>';
+        return new ErrorData($content);
     }
 
     private function tag(string $name, string $value): string
