@@ -406,7 +406,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * Returns the name of the throwable instance.
      *
      * @param Throwable $throwable
-     * 
+     *
      * @return string The name of the throwable instance.
      */
     private function getThrowableName(Throwable $throwable): string
