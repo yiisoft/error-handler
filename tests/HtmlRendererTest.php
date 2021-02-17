@@ -22,11 +22,11 @@ final class HtmlRendererTest extends TestCase
         $renderer = new HtmlRenderer();
         $exceptionMessage = 'exception-test-message';
         $exception = new RuntimeException($exceptionMessage);
-        $renderedOutput = $renderer->render($exception, $this->getServerRequestMock());
+        $errorData = $renderer->render($exception, $this->getServerRequestMock());
 
-        $this->assertStringContainsString('<html', $renderedOutput);
-        $this->assertStringNotContainsString(RuntimeException::class, $renderedOutput);
-        $this->assertStringNotContainsString($exceptionMessage, $renderedOutput);
+        $this->assertStringContainsString('<html', (string) $errorData);
+        $this->assertStringNotContainsString(RuntimeException::class, (string) $errorData);
+        $this->assertStringNotContainsString($exceptionMessage, (string) $errorData);
     }
 
     public function testVerboseOutput(): void
@@ -34,11 +34,11 @@ final class HtmlRendererTest extends TestCase
         $renderer = new HtmlRenderer();
         $exceptionMessage = 'exception-test-message';
         $exception = new RuntimeException($exceptionMessage);
-        $renderedOutput = $renderer->renderVerbose($exception, $this->getServerRequestMock());
+        $errorData = $renderer->renderVerbose($exception, $this->getServerRequestMock());
 
-        $this->assertStringContainsString('<html', $renderedOutput);
-        $this->assertStringContainsString(RuntimeException::class, $renderedOutput);
-        $this->assertStringContainsString($exceptionMessage, $renderedOutput);
+        $this->assertStringContainsString('<html', (string) $errorData);
+        $this->assertStringContainsString(RuntimeException::class, (string) $errorData);
+        $this->assertStringContainsString($exceptionMessage, (string) $errorData);
     }
 
     public function testNonVerboseOutputWithCustomTemplate(): void
@@ -50,8 +50,8 @@ final class HtmlRendererTest extends TestCase
         $exceptionMessage = 'exception-test-message';
         $exception = new RuntimeException($exceptionMessage);
 
-        $renderedOutput = $renderer->render($exception, $this->getServerRequestMock());
-        $this->assertStringContainsString("<html>$exceptionMessage</html>", $renderedOutput);
+        $errorData = $renderer->render($exception, $this->getServerRequestMock());
+        $this->assertStringContainsString("<html>$exceptionMessage</html>", (string) $errorData);
     }
 
     public function testVerboseOutputWithCustomTemplate(): void
@@ -63,8 +63,8 @@ final class HtmlRendererTest extends TestCase
         $exceptionMessage = 'exception-test-message';
         $exception = new RuntimeException($exceptionMessage);
 
-        $renderedOutput = $renderer->renderVerbose($exception, $this->getServerRequestMock());
-        $this->assertStringContainsString("<html>$exceptionMessage</html>", $renderedOutput);
+        $errorData = $renderer->renderVerbose($exception, $this->getServerRequestMock());
+        $this->assertStringContainsString("<html>$exceptionMessage</html>", (string) $errorData);
     }
 
     public function testRenderTemplateThrowsExceptionWhenTemplateFileNotExists(): void

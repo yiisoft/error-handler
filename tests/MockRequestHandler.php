@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests;
 
-use Nyholm\Psr7\Response;
+use HttpSoft\Message\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
 
 final class MockRequestHandler implements RequestHandlerInterface
 {
     public ServerRequestInterface $processedRequest;
     private int $responseStatus;
-    private ?\Throwable $handleException;
+    private ?Throwable $handleException;
 
     public function __construct(int $responseStatus = 200)
     {
         $this->responseStatus = $responseStatus;
     }
 
-    public function setHandleException(?\Throwable $throwable): self
+    public function setHandleException(?Throwable $throwable): self
     {
         $this->handleException = $throwable;
         return $this;
@@ -31,6 +32,7 @@ final class MockRequestHandler implements RequestHandlerInterface
         if ($this->handleException !== null) {
             throw $this->handleException;
         }
+
         $this->processedRequest = $request;
         return new Response($this->responseStatus);
     }
