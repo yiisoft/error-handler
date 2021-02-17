@@ -12,6 +12,8 @@ use Throwable;
  */
 interface ThrowableRendererInterface
 {
+    public const DEFAULT_ERROR_MESSAGE = 'An internal server error occurred.';
+
     /**
      * Returns error data suitable for displaying in production environment.
      *

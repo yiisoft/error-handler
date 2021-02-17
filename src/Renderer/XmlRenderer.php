@@ -7,18 +7,21 @@ namespace Yiisoft\ErrorHandler\Renderer;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\ErrorData;
-use Yiisoft\ErrorHandler\ThrowableRenderer;
+use Yiisoft\ErrorHandler\ThrowableRendererInterface;
+
+use function get_class;
+use function str_replace;
 
 /**
  * Formats exception into XML string.
  */
-final class XmlRenderer extends ThrowableRenderer
+final class XmlRenderer implements ThrowableRendererInterface
 {
     public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
         $content = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
         $content .= "<error>\n";
-        $content .= $this->tag('message', 'An internal server error occurred');
+        $content .= $this->tag('message', self::DEFAULT_ERROR_MESSAGE);
         $content .= '</error>';
         return new ErrorData($content);
     }

@@ -7,19 +7,20 @@ namespace Yiisoft\ErrorHandler\Renderer;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\ErrorData;
-use Yiisoft\ErrorHandler\ThrowableRenderer;
+use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
+use function get_class;
 use function json_encode;
 
 /**
  * Formats exception into JSON string.
  */
-final class JsonRenderer extends ThrowableRenderer
+final class JsonRenderer implements ThrowableRendererInterface
 {
     public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(json_encode([
-            'message' => 'An internal server error occurred',
+            'message' => self::DEFAULT_ERROR_MESSAGE,
         ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
