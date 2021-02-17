@@ -41,7 +41,7 @@ use function stripos;
 use function strpos;
 
 /**
- * Formats exception into HTML string.
+ * Formats throwable into HTML string.
  */
 final class HtmlRenderer implements ThrowableRendererInterface
 {

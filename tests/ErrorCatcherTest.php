@@ -14,12 +14,26 @@ use RuntimeException;
 use Yiisoft\Di\Container;
 use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
 use Yiisoft\ErrorHandler\ErrorHandler;
+use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\Http\Header;
 
 final class ErrorCatcherTest extends TestCase
 {
+    public function testProcessWithHeadRequestMethod(): void
+    {
+        $response = $this->createErrorCatcher()->process(
+            $this->createServerRequest('HEAD', ['Accept' => ['test/html']]),
+            (new MockRequestHandler())->setHandleException(new RuntimeException()),
+        );
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $this->assertEmpty($content);
+        $this->assertSame([HeaderRenderer::DEFAULT_ERROR_MESSAGE], $response->getHeader('X-Error-Message'));
+    }
+
     public function testAddedRenderer(): void
     {
         $mimeType = 'test/test';

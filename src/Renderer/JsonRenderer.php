@@ -13,7 +13,7 @@ use function get_class;
 use function json_encode;
 
 /**
- * Formats exception into JSON string.
+ * Formats throwable into JSON string.
  */
 final class JsonRenderer implements ThrowableRendererInterface
 {

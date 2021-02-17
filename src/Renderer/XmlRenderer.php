@@ -13,7 +13,7 @@ use function get_class;
 use function str_replace;
 
 /**
- * Formats exception into XML string.
+ * Formats throwable into XML string.
  */
 final class XmlRenderer implements ThrowableRendererInterface
 {

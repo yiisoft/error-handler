@@ -14,12 +14,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\HeaderHelper;
+use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\Renderer\JsonRenderer;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\ErrorHandler\Renderer\XmlRenderer;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\Http\Header;
+use Yiisoft\Http\Method;
 use Yiisoft\Http\Status;
 
 use function array_key_exists;
@@ -60,35 +62,36 @@ final class ErrorCatcher implements MiddlewareInterface
         $this->container = $container;
     }
 
-    public function withRenderer(string $mimeType, string $rendererClass): self
+    public function withRenderer(string $contentType, string $rendererClass): self
     {
-        $this->validateMimeType($mimeType);
         $this->validateRenderer($rendererClass);
 
         $new = clone $this;
-        $new->renderers[$this->normalizeMimeType($mimeType)] = $rendererClass;
+        $new->renderers[$this->normalizeContentType($contentType)] = $rendererClass;
         return $new;
     }
 
     /**
-     * @param string[] $mimeTypes MIME types or, if not specified, all will be removed.
+     * @param string[] $contentTypes MIME types or, if not specified, all will be removed.
      */
-    public function withoutRenderers(string ...$mimeTypes): self
+    public function withoutRenderers(string ...$contentTypes): self
     {
         $new = clone $this;
-        if (count($mimeTypes) === 0) {
+
+        if (count($contentTypes) === 0) {
             $new->renderers = [];
             return $new;
         }
-        foreach ($mimeTypes as $mimeType) {
-            $this->validateMimeType($mimeType);
-            unset($new->renderers[$this->normalizeMimeType($mimeType)]);
+
+        foreach ($contentTypes as $contentType) {
+            unset($new->renderers[$this->normalizeContentType($contentType)]);
         }
+
         return $new;
     }
 
     /**
-     * Force content type to respond with regardless of request
+     * Force content type to respond with regardless of request.
      *
      * @param string $contentType
      *
@@ -96,7 +99,8 @@ final class ErrorCatcher implements MiddlewareInterface
      */
     public function forceContentType(string $contentType): self
     {
-        $this->validateMimeType($contentType);
+        $contentType = $this->normalizeContentType($contentType);
+
         if (!isset($this->renderers[$contentType])) {
             throw new InvalidArgumentException(sprintf('The renderer for %s is not set.', $contentType));
         }
@@ -110,19 +114,20 @@ final class ErrorCatcher implements MiddlewareInterface
     {
         try {
             return $handler->handle($request);
-        } catch (Throwable $e) {
-            return $this->handleException($e, $request);
+        } catch (Throwable $t) {
+            return $this->handleException($t, $request);
         }
     }
 
-    private function handleException(Throwable $e, ServerRequestInterface $request): ResponseInterface
+    private function handleException(Throwable $t, ServerRequestInterface $request): ResponseInterface
     {
         $contentType = $this->contentType ?? $this->getContentType($request);
-        $renderer = $this->getRenderer(strtolower($contentType));
-        $data = $this->errorHandler->handleCaughtThrowable($e, $renderer, $request);
-        $response = $this->responseFactory->createResponse(Status::INTERNAL_SERVER_ERROR)
-            ->withHeader(Header::CONTENT_TYPE, $contentType);
-        return $data->setToResponse($response);
+        $renderer = $request->getMethod() === Method::HEAD ? new HeaderRenderer() : $this->getRenderer($contentType);
+
+        $data = $this->errorHandler->handleCaughtThrowable($t, $renderer, $request);
+        $response = $this->responseFactory->createResponse(Status::INTERNAL_SERVER_ERROR);
+
+        return $data->setToResponse($response->withHeader(Header::CONTENT_TYPE, $contentType));
     }
 
     private function getRenderer(string $contentType): ?ThrowableRendererInterface
@@ -130,6 +135,7 @@ final class ErrorCatcher implements MiddlewareInterface
         if (isset($this->renderers[$contentType])) {
             return $this->container->get($this->renderers[$contentType]);
         }
+
         return null;
     }
 
@@ -144,22 +150,17 @@ final class ErrorCatcher implements MiddlewareInterface
         } catch (InvalidArgumentException $e) {
             // The Accept header contains an invalid q factor
         }
+
         return '*/*';
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function validateMimeType(string $mimeType): void
+    private function normalizeContentType(string $contentType): string
     {
-        if (strpos($mimeType, '/') === false) {
-            throw new InvalidArgumentException('Invalid mime type.');
+        if (strpos($contentType, '/') === false) {
+            throw new InvalidArgumentException('Invalid content type.');
         }
-    }
 
-    private function normalizeMimeType(string $mimeType): string
-    {
-        return strtolower(trim($mimeType));
+        return strtolower(trim($contentType));
     }
 
     private function validateRenderer(string $rendererClass): void
@@ -173,13 +174,6 @@ final class ErrorCatcher implements MiddlewareInterface
                 'Class "%s" does not implement "%s".',
                 $rendererClass,
                 ThrowableRendererInterface::class,
-            ));
-        }
-
-        if ($this->container->has($rendererClass) === false) {
-            throw new InvalidArgumentException(sprintf(
-                'The renderer "%s" cannot be found.',
-                $rendererClass,
             ));
         }
     }

@@ -12,21 +12,23 @@ use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use function get_class;
 
 /**
- * Formats throwable into plain text string.
+ * Formats throwable into HTTP headers.
  */
-final class PlainTextRenderer implements ThrowableRendererInterface
+final class HeaderRenderer implements ThrowableRendererInterface
 {
     public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
-        return new ErrorData(self::DEFAULT_ERROR_MESSAGE);
+        return new ErrorData('', ['X-Error-Message' => self::DEFAULT_ERROR_MESSAGE]);
     }
 
     public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
-        return new ErrorData(
-            get_class($t) . " with message '{$t->getMessage()}' \n\nin "
-            . $t->getFile() . ':' . $t->getLine() . "\n\n"
-            . "Stack trace:\n" . $t->getTraceAsString()
-        );
+        return new ErrorData('', [
+            'X-Error-Type' => get_class($t),
+            'X-Error-Message' => $t->getMessage(),
+            'X-Error-Code' => $t->getCode(),
+            'X-Error-File' => $t->getFile(),
+            'X-Error-Line' => $t->getLine(),
+        ]);
     }
 }
