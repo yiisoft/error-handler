@@ -21,7 +21,7 @@ final class JsonRenderer implements ThrowableRendererInterface
     {
         return new ErrorData(json_encode([
             'message' => self::DEFAULT_ERROR_MESSAGE,
-        ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES));
     }
 
     public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData

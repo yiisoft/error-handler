@@ -20,7 +20,7 @@ final class XmlRenderer implements ThrowableRendererInterface
     public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
         $content = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
-        $content .= "<error>\n";
+        $content .= "\n<error>\n";
         $content .= $this->tag('message', self::DEFAULT_ERROR_MESSAGE);
         $content .= '</error>';
         return new ErrorData($content);
@@ -29,7 +29,7 @@ final class XmlRenderer implements ThrowableRendererInterface
     public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
         $content = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
-        $content .= "<error>\n";
+        $content .= "\n<error>\n";
         $content .= $this->tag('type', get_class($t));
         $content .= $this->tag('message', $this->cdata($t->getMessage()));
         $content .= $this->tag('code', $this->cdata((string) $t->getCode()));
