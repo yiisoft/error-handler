@@ -64,7 +64,13 @@ final class ErrorCatcher implements MiddlewareInterface
 
     public function withRenderer(string $contentType, string $rendererClass): self
     {
-        $this->validateRenderer($rendererClass);
+        if (!is_subclass_of($rendererClass, ThrowableRendererInterface::class)) {
+            throw new InvalidArgumentException(sprintf(
+                'Class "%s" does not implement "%s".',
+                $rendererClass,
+                ThrowableRendererInterface::class,
+            ));
+        }
 
         $new = clone $this;
         $new->renderers[$this->normalizeContentType($contentType)] = $rendererClass;
@@ -162,20 +168,5 @@ final class ErrorCatcher implements MiddlewareInterface
         }
 
         return strtolower(trim($contentType));
-    }
-
-    private function validateRenderer(string $rendererClass): void
-    {
-        if (trim($rendererClass) === '') {
-            throw new InvalidArgumentException('The renderer class cannot be an empty string.');
-        }
-
-        if (!is_subclass_of($rendererClass, ThrowableRendererInterface::class)) {
-            throw new InvalidArgumentException(sprintf(
-                'Class "%s" does not implement "%s".',
-                $rendererClass,
-                ThrowableRendererInterface::class,
-            ));
-        }
     }
 }
