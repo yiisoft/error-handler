@@ -7,23 +7,23 @@ namespace Yiisoft\ErrorHandler;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * ErrorData stores content and headers that are suitable for displaying.
+ * ErrorData stores content and headers that are suitable for adding to response.
  */
 final class ErrorData
 {
     /**
-     * @var string The content of error data.
+     * @var string The content to use as response body.
      */
     private string $content;
 
     /**
-     * @var array<string, string|string[]> The headers of error data to add to the response.
+     * @var array<string, string|string[]> The headers to add to the response.
      */
     private array $headers;
 
     /**
-     * @param string $content The content of error data.
-     * @param array<string, string|string[]> $headers The headers of error data to add to the response.
+     * @param string $content The content to use as response body.
+     * @param array<string, string|string[]> $headers The headers to add to the response.
      */
     public function __construct(string $content, array $headers = [])
     {
@@ -32,9 +32,9 @@ final class ErrorData
     }
 
     /**
-     * Returns a content of error data.
+     * Returns a content to use as response body.
      *
-     * @return string The content of error data.
+     * @return string The content to use as response body.
      */
     public function __toString(): string
     {
@@ -48,7 +48,7 @@ final class ErrorData
      *
      * @return ResponseInterface The response with error data.
      */
-    public function setToResponse(ResponseInterface $response): ResponseInterface
+    public function addToResponse(ResponseInterface $response): ResponseInterface
     {
         foreach ($this->headers as $name => $value) {
             $response = $response->withHeader($name, $value);

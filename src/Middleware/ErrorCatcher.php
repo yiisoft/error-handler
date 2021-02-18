@@ -72,7 +72,8 @@ final class ErrorCatcher implements MiddlewareInterface
     }
 
     /**
-     * @param string[] $contentTypes MIME types or, if not specified, all will be removed.
+     * @param string[] $contentTypes MIME types to remove associated renderers for.
+     * If not specified, all renderers will be removed.
      */
     public function withoutRenderers(string ...$contentTypes): self
     {
@@ -127,7 +128,7 @@ final class ErrorCatcher implements MiddlewareInterface
         $data = $this->errorHandler->handleCaughtThrowable($t, $renderer, $request);
         $response = $this->responseFactory->createResponse(Status::INTERNAL_SERVER_ERROR);
 
-        return $data->setToResponse($response->withHeader(Header::CONTENT_TYPE, $contentType));
+        return $data->addToResponse($response->withHeader(Header::CONTENT_TYPE, $contentType));
     }
 
     private function getRenderer(string $contentType): ?ThrowableRendererInterface
