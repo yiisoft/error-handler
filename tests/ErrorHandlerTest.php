@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Yiisoft\ErrorHandler\ErrorHandler;
+use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
 final class ErrorHandlerTest extends TestCase
@@ -16,9 +17,8 @@ final class ErrorHandlerTest extends TestCase
     private LoggerInterface $loggerMock;
     private ThrowableRendererInterface $throwableRendererMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
-        parent::setUp();
         $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->throwableRendererMock = $this->createMock(ThrowableRendererInterface::class);
         $this->errorHandler = new ErrorHandler($this->loggerMock, $this->throwableRendererMock);
@@ -81,5 +81,27 @@ final class ErrorHandlerTest extends TestCase
 
         $this->errorHandler->debug(false);
         $this->errorHandler->handleCaughtThrowable($throwable);
+    }
+
+    public function testHandleError(): void
+    {
+        $array = [];
+        $this->errorHandler->register();
+        $this->expectException(ErrorException::class);
+        $array['undefined'];
+        $this->errorHandler->unregister();
+    }
+
+    public function testHandleErrorIfErrorCodeIsIncludedInErrorReporting(): void
+    {
+        $this->expectException(ErrorException::class);
+        $this->expectExceptionMessage('Some error.');
+        $this->errorHandler->handleError(1, 'Some error.', __FILE__, __LINE__);
+    }
+
+    public function testHandleErrorIfErrorCodeIsNotIncludedInErrorReporting(): void
+    {
+        $this->expectOutputString('');
+        $this->errorHandler->handleError(0, 'Some error.', __FILE__, __LINE__);
     }
 }

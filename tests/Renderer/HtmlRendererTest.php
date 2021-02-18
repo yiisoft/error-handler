@@ -1,0 +1,279 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Yiisoft\ErrorHandler\Tests\Renderer;
+
+use Exception;
+use HttpSoft\Message\Uri;
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
+use ReflectionObject;
+use RuntimeException;
+use Yiisoft\ErrorHandler\Exception\ErrorException;
+use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
+
+use function file_exists;
+use function file_put_contents;
+use function fopen;
+use function unlink;
+
+final class HtmlRendererTest extends TestCase
+{
+    private const CUSTOM_SETTING = [
+        'verboseTemplate' => __DIR__ . '/test-template-verbose.php',
+        'template' => __DIR__ . '/test-template-non-verbose.php',
+    ];
+
+    protected function tearDown(): void
+    {
+        foreach (self::CUSTOM_SETTING as $template) {
+            if (file_exists($template)) {
+                unlink($template);
+            }
+        }
+    }
+
+    public function testNonVerboseOutput(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exceptionMessage = 'exception-test-message';
+        $exception = new RuntimeException($exceptionMessage);
+        $errorData = $renderer->render($exception, $this->createServerRequestMock());
+
+        $this->assertStringContainsString('<html', (string) $errorData);
+        $this->assertStringNotContainsString(RuntimeException::class, (string) $errorData);
+        $this->assertStringNotContainsString($exceptionMessage, (string) $errorData);
+    }
+
+    public function testVerboseOutput(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exceptionMessage = 'exception-test-message';
+        $exception = new RuntimeException($exceptionMessage);
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+
+        $this->assertStringContainsString('<html', (string) $errorData);
+        $this->assertStringContainsString(RuntimeException::class, (string) $errorData);
+        $this->assertStringContainsString($exceptionMessage, (string) $errorData);
+    }
+
+    public function testNonVerboseOutputWithCustomTemplate(): void
+    {
+        $templateFileContents = '<html><?php echo $throwable->getMessage();?></html>';
+        $this->createTestTemplate(self::CUSTOM_SETTING['template'], $templateFileContents);
+
+        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
+        $exceptionMessage = 'exception-test-message';
+        $exception = new RuntimeException($exceptionMessage);
+
+        $errorData = $renderer->render($exception, $this->createServerRequestMock());
+        $this->assertStringContainsString("<html>$exceptionMessage</html>", (string) $errorData);
+    }
+
+    public function testVerboseOutputWithCustomTemplate(): void
+    {
+        $templateFileContents = '<html><?php echo $throwable->getMessage();?></html>';
+        $this->createTestTemplate(self::CUSTOM_SETTING['verboseTemplate'], $templateFileContents);
+
+        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
+        $exceptionMessage = 'exception-test-message';
+        $exception = new RuntimeException($exceptionMessage);
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $this->assertStringContainsString("<html>$exceptionMessage</html>", (string) $errorData);
+    }
+
+    public function testRenderTemplateThrowsExceptionWhenTemplateFileNotExists(): void
+    {
+        $renderer = new HtmlRenderer(['template' => '_not_found_.php']);
+        $exception = new Exception();
+
+        $this->expectException(RuntimeException::class);
+        $renderer->render($exception, $this->createServerRequestMock());
+    }
+
+    public function testRenderTemplateThrowsExceptionWhenFailureInTemplate(): void
+    {
+        $this->createTestTemplate(self::CUSTOM_SETTING['verboseTemplate'], '<html><?php throw $throwable;?></html>');
+        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
+        $exceptionMessage = 'Template error.';
+        $exception = new RuntimeException($exceptionMessage);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+        $renderer->renderVerbose($exception, $this->createServerRequestMock());
+    }
+
+    public function testRenderPreviousExceptions(): void
+    {
+        $previousExceptionMessage = 'Test Previous Exception.';
+        $exception = new RuntimeException('Some error.', 0, new Exception($previousExceptionMessage));
+        $templateFileContents = '<?php echo $this->renderPreviousExceptions($throwable); ?>';
+        $this->createTestTemplate(self::CUSTOM_SETTING['verboseTemplate'], $templateFileContents);
+        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $this->assertStringContainsString($previousExceptionMessage, (string) $errorData);
+    }
+
+    public function testRenderCallStackItemIfFileIsNotExistAndLineMoreZero(): void
+    {
+        $this->assertEmpty($this->invokeMethod(new HtmlRenderer(), 'renderCallStackItem', [
+            'file' => 'not-exist',
+            'line' => 1,
+            'class' => null,
+            'function' => null,
+            'args' => [],
+            'index' => 1,
+        ]));
+    }
+
+    public function testRenderRequest(): void
+    {
+        $output = $this->invokeMethod(new HtmlRenderer(), 'renderRequest', [
+            'request' => $this->createServerRequestMock(),
+        ]);
+        $this->assertSame("<pre>GET https:/example.com\nAccept: text/html</pre>", $output);
+    }
+
+    public function testRenderCurlForFailRequest(): void
+    {
+        $output = $this->invokeMethod(new HtmlRenderer(), 'renderCurl', [
+            'request' => $this->createServerRequestMock(),
+        ]);
+        $this->assertSame('Error generating curl command: Call getHeaderLine()', $output);
+    }
+
+    public function testGetThrowableName(): void
+    {
+        $name = $this->invokeMethod(new HtmlRenderer(), 'getThrowableName', [
+            'throwable' => new ErrorException(),
+        ]);
+        $this->assertSame('Error (' . ErrorException::class . ')', $name);
+    }
+
+    public function createServerInformationLinkDataProvider(): array
+    {
+        return [
+            'not-exist' => [null, ''],
+            'unknown' => ['unknown', ''],
+            'apache' => ['apache', 'https://httpd.apache.org'],
+            'nginx' => ['nginx', 'https://nginx.org'],
+            'lighttpd' => ['lighttpd', 'https://lighttpd.net'],
+            'iis-iis' => ['iis', 'https://iis.net'],
+            'iis-services' => ['services', 'https://iis.net'],
+            'development' => ['development', 'https://www.php.net/manual/en/features.commandline.webserver.php'],
+        ];
+    }
+
+    /**
+     * @dataProvider createServerInformationLinkDataProvider
+     *
+     * @param string|null $serverSoftware
+     * @param string $expected
+     */
+    public function testCreateServerInformationLink(?string $serverSoftware, string $expected): void
+    {
+        $serverRequestMock = $this->createServerRequestMock();
+        $serverRequestMock->method('getServerParams')->willReturn(['SERVER_SOFTWARE' => $serverSoftware]);
+
+        $serverLink = $this->invokeMethod(new HtmlRenderer(), 'createServerInformationLink', [
+            'request' => $serverRequestMock,
+        ]);
+
+        $this->assertStringContainsString($expected, $serverLink);
+    }
+
+    public function argumentsToStringValueDataProvider(): array
+    {
+        return [
+            'int' => [[1], '1'],
+            'float' => [[1.1], '1.1'],
+            'bool' => [[true], 'true'],
+            'null' => [[null], 'null'],
+            'object' => [[new HtmlRenderer()], HtmlRenderer::class],
+            'array' => [[['test-string-array']], 'test-string-array'],
+            'resource' => [[fopen('php://memory', 'r')], 'resource'],
+            'string-less-32' => [['test-string'], 'test-string'],
+            'string-more-32' => [['qwertyuiopasdfghjklzxcvbnm1234567'], 'qwertyuiopasdfghjklzxcvbnm123456...'],
+            'key-string' => [
+                ['key' => 'value'],
+                '<span class="string">\'key\'</span> => <span class="string">\'value\'</span>',
+            ],
+            'key-int' => [
+                [111 => 'value'],
+                '<span class="number">111</span> => <span class="string">\'value\'</span>',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider argumentsToStringValueDataProvider
+     *
+     * @param mixed $args
+     * @param string $expected
+     */
+    public function testArgumentsToString(array $args, string $expected): void
+    {
+        $value = $this->invokeMethod(new HtmlRenderer(), 'argumentsToString', ['args' => $args]);
+        $this->assertStringContainsString($expected, $value);
+    }
+
+    private function createServerRequestMock(): ServerRequestInterface
+    {
+        $serverRequestMock = $this->createMock(ServerRequestInterface::class);
+        $acceptHeader = ['text/html'];
+        $hostHeader = ['example.com'];
+
+        $serverRequestMock
+            ->method('getHeader')
+            ->with('Accept')
+            ->willReturn($acceptHeader);
+
+        $serverRequestMock
+            ->method('getHeader')
+            ->with('Host')
+            ->willReturn($hostHeader);
+
+        $serverRequestMock
+            ->method('getHeaders')
+            ->willReturn(
+                [
+                    'Accept' => $acceptHeader,
+                    'Host' => $hostHeader,
+                ]
+            );
+
+        $serverRequestMock
+            ->method('getMethod')
+            ->willReturn('GET');
+
+        $serverRequestMock
+            ->method('getUri')
+            ->willReturn(new Uri('https:/example.com'));
+
+        $serverRequestMock
+            ->method('getHeaderLine')
+            ->willThrowException(new RuntimeException('Call getHeaderLine()'));
+
+        return $serverRequestMock;
+    }
+
+    private function createTestTemplate(string $path, string $templateContents): void
+    {
+        if (!file_put_contents($path, $templateContents)) {
+            throw new RuntimeException(sprintf('Unable to create file at path %s', $path));
+        }
+    }
+
+    private function invokeMethod(object $object, string $method, array $args = [])
+    {
+        $reflection = new ReflectionObject($object);
+        $method = $reflection->getMethod($method);
+        $method->setAccessible(true);
+        $result = $method->invokeArgs($object, $args);
+        $method->setAccessible(false);
+        return $result;
+    }
+}

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\ErrorHandler\Tests;
+namespace Yiisoft\ErrorHandler\Tests\Middleware;
 
 use DomainException;
 use HttpSoft\Message\ResponseFactory;
