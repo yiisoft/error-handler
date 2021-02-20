@@ -19,6 +19,7 @@ The package provides advanced error handling. The features are:
 - PSR-15 middleware for catching unhandled errors.
 - PSR-15 middleware for mapping certain exceptions to custom responses.
 - Production and debug modes.
+- Debug mode displays details, stacktrace, has dark and light themes and handy buttons to search for error without typing.  
 - Takes PHP settings into account.
 - Handles out of memory errors, fatals, warnings, notices and exceptions. 
 - Can use any PSR-3 compatible logger for error logging.
