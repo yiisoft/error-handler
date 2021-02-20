@@ -73,13 +73,13 @@ final class ErrorHandler
      * @param ThrowableRendererInterface|null $renderer
      * @param ServerRequestInterface|null $request
      *
-     * @return string
+     * @return ErrorData
      */
     public function handleCaughtThrowable(
         Throwable $t,
         ThrowableRendererInterface $renderer = null,
         ServerRequestInterface $request = null
-    ): string {
+    ): ErrorData {
         if ($renderer === null) {
             $renderer = $this->defaultRenderer;
         }
@@ -88,7 +88,7 @@ final class ErrorHandler
             $this->log($t, $request);
             return $this->debug ? $renderer->renderVerbose($t, $request) : $renderer->render($t, $request);
         } catch (Throwable $t) {
-            return (string) $t;
+            return new ErrorData((string) $t);
         }
     }
 

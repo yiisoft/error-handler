@@ -8,7 +8,9 @@ use Alexkart\CurlBuilder\Command;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Throwable;
-use Yiisoft\ErrorHandler\ThrowableRenderer;
+use Yiisoft\ErrorHandler\ErrorData;
+use Yiisoft\ErrorHandler\ThrowableRendererInterface;
+use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
 use function array_values;
 use function dirname;
@@ -39,9 +41,9 @@ use function stripos;
 use function strpos;
 
 /**
- * Formats exception into HTML string.
+ * Formats throwable into HTML string.
  */
-final class HtmlRenderer extends ThrowableRenderer
+final class HtmlRenderer implements ThrowableRendererInterface
 {
     /**
      * @var string The full path to the default template directory.
@@ -104,20 +106,20 @@ final class HtmlRenderer extends ThrowableRenderer
         $this->traceHeaderLine = $settings['traceHeaderLine'] ?? null;
     }
 
-    public function render(Throwable $t, ServerRequestInterface $request = null): string
+    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
-        return $this->renderTemplate($this->template, [
+        return new ErrorData($this->renderTemplate($this->template, [
             'request' => $request,
             'throwable' => $t,
-        ]);
+        ]));
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): string
+    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
-        return $this->renderTemplate($this->verboseTemplate, [
+        return new ErrorData($this->renderTemplate($this->verboseTemplate, [
             'request' => $request,
             'throwable' => $t,
-        ]);
+        ]));
     }
 
     /**
@@ -401,13 +403,31 @@ final class HtmlRenderer extends ThrowableRenderer
     }
 
     /**
+     * Returns the name of the throwable instance.
+     *
+     * @param Throwable $throwable
+     *
+     * @return string The name of the throwable instance.
+     */
+    private function getThrowableName(Throwable $throwable): string
+    {
+        $name = get_class($throwable);
+
+        if ($throwable instanceof FriendlyExceptionInterface) {
+            $name = $throwable->getName() . ' (' . $name . ')';
+        }
+
+        return $name;
+    }
+
+    /**
      * Determines whether given name of the file belongs to the framework.
      *
      * @param string|null $file The name to be checked.
      *
      * @return bool Whether given name of the file belongs to the framework.
      */
-    public function isCoreFile(?string $file): bool
+    private function isCoreFile(?string $file): bool
     {
         return $file === null || strpos(realpath($file), dirname(__DIR__, 3)) === 0;
     }

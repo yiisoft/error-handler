@@ -3,13 +3,14 @@
 /* @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer */
 
 use Yiisoft\ErrorHandler\Exception\UserException;
+use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
 if ($throwable instanceof UserException) {
     $name = $this->getThrowableName($throwable);
     $message = $throwable->getMessage();
 } else {
     $name = 'Error';
-    $message = 'An internal server error occurred.';
+    $message = ThrowableRendererInterface::DEFAULT_ERROR_MESSAGE;
 }
 ?>
 <!DOCTYPE html>
