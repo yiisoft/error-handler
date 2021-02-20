@@ -4,7 +4,11 @@
     "description": "Yii Error Handling Library",
     "keywords": [
         "yiisoft",
-        "error-handler"
+        "error-handler",
+        "psr-3",
+        "psr-7",
+        "psr-11",
+        "psr-15"
     ],
     "homepage": "https://www.yiiframework.com/",
     "license": "BSD-3-Clause",
@@ -15,8 +19,6 @@
         "irc": "irc://irc.freenode.net/yii",
         "source": "https://github.com/yiisoft/error-handler"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
         "php": "^7.4|^8.0",
         "ext-dom": "*",

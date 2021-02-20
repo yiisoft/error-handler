@@ -14,7 +14,17 @@
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Ferror-handler%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/error-handler/master)
 [![static analysis](https://github.com/yiisoft/error-handler/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/error-handler/actions?query=workflow%3A%22static+analysis%22)
 
-The package ...
+The package provides advanced error handling. The features are:
+
+- PSR-15 middleware for catching unhandled errors.
+- PSR-15 middleware for mapping certain exceptions to custom responses.
+- Production and debug modes.
+- Takes PHP settings into account.
+- Handles out of memory errors, fatals, warnings, notices and exceptions. 
+- Can use any PSR-3 compatible logger for error logging.
+- Detects response format based on mime type of the request.
+- Supports responding with HTML, plain text, JSON, XML and headers out of the box.
+- Has ability to implement your own error rendering for additional types.
 
 ## Requirements
 
