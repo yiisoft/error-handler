@@ -429,6 +429,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     private function isCoreFile(?string $file): bool
     {
-        return $file === null || strpos(realpath($file), dirname(__DIR__, 3)) === 0;
+        return $file === null || strpos((string) realpath($file), dirname(__DIR__, 3)) === 0;
     }
 }
