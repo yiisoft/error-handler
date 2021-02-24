@@ -129,47 +129,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return string Encoded content.
      */
-    private function htmlEncode(string $content): string
+    public function htmlEncode(string $content): string
     {
         return htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
-    }
-
-    /**
-     * Renders a template.
-     *
-     * @param string $path The full path of the template file for rendering.
-     * @param array $parameters The name-value pairs that will be extracted and made available in the template file.
-     *
-     * @throws Throwable
-     *
-     * @return string The rendering result.
-     */
-    private function renderTemplate(string $path, array $parameters): string
-    {
-        if (!file_exists($path)) {
-            throw new RuntimeException("Template not found at $path");
-        }
-
-        $renderer = function (): void {
-            extract(func_get_arg(1), EXTR_OVERWRITE);
-            require func_get_arg(0);
-        };
-
-        $obInitialLevel = ob_get_level();
-        ob_start();
-        PHP_VERSION_ID >= 80000 ? ob_implicit_flush(false) : ob_implicit_flush(0);
-
-        try {
-            $renderer->bindTo($this)($path, $parameters);
-            return ob_get_clean();
-        } catch (Throwable $e) {
-            while (ob_get_level() > $obInitialLevel) {
-                if (!@ob_end_clean()) {
-                    ob_clean();
-                }
-            }
-            throw $e;
-        }
     }
 
     /**
@@ -181,7 +143,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return string HTML content of the rendered previous exceptions. Empty string if there are none.
      */
-    private function renderPreviousExceptions(Throwable $t): string
+    public function renderPreviousExceptions(Throwable $t): string
     {
         if (($previous = $t->getPrevious()) !== null) {
             $templatePath = $this->defaultTemplatePath . '/_previous-exception.php';
@@ -200,7 +162,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return string HTML content of the rendered call stack.
      */
-    private function renderCallStack(Throwable $t): string
+    public function renderCallStack(Throwable $t): string
     {
         $out = '<ul>';
         $out .= $this->renderCallStackItem($t->getFile(), $t->getLine(), null, null, [], 1);
@@ -222,56 +184,13 @@ final class HtmlRenderer implements ThrowableRendererInterface
     }
 
     /**
-     * Renders a single call stack element.
-     *
-     * @param string|null $file The name where call has happened.
-     * @param int|null $line The number on which call has happened.
-     * @param string|null $class The called class name.
-     * @param string|null $function The called function/method name.
-     * @param array $args The array of method arguments.
-     * @param int $index The number of the call stack element.
-     *
-     * @throws Throwable
-     *
-     * @return string HTML content of the rendered call stack element.
-     */
-    private function renderCallStackItem(?string $file, ?int $line, ?string $class, ?string $function, array $args, int $index): string
-    {
-        $lines = [];
-        $begin = $end = 0;
-
-        if ($file !== null && $line !== null) {
-            $line--; // adjust line number from one-based to zero-based
-            $lines = @file($file);
-            if ($line < 0 || $lines === false || ($lineCount = count($lines)) < $line) {
-                return '';
-            }
-            $half = (int) (($index === 1 ? $this->maxSourceLines : $this->maxTraceLines) / 2);
-            $begin = $line - $half > 0 ? $line - $half : 0;
-            $end = $line + $half < $lineCount ? $line + $half : $lineCount - 1;
-        }
-
-        return $this->renderTemplate($this->defaultTemplatePath . '/_call-stack-item.php', [
-            'file' => $file,
-            'line' => $line,
-            'class' => $class,
-            'function' => $function,
-            'index' => $index,
-            'lines' => $lines,
-            'begin' => $begin,
-            'end' => $end,
-            'args' => $args,
-        ]);
-    }
-
-    /**
      * Converts arguments array to its string representation.
      *
      * @param array $args arguments array to be converted
      *
      * @return string The string representation of the arguments array.
      */
-    private function argumentsToString(array $args): string
+    public function argumentsToString(array $args): string
     {
         $count = 0;
         $isAssoc = $args !== array_values($args);
@@ -329,7 +248,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return string The rendering result.
      */
-    private function renderRequest(ServerRequestInterface $request): string
+    public function renderRequest(ServerRequestInterface $request): string
     {
         $output = $request->getMethod() . ' ' . $request->getUri() . "\n";
 
@@ -355,7 +274,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return string The rendering result.
      */
-    private function renderCurl(ServerRequestInterface $request): string
+    public function renderCurl(ServerRequestInterface $request): string
     {
         try {
             $output = (new Command())->setRequest($request)->build();
@@ -374,7 +293,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return string The server software information hyperlink.
      */
-    private function createServerInformationLink(ServerRequestInterface $request): string
+    public function createServerInformationLink(ServerRequestInterface $request): string
     {
         $serverSoftware = $request->getServerParams()['SERVER_SOFTWARE'] ?? null;
 
@@ -409,7 +328,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return string The name of the throwable instance.
      */
-    private function getThrowableName(Throwable $throwable): string
+    public function getThrowableName(Throwable $throwable): string
     {
         $name = get_class($throwable);
 
@@ -427,8 +346,89 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return bool Whether given name of the file belongs to the framework.
      */
-    private function isCoreFile(?string $file): bool
+    public function isCoreFile(?string $file): bool
     {
         return $file === null || strpos((string) realpath($file), dirname(__DIR__, 3)) === 0;
+    }
+
+    /**
+     * Renders a template.
+     *
+     * @param string $path The full path of the template file for rendering.
+     * @param array $parameters The name-value pairs that will be extracted and made available in the template file.
+     *
+     * @throws Throwable
+     *
+     * @return string The rendering result.
+     */
+    private function renderTemplate(string $path, array $parameters): string
+    {
+        if (!file_exists($path)) {
+            throw new RuntimeException("Template not found at $path");
+        }
+
+        $renderer = function (): void {
+            extract(func_get_arg(1), EXTR_OVERWRITE);
+            require func_get_arg(0);
+        };
+
+        $obInitialLevel = ob_get_level();
+        ob_start();
+        PHP_VERSION_ID >= 80000 ? ob_implicit_flush(false) : ob_implicit_flush(0);
+
+        try {
+            $renderer->bindTo($this)($path, $parameters);
+            return ob_get_clean();
+        } catch (Throwable $e) {
+            while (ob_get_level() > $obInitialLevel) {
+                if (!@ob_end_clean()) {
+                    ob_clean();
+                }
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Renders a single call stack element.
+     *
+     * @param string|null $file The name where call has happened.
+     * @param int|null $line The number on which call has happened.
+     * @param string|null $class The called class name.
+     * @param string|null $function The called function/method name.
+     * @param array $args The array of method arguments.
+     * @param int $index The number of the call stack element.
+     *
+     * @throws Throwable
+     *
+     * @return string HTML content of the rendered call stack element.
+     */
+    private function renderCallStackItem(?string $file, ?int $line, ?string $class, ?string $function, array $args, int $index): string
+    {
+        $lines = [];
+        $begin = $end = 0;
+
+        if ($file !== null && $line !== null) {
+            $line--; // adjust line number from one-based to zero-based
+            $lines = @file($file);
+            if ($line < 0 || $lines === false || ($lineCount = count($lines)) < $line) {
+                return '';
+            }
+            $half = (int) (($index === 1 ? $this->maxSourceLines : $this->maxTraceLines) / 2);
+            $begin = $line - $half > 0 ? $line - $half : 0;
+            $end = $line + $half < $lineCount ? $line + $half : $lineCount - 1;
+        }
+
+        return $this->renderTemplate($this->defaultTemplatePath . '/_call-stack-item.php', [
+            'file' => $file,
+            'line' => $line,
+            'class' => $class,
+            'function' => $function,
+            'index' => $index,
+            'lines' => $lines,
+            'begin' => $begin,
+            'end' => $end,
+            'args' => $args,
+        ]);
     }
 }
