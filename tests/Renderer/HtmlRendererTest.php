@@ -131,25 +131,25 @@ final class HtmlRendererTest extends TestCase
 
     public function testRenderRequest(): void
     {
-        $output = $this->invokeMethod(new HtmlRenderer(), 'renderRequest', [
-            'request' => $this->createServerRequestMock(),
-        ]);
+        $renderer = new HtmlRenderer();
+        $output = $renderer->renderRequest($this->createServerRequestMock());
+
         $this->assertSame("<pre>GET https:/example.com\nAccept: text/html</pre>", $output);
     }
 
     public function testRenderCurlForFailRequest(): void
     {
-        $output = $this->invokeMethod(new HtmlRenderer(), 'renderCurl', [
-            'request' => $this->createServerRequestMock(),
-        ]);
+        $renderer = new HtmlRenderer();
+        $output = $renderer->renderCurl($this->createServerRequestMock());
+
         $this->assertSame('Error generating curl command: Call getHeaderLine()', $output);
     }
 
     public function testGetThrowableName(): void
     {
-        $name = $this->invokeMethod(new HtmlRenderer(), 'getThrowableName', [
-            'throwable' => new ErrorException(),
-        ]);
+        $renderer = new HtmlRenderer();
+        $name = $renderer->getThrowableName(new ErrorException());
+
         $this->assertSame('Error (' . ErrorException::class . ')', $name);
     }
 
@@ -175,14 +175,11 @@ final class HtmlRendererTest extends TestCase
      */
     public function testCreateServerInformationLink(?string $serverSoftware, string $expected): void
     {
+        $renderer = new HtmlRenderer();
         $serverRequestMock = $this->createServerRequestMock();
         $serverRequestMock->method('getServerParams')->willReturn(['SERVER_SOFTWARE' => $serverSoftware]);
 
-        $serverLink = $this->invokeMethod(new HtmlRenderer(), 'createServerInformationLink', [
-            'request' => $serverRequestMock,
-        ]);
-
-        $this->assertStringContainsString($expected, $serverLink);
+        $this->assertStringContainsString($expected, $renderer->createServerInformationLink($serverRequestMock));
     }
 
     public function argumentsToStringValueDataProvider(): array
@@ -216,7 +213,9 @@ final class HtmlRendererTest extends TestCase
      */
     public function testArgumentsToString(array $args, string $expected): void
     {
-        $value = $this->invokeMethod(new HtmlRenderer(), 'argumentsToString', ['args' => $args]);
+        $renderer = new HtmlRenderer();
+        $value = $renderer->argumentsToString($args);
+
         $this->assertStringContainsString($expected, $value);
     }
 
