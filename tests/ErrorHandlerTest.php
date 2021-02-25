@@ -22,9 +22,10 @@ final class ErrorHandlerTest extends TestCase
         $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->throwableRendererMock = $this->createMock(ThrowableRendererInterface::class);
         $this->errorHandler = new ErrorHandler($this->loggerMock, $this->throwableRendererMock);
+        $this->errorHandler->memoryReserveSize(0);
     }
 
-    public function testHandleCaughtThrowableCallsDefaultRendererWhenNonePassed(): void
+    public function testHandleThrowableCallsDefaultRendererWhenNonePassed(): void
     {
         $throwable = new RuntimeException();
 
@@ -35,10 +36,10 @@ final class ErrorHandlerTest extends TestCase
             ->with($throwable);
 
 
-        $this->errorHandler->handleCaughtThrowable($throwable);
+        $this->errorHandler->handleThrowable($throwable);
     }
 
-    public function testHandleCaughtThrowableCallsPassedRenderer(): void
+    public function testHandleThrowableCallsPassedRenderer(): void
     {
         $throwable = new RuntimeException();
         $throwableRendererMock = $this->createMock(ThrowableRendererInterface::class);
@@ -54,10 +55,10 @@ final class ErrorHandlerTest extends TestCase
             ->method('render')
             ->with($throwable);
 
-        $this->errorHandler->handleCaughtThrowable($throwable, $throwableRendererMock);
+        $this->errorHandler->handleThrowable($throwable, $throwableRendererMock);
     }
 
-    public function testHandleCaughtThrowableWithExposedDetailsCallsRenderVerbose(): void
+    public function testHandleThrowableWithExposedDetailsCallsRenderVerbose(): void
     {
         $throwable = new RuntimeException();
         $this
@@ -67,10 +68,10 @@ final class ErrorHandlerTest extends TestCase
             ->with($throwable);
 
         $this->errorHandler->debug();
-        $this->errorHandler->handleCaughtThrowable($throwable);
+        $this->errorHandler->handleThrowable($throwable);
     }
 
-    public function testHandleCaughtThrowableWithoutExposedDetailsCallsRender(): void
+    public function testHandleThrowableWithoutExposedDetailsCallsRender(): void
     {
         $throwable = new RuntimeException();
         $this
@@ -80,7 +81,7 @@ final class ErrorHandlerTest extends TestCase
             ->with($throwable);
 
         $this->errorHandler->debug(false);
-        $this->errorHandler->handleCaughtThrowable($throwable);
+        $this->errorHandler->handleThrowable($throwable);
     }
 
     public function testHandleError(): void
@@ -90,18 +91,5 @@ final class ErrorHandlerTest extends TestCase
         $this->expectException(ErrorException::class);
         $array['undefined'];
         $this->errorHandler->unregister();
-    }
-
-    public function testHandleErrorIfErrorCodeIsIncludedInErrorReporting(): void
-    {
-        $this->expectException(ErrorException::class);
-        $this->expectExceptionMessage('Some error.');
-        $this->errorHandler->handleError(1, 'Some error.', __FILE__, __LINE__);
-    }
-
-    public function testHandleErrorIfErrorCodeIsNotIncludedInErrorReporting(): void
-    {
-        $this->expectOutputString('');
-        $this->errorHandler->handleError(0, 'Some error.', __FILE__, __LINE__);
     }
 }

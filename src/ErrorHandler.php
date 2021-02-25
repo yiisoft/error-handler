@@ -48,29 +48,7 @@ final class ErrorHandler
     }
 
     /**
-     * Handles PHP execution errors such as warnings and notices.
-     *
-     * This method is used as a PHP error handler. It will raise an [[\ErrorException]].
-     *
-     * @param int $severity the level of the error raised.
-     * @param string $message the error message.
-     * @param string $file the filename that the error was raised in.
-     * @param int $line the line number the error was raised at.
-     *
-     * @throws ErrorException
-     */
-    public function handleError(int $severity, string $message, string $file, int $line): void
-    {
-        if (!(error_reporting() & $severity)) {
-            // This error code is not included in error_reporting
-            return;
-        }
-
-        throw new ErrorException($message, $severity, $severity, $file, $line);
-    }
-
-    /**
-     * Handle throwable and return output.
+     * Handles throwable and returns error data.
      *
      * @param Throwable $t
      * @param ThrowableRendererInterface|null $renderer
@@ -78,7 +56,7 @@ final class ErrorHandler
      *
      * @return ErrorData
      */
-    public function handleCaughtThrowable(
+    public function handleThrowable(
         Throwable $t,
         ThrowableRendererInterface $renderer = null,
         ServerRequestInterface $request = null
@@ -88,27 +66,11 @@ final class ErrorHandler
         }
 
         try {
-            $this->log($t, $request);
+            $this->logger->error((string) (new PlainTextRenderer())->renderVerbose($t, $request), ['throwable' => $t]);
             return $this->debug ? $renderer->renderVerbose($t, $request) : $renderer->render($t, $request);
         } catch (Throwable $t) {
             return new ErrorData((string) $t);
         }
-    }
-
-    /**
-     * Handle throwable, echo output and exit.
-     *
-     * @param Throwable $t
-     */
-    public function handleThrowable(Throwable $t): void
-    {
-        // disable error capturing to avoid recursive errors while handling exceptions
-        $this->unregister();
-        // set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent
-        http_response_code(Status::INTERNAL_SERVER_ERROR);
-
-        echo $this->handleCaughtThrowable($t);
-        exit(1);
     }
 
     /**
@@ -124,21 +86,56 @@ final class ErrorHandler
     }
 
     /**
+     * Sets the size of the reserved memory.
+     *
+     * @param int $size The size of the reserved memory.
+     *
+     * @see $memoryReserveSize
+     */
+    public function memoryReserveSize(int $size): void
+    {
+        $this->memoryReserveSize = $size;
+    }
+
+    /**
      * Register this error handler.
      */
     public function register(): void
     {
-        $this->disableDisplayErrors();
+        // Disables the display of error.
+        if (function_exists('ini_set')) {
+            ini_set('display_errors', '0');
+        }
 
-        set_exception_handler([$this, 'handleThrowable']);
-        /** @psalm-suppress InvalidArgument */
-        set_error_handler([$this, 'handleError']);
+        // Handles throwable, echo output and exit.
+        set_exception_handler(function (Throwable $t): void {
+            $this->renderThrowableAndTerminate($t);
+        });
+
+        // Handles PHP execution errors such as warnings and notices.
+        set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
+            if (!(error_reporting() & $severity)) {
+                // This error code is not included in error_reporting.
+                return true;
+            }
+
+            throw new ErrorException($message, $severity, $severity, $file, $line);
+        });
 
         if ($this->memoryReserveSize > 0) {
             $this->memoryReserve = str_repeat('x', $this->memoryReserveSize);
         }
 
-        register_shutdown_function([$this, 'handleFatalError']);
+        // Handles fatal error.
+        register_shutdown_function(function (): void {
+            $this->memoryReserve = '';
+            $e = error_get_last();
+
+            if ($e !== null && ErrorException::isFatalError($e)) {
+                $error = new ErrorException($e['message'], $e['type'], $e['type'], $e['file'], $e['line']);
+                $this->renderThrowableAndTerminate($error);
+            }
+        });
     }
 
     /**
@@ -151,47 +148,18 @@ final class ErrorHandler
     }
 
     /**
-     * Handle fatal error, echo output and exit.
-     */
-    public function handleFatalError(): void
-    {
-        unset($this->memoryReserve);
-        $error = error_get_last();
-
-        if ($error !== null && ErrorException::isFatalError($error)) {
-            $exception = new ErrorException(
-                $error['message'],
-                $error['type'],
-                $error['type'],
-                $error['file'],
-                $error['line']
-            );
-
-            $this->handleThrowable($exception);
-        }
-    }
-
-    /**
-     * Logs information about the error.
+     * Renders the throwable and terminates the script.
      *
      * @param Throwable $t
-     * @param ServerRequestInterface|null $request
      */
-    private function log(Throwable $t, ServerRequestInterface $request = null): void
+    private function renderThrowableAndTerminate(Throwable $t): void
     {
-        $this->logger->error(
-            (string) (new PlainTextRenderer())->renderVerbose($t, $request),
-            ['throwable' => $t]
-        );
-    }
+        // disable error capturing to avoid recursive errors while handling exceptions
+        $this->unregister();
+        // set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent
+        http_response_code(Status::INTERNAL_SERVER_ERROR);
 
-    /**
-     * Disables the display of error.
-     */
-    private function disableDisplayErrors(): void
-    {
-        if (function_exists('ini_set')) {
-            ini_set('display_errors', '0');
-        }
+        echo $this->handleThrowable($t);
+        exit(1);
     }
 }
