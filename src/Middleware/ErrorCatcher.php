@@ -62,6 +62,14 @@ final class ErrorCatcher implements MiddlewareInterface
         $this->container = $container;
     }
 
+    /**
+     * Returns a new instance with the specified content type and renderer class.
+     *
+     * @param string $contentType The content type to add associated renderers for.
+     * @param string $rendererClass The classname implementing the {@see ThrowableRendererInterface}.
+     *
+     * @return self
+     */
     public function withRenderer(string $contentType, string $rendererClass): self
     {
         if (!is_subclass_of($rendererClass, ThrowableRendererInterface::class)) {
@@ -78,8 +86,12 @@ final class ErrorCatcher implements MiddlewareInterface
     }
 
     /**
-     * @param string[] $contentTypes MIME types to remove associated renderers for.
+     * Returns a new instance without renderers by the specified content types.
+     *
+     * @param string[] $contentTypes The content types to remove associated renderers for.
      * If not specified, all renderers will be removed.
+     *
+     * @return self
      */
     public function withoutRenderers(string ...$contentTypes): self
     {
@@ -100,7 +112,7 @@ final class ErrorCatcher implements MiddlewareInterface
     /**
      * Force content type to respond with regardless of request.
      *
-     * @param string $contentType
+     * @param string $contentType The content type to respond with regardless of request.
      *
      * @return self
      */
@@ -122,11 +134,19 @@ final class ErrorCatcher implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (Throwable $t) {
-            return $this->handleException($t, $request);
+            return $this->generateErrorResponse($t, $request);
         }
     }
 
-    private function handleException(Throwable $t, ServerRequestInterface $request): ResponseInterface
+    /**
+     * Generates a response with error information.
+     *
+     * @param Throwable $t
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    private function generateErrorResponse(Throwable $t, ServerRequestInterface $request): ResponseInterface
     {
         $contentType = $this->contentType ?? $this->getContentType($request);
         $renderer = $request->getMethod() === Method::HEAD ? new HeaderRenderer() : $this->getRenderer($contentType);
@@ -137,6 +157,13 @@ final class ErrorCatcher implements MiddlewareInterface
         return $data->addToResponse($response->withHeader(Header::CONTENT_TYPE, $contentType));
     }
 
+    /**
+     * Returns the renderer by the specified content type, or null if the renderer was not set.
+     *
+     * @param string $contentType The content type associated with the renderer.
+     *
+     * @return ThrowableRendererInterface|null
+     */
     private function getRenderer(string $contentType): ?ThrowableRendererInterface
     {
         if (isset($this->renderers[$contentType])) {
@@ -146,6 +173,13 @@ final class ErrorCatcher implements MiddlewareInterface
         return null;
     }
 
+    /**
+     * Returns the priority content type from the accept request header.
+     *
+     * @param ServerRequestInterface $request
+     *
+     * @return string The priority content type.
+     */
     private function getContentType(ServerRequestInterface $request): string
     {
         try {
@@ -155,12 +189,19 @@ final class ErrorCatcher implements MiddlewareInterface
                 }
             }
         } catch (InvalidArgumentException $e) {
-            // The Accept header contains an invalid q factor
+            // The Accept header contains an invalid q factor.
         }
 
         return '*/*';
     }
 
+    /**
+     * Normalizes the content type.
+     *
+     * @param string $contentType The raw content type.
+     *
+     * @return string Normalized content type.
+     */
     private function normalizeContentType(string $contentType): string
     {
         if (strpos($contentType, '/') === false) {

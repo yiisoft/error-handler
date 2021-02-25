@@ -28,11 +28,14 @@ use function substr;
 use function trim;
 use function usort;
 
+/**
+ * HeaderHelper parses the header value parameters.
+ */
 final class HeaderHelper
 {
     /**
      * @link https://www.rfc-editor.org/rfc/rfc2616.html#section-2.2
-     * token  = 1*<any CHAR except CTLs or separators>
+     * token = 1*<any CHAR except CTLs or separators>
      */
     private const PATTERN_TOKEN = '(?:(?:[^()<>@,;:\\"\/[\\]?={} \t\x7f]|[\x00-\x1f])+)';
 
@@ -60,14 +63,21 @@ final class HeaderHelper
      * Explode header value to value and parameters (eg. text/html;q=2;version=6)
      *
      * @link https://www.rfc-editor.org/rfc/rfc2616.html#section-3.6
-     * transfer-extension      = token *( ";" parameter )
+     * transfer-extension = token *( ";" parameter )
      *
-     * @param string $headerValue
+     * @param string $headerValue Header value.
+     * @param bool $lowerCaseValue Whether should cast header value to lowercase.
+     * @param bool $lowerCaseParameter Whether should cast header parameter name to lowercase.
+     * @param bool $lowerCaseParameterValue Whether should cast header parameter value to lowercase.
      *
-     * @return array first element is the value, and key-value are the parameters
+     * @return array First element is the value, and key-value are the parameters.
      */
-    public static function getValueAndParameters(string $headerValue, bool $lowerCaseValue = true, bool $lowerCaseParameter = true, bool $lowerCaseParameterValue = true): array
-    {
+    public static function getValueAndParameters(
+        string $headerValue,
+        bool $lowerCaseValue = true,
+        bool $lowerCaseParameter = true,
+        bool $lowerCaseParameterValue = true
+    ): array {
         $headerValue = trim($headerValue);
 
         if ($headerValue === '') {
@@ -88,9 +98,18 @@ final class HeaderHelper
      * Explode header value to parameters (eg. q=2;version=6)
      *
      * @link https://tools.ietf.org/html/rfc7230#section-3.2.6
+     *
+     * @param string $headerValue Header value.
+     * @param bool $lowerCaseParameter Whether should cast header parameter name to lowercase.
+     * @param bool $lowerCaseParameterValue Whether should cast header parameter value to lowercase.
+     *
+     * @return array
      */
-    public static function getParameters(string $headerValue, bool $lowerCaseParameter = true, bool $lowerCaseValue = true): array
-    {
+    public static function getParameters(
+        string $headerValue,
+        bool $lowerCaseParameter = true,
+        bool $lowerCaseParameterValue = true
+    ): array {
         $headerValue = trim($headerValue);
 
         if ($headerValue === '') {
@@ -107,7 +126,7 @@ final class HeaderHelper
             /** @psalm-suppress InvalidArgument */
             $headerValue = preg_replace_callback(
                 '/^[ \t]*(?<parameter>' . self::PATTERN_ATTRIBUTE . ')[ \t]*=[ \t]*(?<value>' . self::PATTERN_VALUE . ')[ \t]*(?:;|$)/u',
-                static function ($matches) use (&$output, $lowerCaseParameter, $lowerCaseValue) {
+                static function (array $matches) use (&$output, $lowerCaseParameter, $lowerCaseParameterValue) {
                     $value = $matches['value'];
                     if (mb_strpos($matches['value'], '"') === 0) {
                         // unescape + remove first and last quote
@@ -118,7 +137,7 @@ final class HeaderHelper
                         // The first is the winner.
                         return;
                     }
-                    $output[$key] = $lowerCaseValue ? mb_strtolower($value) : $value;
+                    $output[$key] = $lowerCaseParameterValue ? mb_strtolower($value) : $value;
                 },
                 $headerValue,
                 1,
@@ -133,16 +152,25 @@ final class HeaderHelper
     }
 
     /**
-     * Getting header value as q factor sorted list
+     * Getting header value as q factor sorted list.
      *
-     * @param string|string[] $values Header value as a comma-separated string or already exploded string array.
+     * @param mixed $values Header value as a comma-separated string or already exploded string array.
+     * @param bool $lowerCaseValue Whether should cast header value to lowercase.
+     * @param bool $lowerCaseParameter Whether should cast header parameter name to lowercase.
+     * @param bool $lowerCaseParameterValue Whether should cast header parameter value to lowercase.
      *
-     * @see getValueAndParameters
+     * @return array The q factor sorted list.
+     *
      * @link https://developer.mozilla.org/en-US/docs/Glossary/Quality_values
      * @link https://www.ietf.org/rfc/rfc2045.html#section-2
+     * @see getValueAndParameters
      */
-    public static function getSortedValueAndParameters($values, bool $lowerCaseValue = true, bool $lowerCaseParameter = true, bool $lowerCaseParameterValue = true): array
-    {
+    public static function getSortedValueAndParameters(
+        $values,
+        bool $lowerCaseValue = true,
+        bool $lowerCaseParameter = true,
+        bool $lowerCaseParameterValue = true
+    ): array {
         if (!is_array($values) && !is_string($values)) {
             throw new InvalidArgumentException('Values are neither array nor string.');
         }
@@ -161,13 +189,13 @@ final class HeaderHelper
 
             // min 0.000 max 1.000, max 3 digits, without digits allowed
             if (is_string($q) && preg_match('/^(?:0(?:\.\d{1,3})?|1(?:\.0{1,3})?)$/', $q) === 0) {
-                throw new InvalidArgumentException('Invalid q factor');
+                throw new InvalidArgumentException('Invalid q factor.');
             }
-            $parse['q'] = (float)$q;
+            $parse['q'] = (float) $q;
             unset($parse['Q']);
             $output[] = $parse;
         }
-        usort($output, static function ($a, $b) {
+        usort($output, static function (array $a, array $b) {
             $a = $a['q'];
             $b = $b['q'];
             if ($a === $b) {
@@ -179,10 +207,12 @@ final class HeaderHelper
     }
 
     /**
-     * @param $values string|string[] $values Header value as a comma-separated string or already exploded string array
+     * Returns a list of sorted content types from the accept header values.
      *
-     * @return string[] sorted accept types. Note: According to RFC 7231, special parameters (except the q factor) are
-     *                  added to the type, which are always appended by a semicolon and sorted by string.
+     * @param string|string[] $values Header value as a comma-separated string or already exploded string array.
+     *
+     * @return string[] Sorted accept types. Note: According to RFC 7231, special parameters (except the q factor)
+     * are added to the type, which are always appended by a semicolon and sorted by string.
      *
      * @link https://tools.ietf.org/html/rfc7231#section-5.3.2
      * @link https://www.ietf.org/rfc/rfc2045.html#section-2
@@ -190,7 +220,7 @@ final class HeaderHelper
     public static function getSortedAcceptTypes($values): array
     {
         $output = self::getSortedValueAndParameters($values);
-        usort($output, static function ($a, $b) {
+        usort($output, static function (array $a, array $b) {
             if ($a['q'] !== $b['q']) {
                 // The higher q value wins
                 return $a['q'] > $b['q'] ? -1 : 1;

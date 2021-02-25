@@ -33,8 +33,8 @@ final class HeaderRendererTest extends TestCase
         $this->assertEmpty($response->getBody()->getContents());
         $this->assertSame([RuntimeException::class], $response->getHeader('X-Error-Type'));
         $this->assertSame([$throwable->getMessage()], $response->getHeader('X-Error-Message'));
-        $this->assertSame([$throwable->getCode()], $response->getHeader('X-Error-Code'));
+        $this->assertSame([(string) $throwable->getCode()], $response->getHeader('X-Error-Code'));
         $this->assertSame([$throwable->getFile()], $response->getHeader('X-Error-File'));
-        $this->assertSame([$throwable->getLine()], $response->getHeader('X-Error-Line'));
+        $this->assertSame([(string) $throwable->getLine()], $response->getHeader('X-Error-Line'));
     }
 }
