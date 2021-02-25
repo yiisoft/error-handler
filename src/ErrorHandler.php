@@ -108,14 +108,8 @@ final class ErrorHandler
         }
 
         // Handles throwable, echo output and exit.
-        set_exception_handler(function (Throwable $t) {
-            // disable error capturing to avoid recursive errors while handling exceptions
-            $this->unregister();
-            // set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent
-            http_response_code(Status::INTERNAL_SERVER_ERROR);
-
-            echo $this->handleThrowable($t);
-            exit(1);
+        set_exception_handler(function (Throwable $t): void {
+            $this->renderThrowableAndTerminate($t);
         });
 
         // Handles PHP execution errors such as warnings and notices.
@@ -138,7 +132,8 @@ final class ErrorHandler
             $e = error_get_last();
 
             if ($e !== null && ErrorException::isFatalError($e)) {
-                throw new ErrorException($e['message'], $e['type'], $e['type'], $e['file'], $e['line']);
+                $error = new ErrorException($e['message'], $e['type'], $e['type'], $e['file'], $e['line']);
+                $this->renderThrowableAndTerminate($error);
             }
         });
     }
@@ -150,5 +145,21 @@ final class ErrorHandler
     {
         restore_error_handler();
         restore_exception_handler();
+    }
+
+    /**
+     * Renders the throwable and terminates the script.
+     *
+     * @param Throwable $t
+     */
+    private function renderThrowableAndTerminate(Throwable $t): void
+    {
+        // disable error capturing to avoid recursive errors while handling exceptions
+        $this->unregister();
+        // set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent
+        http_response_code(Status::INTERNAL_SERVER_ERROR);
+
+        echo $this->handleThrowable($t);
+        exit(1);
     }
 }
