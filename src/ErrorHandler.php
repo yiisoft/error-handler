@@ -23,10 +23,13 @@ use function set_error_handler;
 use function set_exception_handler;
 use function str_repeat;
 
+/**
+ * ErrorHandler handles out of memory errors, fatals, warnings, notices and exceptions.
+ */
 final class ErrorHandler
 {
     /**
-     * @var int the size of the reserved memory. A portion of memory is pre-allocated so that
+     * @var int The size of the reserved memory. A portion of memory is pre-allocated so that
      * when an out-of-memory issue occurs, the error handler is able to handle the error with
      * the help of this reserved memory. If you set this value to be 0, no memory will be reserved.
      * Defaults to 256KB.
@@ -67,7 +70,7 @@ final class ErrorHandler
     }
 
     /**
-     * Handle throwable and return output
+     * Handle throwable and return output.
      *
      * @param Throwable $t
      * @param ThrowableRendererInterface|null $renderer
@@ -93,7 +96,7 @@ final class ErrorHandler
     }
 
     /**
-     * Handle throwable, echo output and exit
+     * Handle throwable, echo output and exit.
      *
      * @param Throwable $t
      */
@@ -147,6 +150,9 @@ final class ErrorHandler
         restore_exception_handler();
     }
 
+    /**
+     * Handle fatal error, echo output and exit.
+     */
     public function handleFatalError(): void
     {
         unset($this->memoryReserve);
@@ -162,20 +168,26 @@ final class ErrorHandler
             );
 
             $this->handleThrowable($exception);
-            exit(1);
         }
     }
 
+    /**
+     * Logs information about the error.
+     *
+     * @param Throwable $t
+     * @param ServerRequestInterface|null $request
+     */
     private function log(Throwable $t, ServerRequestInterface $request = null): void
     {
-        $renderer = new PlainTextRenderer();
-
         $this->logger->error(
-            $renderer->renderVerbose($t, $request),
+            (string) (new PlainTextRenderer())->renderVerbose($t, $request),
             ['throwable' => $t]
         );
     }
 
+    /**
+     * Disables the display of error.
+     */
     private function disableDisplayErrors(): void
     {
         if (function_exists('ini_set')) {

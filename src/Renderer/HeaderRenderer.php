@@ -26,9 +26,9 @@ final class HeaderRenderer implements ThrowableRendererInterface
         return new ErrorData('', [
             'X-Error-Type' => get_class($t),
             'X-Error-Message' => $t->getMessage(),
-            'X-Error-Code' => $t->getCode(),
+            'X-Error-Code' => (string) $t->getCode(),
             'X-Error-File' => $t->getFile(),
-            'X-Error-Line' => $t->getLine(),
+            'X-Error-Line' => (string) $t->getLine(),
         ]);
     }
 }
