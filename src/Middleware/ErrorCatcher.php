@@ -22,8 +22,8 @@ use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\Http\Header;
 use Yiisoft\Http\Method;
 use Yiisoft\Http\Status;
-
 use Yiisoft\Injector\Injector;
+
 use function array_key_exists;
 use function count;
 use function is_subclass_of;
