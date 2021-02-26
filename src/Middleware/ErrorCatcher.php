@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\ErrorHandler\Middleware;
 
 use InvalidArgumentException;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -24,6 +23,7 @@ use Yiisoft\Http\Header;
 use Yiisoft\Http\Method;
 use Yiisoft\Http\Status;
 
+use Yiisoft\Injector\Injector;
 use function array_key_exists;
 use function count;
 use function is_subclass_of;
@@ -49,17 +49,17 @@ final class ErrorCatcher implements MiddlewareInterface
 
     private ResponseFactoryInterface $responseFactory;
     private ErrorHandler $errorHandler;
-    private ContainerInterface $container;
+    private Injector $injector;
     private ?string $contentType = null;
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         ErrorHandler $errorHandler,
-        ContainerInterface $container
+        Injector $injector
     ) {
         $this->responseFactory = $responseFactory;
         $this->errorHandler = $errorHandler;
-        $this->container = $container;
+        $this->injector = $injector;
     }
 
     /**
@@ -167,7 +167,7 @@ final class ErrorCatcher implements MiddlewareInterface
     private function getRenderer(string $contentType): ?ThrowableRendererInterface
     {
         if (isset($this->renderers[$contentType])) {
-            return $this->container->get($this->renderers[$contentType]);
+            return $this->injector->make($this->renderers[$contentType]);
         }
 
         return null;

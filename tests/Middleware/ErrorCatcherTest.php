@@ -20,6 +20,7 @@ use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\Http\Header;
+use Yiisoft\Injector\Injector;
 
 final class ErrorCatcherTest extends TestCase
 {
@@ -159,7 +160,7 @@ final class ErrorCatcherTest extends TestCase
 
     private function createErrorCatcher(): ErrorCatcher
     {
-        return new ErrorCatcher(new ResponseFactory(), $this->createErrorHandler(), new Container());
+        return new ErrorCatcher(new ResponseFactory(), $this->createErrorHandler(), new Injector(new Container()));
     }
 
     private function createServerRequest(string $method, array $headers = []): ServerRequestInterface
