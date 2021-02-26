@@ -13,13 +13,13 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Yiisoft\Di\Container;
 use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\Http\Header;
+use Yiisoft\Test\Support\Container\SimpleContainer;
 
 final class ErrorCatcherTest extends TestCase
 {
@@ -159,7 +159,8 @@ final class ErrorCatcherTest extends TestCase
 
     private function createErrorCatcher(): ErrorCatcher
     {
-        return new ErrorCatcher(new ResponseFactory(), $this->createErrorHandler(), new Container());
+        $container = new SimpleContainer([], fn (string $className): object => new $className());
+        return new ErrorCatcher(new ResponseFactory(), $this->createErrorHandler(), $container);
     }
 
     private function createServerRequest(string $method, array $headers = []): ServerRequestInterface

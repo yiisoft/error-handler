@@ -35,13 +35,13 @@
         "yiisoft/injector": "^1.0"
     },
     "require-dev": {
-        "httpsoft/http-message": "^1.0.7",
-        "phpunit/phpunit": "^9.4",
+        "httpsoft/http-message": "^1.0.8",
+        "phpunit/phpunit": "^9.5",
         "psr/http-server-handler": "^1.0",
         "roave/infection-static-analysis-plugin": "^1.6",
         "spatie/phpunit-watcher": "^1.23",
-        "vimeo/psalm": "^4.4",
-        "yiisoft/di": "^3.0@dev"
+        "vimeo/psalm": "^4.6",
+        "yiisoft/test-support": "^1.2"
     },
     "autoload": {
         "psr-4": {
