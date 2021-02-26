@@ -13,11 +13,11 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Yiisoft\Di\Container;
 use Yiisoft\ErrorHandler\Middleware\ExceptionResponder;
 use Yiisoft\Http\Method;
 use Yiisoft\Http\Status;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Test\Support\Container\SimpleContainer;
 
 final class ExceptionResponderTest extends TestCase
 {
@@ -70,8 +70,8 @@ final class ExceptionResponderTest extends TestCase
             $exceptionMap,
             new ResponseFactory(),
             new Injector(
-                new Container([
-                    ResponseFactoryInterface::class => ResponseFactory::class,
+                new SimpleContainer([
+                    ResponseFactoryInterface::class => new ResponseFactory(),
                 ]),
             ),
         );
