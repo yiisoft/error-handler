@@ -41,7 +41,7 @@ composer require yiisoft/error-handler --prefer-dist
 
 ## General usage
 
-Creating a error handler:
+Creating an error handler:
 
 ```php
 use Yiisoft\ErrorHandler\ErrorHandler;
@@ -54,11 +54,11 @@ use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 $errorHandler = new ErrorHandler($logger, new HtmlRenderer());
 ```
 
-The error handler logs information about the error. You can use any [PSR-3](https://www.php-fig.org/psr/psr-3/)
-compatible logger for error logging. If for some reason you don't want to log error information,
+The error handler logs information about the error using any [PSR-3](https://www.php-fig.org/psr/psr-3/)
+compatible logger. If for some reason you do not want to log error information,
 specify an instance of the `\Psr\Log\NullLogger`.
 
-By default, the error handler is set to production mode and shows a minimum of error information.
+By default, the error handler is set to production mode and displays no detailed information.
 You can enable and disable debug mode as follows:
 
 ```php
@@ -72,9 +72,9 @@ $errorHandler->debug(false);
 $errorHandler->debug($_ENV['debug'] ?? false);
 ```
 
-The error handler handles out-of-memory errors. To do this, memory is pre-allocated so that if a problem occurs with
-a lack of memory, the error handler can handle the error using this reserved memory. You can specify your own using
-the `memoryReserveSize()` method If you set this value to 0, no memory will be reserved.
+The error handler handles out-of-memory errors. To achieve it, memory is pre-allocated so that if a problem occurs with
+a lack of memory, the error handler can handle the error using this reserved memory. You can specify your own reserve
+size using the `memoryReserveSize()` method. If you set this value to 0, no memory will be reserved.
 
 ```php
 // Allocate 512KB. Defaults to 256KB.
@@ -82,24 +82,24 @@ $errorHandler->memoryReserveSize(524_288);
 ```
 
 The `register()` method registers the PHP error and exception handlers.
-To unregister and restore the PHP error and exception handlers, use the `unregister()` method.
+To unregister these and restore the PHP error and exception handlers, use the `unregister()` method.
 
 ```php
 $errorHandler->register();
-// Errors are being handled
+// Errors are being handled.
 $errorHandler->unregister();
-// Errors are not handled
+// Errors are not handled.
 ```
 
 ### Rendering error data
 
 The following renderers are available out of the box:
 
-- `Yiisoft\ErrorHandler\Renderer\HeaderRenderer` - Renders error into HTTP headers. Is used for HEAD request.
-- `Yiisoft\ErrorHandler\Renderer\HtmlRenderer` - Renders error into HTML string.
-- `Yiisoft\ErrorHandler\Renderer\JsonRenderer` - Renders error into JSON string.
-- `Yiisoft\ErrorHandler\Renderer\PlainTextRenderer` - Renders error into plain text string.
-- `Yiisoft\ErrorHandler\Renderer\XmlRenderer` - Renders error into XML string.
+- `Yiisoft\ErrorHandler\Renderer\HeaderRenderer` - Renders error into HTTP headers. It is used for HEAD requests.
+- `Yiisoft\ErrorHandler\Renderer\HtmlRenderer` - Renders error into HTML.
+- `Yiisoft\ErrorHandler\Renderer\JsonRenderer` - Renders error into JSON.
+- `Yiisoft\ErrorHandler\Renderer\PlainTextRenderer` - Renders error into plain text.
+- `Yiisoft\ErrorHandler\Renderer\XmlRenderer` - Renders error into XML.
 
 If the existing renderers are not enough, you can create your own. To do this, you must implement the
 `Yiisoft\ErrorHandler\ThrowableRendererInterface` and specify it when creating an instance of the error handler.
@@ -120,7 +120,7 @@ For more information about creating your own renders and examples of rendering e
 
 ### Using middleware for catching unhandled errors
 
-`Yiisoft\ErrorHandler\Middleware\ErrorCatcher` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) middleware that,
+`Yiisoft\ErrorHandler\Middleware\ErrorCatcher` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) middleware that
 catches exceptions that appear during middleware stack execution and passes them to the handler.
 
 ```php
@@ -144,7 +144,7 @@ $response = $errorCatcher->process($request, $handler);
 
 The error catcher chooses how to render an exception based on accept HTTP header. If it is `text/html`
 or any unknown content type, it will use the error or exception HTML template to display errors. For other
-mime types, the error handler will choose different rendering that is registered within the error catcher.
+mime types, the error handler will choose different renderer that is registered within the error catcher.
 By default, JSON, XML and plain text are supported. You can change this behavior as follows:
 
 ```php
@@ -161,7 +161,7 @@ $errorCatcher = $errorCatcher->forceContentType('application/json');
 ### Using middleware for mapping certain exceptions to custom responses
 
 `Yiisoft\ErrorHandler\Middleware\ExceptionResponder` is a [PSR-15](https://www.php-fig.org/psr/psr-15/)
-middleware that, maps certain exceptions to custom responses.
+middleware that maps certain exceptions to custom responses.
 
 ```php
 use Yiisoft\ErrorHandler\Middleware\ExceptionResponder;
@@ -179,17 +179,17 @@ $exceptionMap = [
     // PHP callable that must return a `Psr\Http\Message\ResponseInterface`.
     MyHttpException::class => static fn () => new MyResponse(),
     // ...
-],
+];
 
 $exceptionResponder = new ExceptionResponder($exceptionMap, $responseFactory, $injector);
 
 // Returns the expected response, or the response associated with the thrown exception,
-//or throws an exception if it is not present in the exception map.
+// or throws an exception if it does not present in the exception map.
 $response = $exceptionResponder->process($request, $handler);
 ```
 
-`Yiisoft\ErrorHandler\Middleware\ExceptionResponder` must be placed before
-`Yiisoft\ErrorHandler\Middleware\ErrorCatcher` in the middleware stack.
+In the application middleware stack `Yiisoft\ErrorHandler\Middleware\ExceptionResponder` must be placed before
+`Yiisoft\ErrorHandler\Middleware\ErrorCatcher`.
 
 For use in the [Yii framework](http://www.yiiframework.com/),
 see [Yii guide to handling errors](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md).
