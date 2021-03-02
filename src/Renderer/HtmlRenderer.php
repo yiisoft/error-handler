@@ -164,23 +164,33 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     public function renderCallStack(Throwable $t): string
     {
-        $out = '<ul>';
-        $out .= $this->renderCallStackItem($t->getFile(), $t->getLine(), null, null, [], 1);
+        $application = $vendor = [];
+        $application[1] = $this->renderCallStackItem($t->getFile(), $t->getLine(), null, null, [], 1, false);
 
         for ($i = 0, $trace = $t->getTrace(), $length = count($trace); $i < $length; ++$i) {
             $file = !empty($trace[$i]['file']) ? $trace[$i]['file'] : null;
             $line = !empty($trace[$i]['line']) ? $trace[$i]['line'] : null;
             $class = !empty($trace[$i]['class']) ? $trace[$i]['class'] : null;
+            $args = !empty($trace[$i]['args']) ? $trace[$i]['args'] : [];
+
             $function = null;
             if (!empty($trace[$i]['function']) && $trace[$i]['function'] !== 'unknown') {
                 $function = $trace[$i]['function'];
             }
-            $args = !empty($trace[$i]['args']) ? $trace[$i]['args'] : [];
-            $out .= $this->renderCallStackItem($file, $line, $class, $function, $args, $i + 2);
+            $index = $i + 2;
+
+            if ($isVendor = $this->isVendorFile($file)) {
+                $vendor[$index] = $this->renderCallStackItem($file, $line, $class, $function, $args, $index, $isVendor);
+                continue;
+            }
+
+            $application[$index] = $this->renderCallStackItem($file, $line, $class, $function, $args, $index, $isVendor);
         }
 
-        $out .= '</ul>';
-        return $out;
+        return $this->renderTemplate($this->defaultTemplatePath . '/_call-stack-items.php', [
+            'applicationItems' => $application,
+            'vendorItems' => $vendor,
+        ]);
     }
 
     /**
@@ -227,7 +237,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             } elseif (is_resource($value)) {
                 $args[$key] = '<span class="keyword">resource</span>';
             } else {
-                $args[$key] = '<span class="number">' . (string) $value . '</span>';
+                $args[$key] = '<span class="number">' . $value . '</span>';
             }
 
             if (is_string($key)) {
@@ -295,9 +305,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     public function createServerInformationLink(ServerRequestInterface $request): string
     {
-        $serverSoftware = (string) ($request->getServerParams()['SERVER_SOFTWARE'] ?? '');
+        $serverSoftware = $request->getServerParams()['SERVER_SOFTWARE'] ?? null;
 
-        if ($serverSoftware === '') {
+        if ($serverSoftware === null) {
             return '';
         }
 
@@ -340,18 +350,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
     }
 
     /**
-     * Determines whether given name of the file belongs to the framework.
-     *
-     * @param string|null $file The name to be checked.
-     *
-     * @return bool Whether given name of the file belongs to the framework.
-     */
-    public function isCoreFile(?string $file): bool
-    {
-        return $file === null || strpos((string) realpath($file), dirname(__DIR__, 3)) === 0;
-    }
-
-    /**
      * Renders a template.
      *
      * @param string $path The full path of the template file for rendering.
@@ -361,8 +359,8 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return string The rendering result.
      *
-     * @psalm-suppress PossiblyFalseArgument
      * @psalm-suppress PossiblyInvalidFunctionCall
+     * @psalm-suppress PossiblyFalseArgument
      * @psalm-suppress UnresolvableInclude
      */
     private function renderTemplate(string $path, array $parameters): string
@@ -402,13 +400,21 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * @param string|null $function The called function/method name.
      * @param array $args The array of method arguments.
      * @param int $index The number of the call stack element.
+     * @param bool $isVendorFile Whether given name of the file belongs to the vendor package.
      *
      * @throws Throwable
      *
      * @return string HTML content of the rendered call stack element.
      */
-    private function renderCallStackItem(?string $file, ?int $line, ?string $class, ?string $function, array $args, int $index): string
-    {
+    private function renderCallStackItem(
+        ?string $file,
+        ?int $line,
+        ?string $class,
+        ?string $function,
+        array $args,
+        int $index,
+        bool $isVendorFile
+    ): string {
         $lines = [];
         $begin = $end = 0;
 
@@ -433,6 +439,19 @@ final class HtmlRenderer implements ThrowableRendererInterface
             'begin' => $begin,
             'end' => $end,
             'args' => $args,
+            'isVendorFile' => $isVendorFile,
         ]);
+    }
+
+    /**
+     * Determines whether given name of the file belongs to the vendor package.
+     *
+     * @param string|null $file The name to be checked.
+     *
+     * @return bool Whether given name of the file belongs to the vendor package.
+     */
+    private function isVendorFile(?string $file): bool
+    {
+        return $file !== null && strpos((string) realpath($file), dirname(__DIR__, 4)) === 0;
     }
 }

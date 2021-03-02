@@ -126,6 +126,7 @@ final class HtmlRendererTest extends TestCase
             'function' => null,
             'args' => [],
             'index' => 1,
+            'isVendorFile' => false,
         ]));
     }
 
