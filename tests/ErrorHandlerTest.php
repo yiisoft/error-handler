@@ -37,7 +37,7 @@ final class ErrorHandlerTest extends TestCase
             ->with($throwable);
 
 
-        $this->errorHandler->handleThrowable($throwable);
+        $this->errorHandler->handle($throwable);
     }
 
     public function testHandleThrowableCallsPassedRenderer(): void
@@ -56,7 +56,7 @@ final class ErrorHandlerTest extends TestCase
             ->method('render')
             ->with($throwable);
 
-        $this->errorHandler->handleThrowable($throwable, $throwableRendererMock);
+        $this->errorHandler->handle($throwable, $throwableRendererMock);
     }
 
     public function testHandleThrowableWithExposedDetailsCallsRenderVerbose(): void
@@ -69,7 +69,7 @@ final class ErrorHandlerTest extends TestCase
             ->with($throwable);
 
         $this->errorHandler->debug();
-        $this->errorHandler->handleThrowable($throwable);
+        $this->errorHandler->handle($throwable);
     }
 
     public function testHandleThrowableWithoutExposedDetailsCallsRender(): void
@@ -82,7 +82,7 @@ final class ErrorHandlerTest extends TestCase
             ->with($throwable);
 
         $this->errorHandler->debug(false);
-        $this->errorHandler->handleThrowable($throwable);
+        $this->errorHandler->handle($throwable);
     }
 
     public function testHandleError(): void
