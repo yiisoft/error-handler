@@ -237,7 +237,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             } elseif (is_resource($value)) {
                 $args[$key] = '<span class="keyword">resource</span>';
             } else {
-                $args[$key] = '<span class="number">' . $value . '</span>';
+                $args[$key] = '<span class="number">' . (string) $value . '</span>';
             }
 
             if (is_string($key)) {
@@ -305,9 +305,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     public function createServerInformationLink(ServerRequestInterface $request): string
     {
-        $serverSoftware = $request->getServerParams()['SERVER_SOFTWARE'] ?? null;
+        $serverSoftware = (string) ($request->getServerParams()['SERVER_SOFTWARE'] ?? '');
 
-        if ($serverSoftware === null) {
+        if ($serverSoftware === '') {
             return '';
         }
 

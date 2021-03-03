@@ -52,7 +52,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
      *
      * @param array $error error got from error_get_last()
      *
-     * @return bool if error is one of fatal type
+     * @return bool If error is one of fatal type.
      */
     public static function isFatalError(array $error): bool
     {
@@ -64,11 +64,16 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
     }
 
     /**
-     * @return string the user-friendly name of this exception
+     * @return string The user-friendly name of this exception.
      */
     public function getName(): string
     {
         return self::ERROR_NAMES[$this->getCode()] ?? 'Error';
+    }
+
+    public function getSolution(): ?string
+    {
+        return null;
     }
 
     /**
@@ -132,10 +137,5 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
 
         // Xdebug 3 and later, proper mode is required
         return false !== strpos(ini_get('xdebug.mode'), 'develop');
-    }
-
-    public function getSolution(): ?string
-    {
-        return null;
     }
 }

@@ -7,6 +7,7 @@ namespace Yiisoft\ErrorHandler\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Throwable;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
@@ -90,6 +91,22 @@ final class ErrorHandlerTest extends TestCase
         $this->errorHandler->register();
         $this->expectException(ErrorException::class);
         $array['undefined'];
+        $this->errorHandler->unregister();
+    }
+
+    public function testHandleErrorWithCatching(): void
+    {
+        $this->errorHandler->register();
+        $array = [];
+
+        try {
+            $array['undefined'];
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(ErrorException::class, $e);
+            $this->assertFalse($e::isFatalError($array));
+            $this->assertNull($e->getSolution());
+        }
+
         $this->errorHandler->unregister();
     }
 }
