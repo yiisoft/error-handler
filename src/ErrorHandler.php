@@ -56,7 +56,8 @@ final class ErrorHandler
      *
      * @return ErrorData
      */
-    public function handle(Throwable $t,
+    public function handle(
+        Throwable $t,
         ThrowableRendererInterface $renderer = null,
         ServerRequestInterface $request = null
     ): ErrorData {
