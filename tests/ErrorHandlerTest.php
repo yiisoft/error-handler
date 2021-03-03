@@ -97,7 +97,7 @@ final class ErrorHandlerTest extends TestCase
     public function testHandleErrorWithCatching(): void
     {
         $this->errorHandler->register();
-        $array = [];
+        $array = ['type' => 'undefined'];
 
         try {
             $array['undefined'];
