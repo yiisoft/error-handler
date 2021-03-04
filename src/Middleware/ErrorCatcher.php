@@ -151,7 +151,7 @@ final class ErrorCatcher implements MiddlewareInterface
         $contentType = $this->contentType ?? $this->getContentType($request);
         $renderer = $request->getMethod() === Method::HEAD ? new HeaderRenderer() : $this->getRenderer($contentType);
 
-        $data = $this->errorHandler->handleThrowable($t, $renderer, $request);
+        $data = $this->errorHandler->handle($t, $renderer, $request);
         $response = $this->responseFactory->createResponse(Status::INTERNAL_SERVER_ERROR);
 
         return $data->addToResponse($response->withHeader(Header::CONTENT_TYPE, $contentType));

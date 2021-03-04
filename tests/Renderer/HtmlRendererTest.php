@@ -117,6 +117,16 @@ final class HtmlRendererTest extends TestCase
         $this->assertStringContainsString($previousExceptionMessage, (string) $errorData);
     }
 
+    public function testRenderCallStack(): void
+    {
+        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
+
+        $this->assertStringContainsString(
+            'new RuntimeException(&#039;Some error.&#039;)',
+            $renderer->renderCallStack(new RuntimeException('Some error.'))
+        );
+    }
+
     public function testRenderCallStackItemIfFileIsNotExistAndLineMoreZero(): void
     {
         $this->assertEmpty($this->invokeMethod(new HtmlRenderer(), 'renderCallStackItem', [
@@ -126,6 +136,7 @@ final class HtmlRendererTest extends TestCase
             'function' => null,
             'args' => [],
             'index' => 1,
+            'isVendorFile' => false,
         ]));
     }
 

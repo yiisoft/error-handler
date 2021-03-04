@@ -56,7 +56,7 @@ final class ErrorHandler
      *
      * @return ErrorData
      */
-    public function handleThrowable(
+    public function handle(
         Throwable $t,
         ThrowableRendererInterface $renderer = null,
         ServerRequestInterface $request = null
@@ -159,7 +159,7 @@ final class ErrorHandler
         // set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent
         http_response_code(Status::INTERNAL_SERVER_ERROR);
 
-        echo $this->handleThrowable($t);
+        echo $this->handle($t);
         exit(1);
     }
 }

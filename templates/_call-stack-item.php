@@ -8,8 +8,8 @@
 /* @var $begin int */
 /* @var $end int */
 /* @var $args array */
+/* @var $isVendorFile bool */
 /* @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer */
-
 $icon = <<<HTML
 <svg class="external-link" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <title>Open the target page</title>
@@ -18,7 +18,7 @@ $icon = <<<HTML
 </svg>
 HTML;
 ?>
-<li class="<?= (!empty($lines) && ($index === 1 || !$this->isCoreFile($file))) ? 'application' : '' ?> call-stack-item"
+<li class="<?= (!empty($lines) && ($index === 1 || !$isVendorFile)) ? 'application ' : '' ?>call-stack-item"
     data-line="<?= (int) ($line - $begin) ?>">
     <div class="element-wrap">
         <div class="flex-1">

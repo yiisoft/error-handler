@@ -15,7 +15,6 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
     <title>
         <?= $this->htmlEncode($this->getThrowableName($throwable)) ?>
     </title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700">
     <style type="text/css">
         /* reset */
         html,
@@ -199,12 +198,44 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             border-radius: 3px;
         }
 
-        .call-stack ul li:first-child {
+        .call-stack > ul > li:first-child {
             margin-top: -200px;
         }
 
-        .call-stack ul li:last-child {
+        .call-stack > ul > li:last-child {
             margin-bottom: 50px;
+        }
+
+        .call-stack > ul > li.call-stack-vendor-collapse {
+            background: #ededed;
+        }
+
+        .call-stack > ul > li.call-stack-vendor-collapse .call-stack-vendor-state {
+            display: inline-block;
+            height: 22px;
+            width: 22px;
+            font-size: 20px;
+            color: #fff;
+            background: #999;
+            border-radius: 3px;
+            text-align: center;
+            margin-right: 15px;
+        }
+
+        .call-stack > ul > li.call-stack-vendor-collapse > ul {
+            display: none;
+            background: #ededed;
+        }
+
+        .call-stack > ul > li.call-stack-vendor-collapse > ul > li {
+            border-left: 0;
+            border-right: 0;
+            box-shadow: none;
+        }
+
+        .call-stack > ul > li.call-stack-vendor-collapse > ul > li:last-child {
+            border-bottom: 2px solid transparent;
+            margin-bottom: 0;
         }
 
         .call-stack ul li .element-wrap {
@@ -470,6 +501,31 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             box-shadow: 0 13px 20px rgba(0, 0, 0, 0.25);
         }
 
+        .dark-theme .call-stack ul li.call-stack-vendor-collapse {
+            background: rgba(46,46,46, 0.9);
+            border: 2px solid #666;
+        }
+
+        .dark-theme .call-stack > ul > li.call-stack-vendor-collapse .call-stack-vendor-state {
+            background: #666;
+        }
+
+        .dark-theme .call-stack > ul > li.call-stack-vendor-collapse > ul {
+            background: rgba(46,46,46, 0.9);
+        }
+
+        .dark-theme .call-stack > ul > li.call-stack-vendor-collapse > ul > li {
+            border-top: 2px solid #666;
+            border-bottom: 2px solid #666;
+            border-left: 0;
+            border-right: 0;
+            box-shadow: none;
+        }
+
+        .dark-theme .call-stack > ul > li.call-stack-vendor-collapse > ul > li:last-child {
+            border-bottom: 2px solid transparent;
+        }
+
         .dark-theme .call-stack ul li .error-line {
             background-color: #422c2c;
         }
@@ -479,7 +535,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             background: #292929 !important;
         }
 
-        .dark-theme .element-wrap {
+        .dark-theme li.application .element-wrap {
             border-bottom: 1px solid #141414 !important;
         }
 
@@ -574,6 +630,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         }
         /* end dark-theme */
     </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700">
 </head>
 <body<?= !empty($theme) ? " class=\"{$this->htmlEncode($theme)}\"" : '' ?>>
 <header>
@@ -1048,6 +1105,23 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         var codeBlocks = document.getElementsByTagName('pre'),
             callStackItems = document.getElementsByClassName('call-stack-item');
 
+        // If there are grouped vendor package files
+        var vendorCollapse = document.getElementById('vendorCollapse');
+        if (vendorCollapse !== null) {
+            vendorCollapse.addEventListener('click', function (event) {
+                var vendorCollapseItems = document.getElementById('vendorCollapseItems');
+                var vendorCollapseState = document.getElementById('vendorCollapseState');
+
+                if (vendorCollapseItems.style.display === 'block') {
+                    vendorCollapseItems.style.display = 'none';
+                    vendorCollapseState.innerText = '+';
+                } else {
+                    vendorCollapseItems.style.display = 'block';
+                    vendorCollapseState.innerText = '–';
+                }
+            });
+        }
+
         // highlight code blocks
         for (var i = 0, imax = codeBlocks.length; i < imax; ++i) {
             hljs.highlightBlock(codeBlocks[i]);
@@ -1083,7 +1157,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             refreshCallStackItemCode(callStackItems[i]);
 
             // toggle code block visibility
-            callStackItems[i].getElementsByClassName('element-wrap')[0].addEventListener('click', function(event) {
+            callStackItems[i].getElementsByClassName('element-wrap')[0].addEventListener('click', function (event) {
                 if (event.target.nodeName.toLowerCase() === 'a') {
                     return;
                 }
@@ -1093,7 +1167,14 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
                 if (typeof code !== 'undefined') {
                     code.style.display = window.getComputedStyle(code).display === 'block' ? 'none' : 'block';
-                    this.style.borderBottom = code.style.display === 'block' ? '1px solid #d0d0d0' : 'none';
+                    if (code.style.display === 'block') {
+                        this.style.borderBottom = document.body.classList.contains('dark-theme')
+                            ? '1px solid #141414'
+                            : '1px solid #d0d0d0'
+                        ;
+                    } else {
+                        this.style.borderBottom = 'none';
+                    }
                     refreshCallStackItemCode(callStackItem);
                 }
             });
