@@ -1106,14 +1106,18 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             callStackItems = document.getElementsByClassName('call-stack-item');
 
         // If there are grouped vendor package files
-        if (document.getElementById('vendorCollapse') !== null) {
-            document.getElementById('vendorCollapse').addEventListener('click', function (event) {
-                if (document.getElementById('vendorCollapseItems').style.display === 'block') {
-                    document.getElementById('vendorCollapseItems').style.display = 'none';
-                    document.getElementById('vendorCollapseState').innerText = '+';
+        var vendorCollapse = document.getElementById('vendorCollapse');
+        if (vendorCollapse !== null) {
+            vendorCollapse.addEventListener('click', function (event) {
+                var vendorCollapseItems = document.getElementById('vendorCollapseItems');
+                var vendorCollapseState = document.getElementById('vendorCollapseState');
+
+                if (vendorCollapseItems.style.display === 'block') {
+                    vendorCollapseItems.style.display = 'none';
+                    vendorCollapseState.innerText = '+';
                 } else {
-                    document.getElementById('vendorCollapseItems').style.display = 'block';
-                    document.getElementById('vendorCollapseState').innerText = '–';
+                    vendorCollapseItems.style.display = 'block';
+                    vendorCollapseState.innerText = '–';
                 }
             });
         }
