@@ -1,8 +1,8 @@
 <p align="center">
     <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://github.com/yiisoft.png" height="100px">
+        <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="100px">
     </a>
-    <h1 align="center">Yii error handler</h1>
+    <h1 align="center">Yii Error Handler</h1>
     <br>
 </p>
 
@@ -35,7 +35,7 @@ The package provides advanced error handling. The features are:
 
 The package could be installed with composer:
 
-```
+```shell
 composer require yiisoft/error-handler --prefer-dist
 ```
 
@@ -194,6 +194,8 @@ In the application middleware stack `Yiisoft\ErrorHandler\Middleware\ExceptionRe
 For use in the [Yii framework](http://www.yiiframework.com/),
 see [Yii guide to handling errors](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md).
 
+## Testing
+
 ### Unit testing
 
 The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
@@ -204,10 +206,11 @@ The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
 
 ### Mutation testing
 
-The package tests are checked with [Infection](https://infection.github.io/) mutation framework. To run it:
+The package tests are checked with [Infection](https://infection.github.io/) mutation framework with
+[Infection Static Analysis Plugin](https://github.com/Roave/infection-static-analysis-plugin). To run it:
 
 ```shell
-./vendor/bin/infection
+./vendor/bin/roave-infection-static-analysis-plugin
 ```
 
 ### Static analysis
@@ -224,3 +227,15 @@ The Yii error handler is free software. It is released under the terms of the BS
 Please see [`LICENSE`](./LICENSE.md) for more information.
 
 Maintained by [Yii Software](https://www.yiiframework.com/).
+
+## Support the project
+
+[![Open Collective](https://img.shields.io/badge/Open%20Collective-sponsor-7eadf1?logo=open%20collective&logoColor=7eadf1&labelColor=555555)](https://opencollective.com/yiisoft)
+
+## Follow updates
+
+[![Official website](https://img.shields.io/badge/Powered_by-Yii_Framework-green.svg?style=flat)](https://www.yiiframework.com/)
+[![Twitter](https://img.shields.io/badge/twitter-follow-1DA1F2?logo=twitter&logoColor=1DA1F2&labelColor=555555?style=flat)](https://twitter.com/yiiframework)
+[![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3en)
+[![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
+[![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
