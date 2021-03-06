@@ -230,6 +230,41 @@ final class HtmlRendererTest extends TestCase
         $this->assertStringContainsString($expected, $value);
     }
 
+    public function testGroupVendorCallStackItems(): void
+    {
+        $groupedItems = [
+            2 => [
+                2 => 'Item #2',
+                3 => 'Item #3',
+            ],
+            5 => [
+                5 => 'Item #5',
+            ],
+            16 => [
+                16 => 'Item #16',
+                17 => 'Item #17',
+                18 => 'Item #18',
+            ],
+            54 => [
+                54 => 'Item #54',
+                55 => 'Item #55',
+            ],
+        ];
+
+        $this->assertSame($groupedItems, $this->invokeMethod(new HtmlRenderer(), 'groupVendorCallStackItems', [
+            'items' => [
+                2 => 'Item #2',
+                3 => 'Item #3',
+                5 => 'Item #5',
+                16 => 'Item #16',
+                17 => 'Item #17',
+                18 => 'Item #18',
+                54 => 'Item #54',
+                55 => 'Item #55',
+            ],
+        ]));
+    }
+
     private function createServerRequestMock(): ServerRequestInterface
     {
         $serverRequestMock = $this->createMock(ServerRequestInterface::class);

@@ -189,7 +189,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
         return $this->renderTemplate($this->defaultTemplatePath . '/_call-stack-items.php', [
             'applicationItems' => $application,
-            'vendorItems' => $vendor,
+            'vendorItemGroups' => $this->groupVendorCallStackItems($vendor),
         ]);
     }
 
@@ -441,6 +441,37 @@ final class HtmlRenderer implements ThrowableRendererInterface
             'args' => $args,
             'isVendorFile' => $isVendorFile,
         ]);
+    }
+
+    /**
+     * Groups a vendor call stack items to render.
+     *
+     * @param array<int, string> $items The list of the vendor call stack items.
+     *
+     * @return array<int, array<int, string>> The grouped items of the vendor call stack.
+     */
+    private function groupVendorCallStackItems(array $items): array
+    {
+        $groupIndex = null;
+        $groupedItems = [];
+
+        foreach ($items as $index => $item) {
+            if ($groupIndex === null) {
+                $groupIndex = $index;
+                $groupedItems[$groupIndex][$index] = $item;
+                continue;
+            }
+
+            if (isset($items[$index - 1])) {
+                $groupedItems[$groupIndex][$index] = $item;
+                continue;
+            }
+
+            $groupIndex = $index;
+            $groupedItems[$groupIndex][$index] = $item;
+        }
+
+        return $groupedItems;
     }
 
     /**
