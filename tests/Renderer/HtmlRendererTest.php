@@ -8,14 +8,17 @@ use Exception;
 use HttpSoft\Message\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionClass;
 use ReflectionObject;
 use RuntimeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 
+use function dirname;
 use function file_exists;
 use function file_put_contents;
 use function fopen;
+use function strpos;
 use function unlink;
 
 final class HtmlRendererTest extends TestCase
@@ -263,6 +266,24 @@ final class HtmlRendererTest extends TestCase
                 55 => 'Item #55',
             ],
         ]));
+    }
+
+    public function isVendorFileReturnFalseDataProvider(): array
+    {
+        return [
+            'null' => [null],
+            'not-exist' => ['not-exist'],
+        ];
+    }
+
+    /**
+     * @dataProvider isVendorFileReturnFalseDataProvider
+     *
+     * @param string|null $file
+     */
+    public function testIsVendorFileReturnFalse(?string $file): void
+    {
+        $this->assertFalse($this->invokeMethod(new HtmlRenderer(), 'isVendorFile', ['file' => $file]));
     }
 
     private function createServerRequestMock(): ServerRequestInterface

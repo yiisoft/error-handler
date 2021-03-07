@@ -19,10 +19,12 @@ use function file;
 use function file_exists;
 use function func_get_arg;
 use function get_class;
+use function glob;
 use function htmlspecialchars;
 use function implode;
 use function is_array;
 use function is_bool;
+use function is_file;
 use function is_object;
 use function is_resource;
 use function is_string;
@@ -87,6 +89,14 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * ```
      */
     private ?string $traceHeaderLine;
+
+    /**
+     * @var string[]|null The list of vendor paths is determined automatically.
+     *
+     * One path if the error handler is installed as a vendor package, or a list of package vendor paths
+     * if the error handler is installed for development in {@see https://github.com/yiisoft/yii-dev-tool}.
+     */
+    private ?array $vendorPaths = null;
 
     /**
      * @param array $settings Settings can have the following keys:
@@ -483,6 +493,54 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     private function isVendorFile(?string $file): bool
     {
-        return $file !== null && strpos((string) realpath($file), dirname(__DIR__, 4)) === 0;
+        if ($file === null) {
+            return false;
+        }
+
+        $file = realpath($file);
+
+        if ($file === false) {
+            return false;
+        }
+
+        foreach ($this->getVendorPaths() as $vendorPath) {
+            if (strpos($file, $vendorPath) === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns a list of vendor paths.
+     *
+     * @return string[] The list of vendor paths.
+     *
+     * @see $vendorPaths
+     */
+    private function getVendorPaths(): array
+    {
+        if ($this->vendorPaths !== null) {
+            return $this->vendorPaths;
+        }
+
+        $rootPath = dirname(__DIR__, 4);
+
+        // If the error handler is installed as a vendor package.
+        if (strpos($rootPath, 'vendor', -6) !== false) {
+            $this->vendorPaths = [$rootPath];
+            return $this->vendorPaths;
+        }
+
+        // If the error handler is installed for development in `yiisoft/yii-dev-tool`.
+        if (is_file("{$rootPath}/yii-dev") || is_file("{$rootPath}/yii-dev.bat")) {
+            $vendorPaths = glob("{$rootPath}/dev/*/vendor");
+            $this->vendorPaths = empty($vendorPaths) ? [] : $vendorPaths;
+            return $this->vendorPaths;
+        }
+
+        $this->vendorPaths = [];
+        return $this->vendorPaths;
     }
 }
