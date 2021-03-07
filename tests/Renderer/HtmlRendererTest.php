@@ -8,17 +8,14 @@ use Exception;
 use HttpSoft\Message\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
-use ReflectionClass;
 use ReflectionObject;
 use RuntimeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 
-use function dirname;
 use function file_exists;
 use function file_put_contents;
 use function fopen;
-use function strpos;
 use function unlink;
 
 final class HtmlRendererTest extends TestCase

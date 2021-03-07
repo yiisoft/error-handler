@@ -40,6 +40,7 @@ use function ob_start;
 use function realpath;
 use function rtrim;
 use function stripos;
+use function strlen;
 use function strpos;
 
 /**
@@ -528,7 +529,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $rootPath = dirname(__DIR__, 4);
 
         // If the error handler is installed as a vendor package.
-        if (strpos($rootPath, 'vendor', -6) !== false) {
+        if (strlen($rootPath) > 6 && strpos($rootPath, 'vendor', -6) !== false) {
             $this->vendorPaths = [$rootPath];
             return $this->vendorPaths;
         }
