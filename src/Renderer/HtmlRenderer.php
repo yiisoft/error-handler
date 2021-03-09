@@ -12,8 +12,6 @@ use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
-use function array_filter;
-use function array_map;
 use function array_values;
 use function dirname;
 use function extract;
@@ -41,6 +39,7 @@ use function ob_implicit_flush;
 use function ob_start;
 use function realpath;
 use function rtrim;
+use function str_replace;
 use function stripos;
 use function strlen;
 use function strpos;
@@ -539,7 +538,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         // If the error handler is installed for development in `yiisoft/yii-dev-tool`.
         if (is_file("{$rootPath}/yii-dev") || is_file("{$rootPath}/yii-dev.bat")) {
             $vendorPaths = glob("{$rootPath}/dev/*/vendor");
-            $this->vendorPaths = empty($vendorPaths) ? [] : array_filter(array_map('realpath', $vendorPaths));
+            $this->vendorPaths = empty($vendorPaths) ? [] : str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $vendorPaths);
             return $this->vendorPaths;
         }
 
