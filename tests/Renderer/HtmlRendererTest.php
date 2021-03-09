@@ -8,11 +8,13 @@ use Exception;
 use HttpSoft\Message\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionClass;
 use ReflectionObject;
 use RuntimeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 
+use function dirname;
 use function file_exists;
 use function file_put_contents;
 use function fopen;
@@ -270,6 +272,7 @@ final class HtmlRendererTest extends TestCase
         return [
             'null' => [null],
             'not-exist' => ['not-exist'],
+            'not-vendor-file' => [__FILE__],
         ];
     }
 
@@ -281,6 +284,17 @@ final class HtmlRendererTest extends TestCase
     public function testIsVendorFileReturnFalse(?string $file): void
     {
         $this->assertFalse($this->invokeMethod(new HtmlRenderer(), 'isVendorFile', ['file' => $file]));
+    }
+
+    public function testIsVendorFileWithPathsAlreadyAdded(): void
+    {
+        $renderer = new HtmlRenderer();
+
+        $this->setVendorPaths($renderer, [__DIR__]);
+        $this->assertTrue($this->invokeMethod($renderer, 'isVendorFile', ['file' => __FILE__]));
+
+        $this->setVendorPaths($renderer, [dirname(__DIR__) . '/Middleware']);
+        $this->assertFalse($this->invokeMethod($renderer, 'isVendorFile', ['file' => __FILE__]));
     }
 
     private function createServerRequestMock(): ServerRequestInterface
@@ -338,5 +352,14 @@ final class HtmlRendererTest extends TestCase
         $result = $method->invokeArgs($object, $args);
         $method->setAccessible(false);
         return $result;
+    }
+
+    private function setVendorPaths(HtmlRenderer $renderer, array $vendorPaths): void
+    {
+        $reflection = new ReflectionClass($renderer);
+        $property = $reflection->getProperty('vendorPaths');
+        $property->setAccessible(true);
+        $property->setValue($renderer, $vendorPaths);
+        $property->setAccessible(false);
     }
 }
