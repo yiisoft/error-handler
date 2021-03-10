@@ -122,10 +122,11 @@ final class HtmlRendererTest extends TestCase
     public function testRenderCallStack(): void
     {
         $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
+        $this->setVendorPaths($renderer, [dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'vendor']);
 
         $this->assertStringContainsString(
             'new RuntimeException(&#039;Some error.&#039;)',
-            $renderer->renderCallStack(new RuntimeException('Some error.'))
+            $renderer->renderCallStack(new RuntimeException('Some error.')),
         );
     }
 
@@ -293,7 +294,7 @@ final class HtmlRendererTest extends TestCase
         $this->setVendorPaths($renderer, [__DIR__]);
         $this->assertTrue($this->invokeMethod($renderer, 'isVendorFile', ['file' => __FILE__]));
 
-        $this->setVendorPaths($renderer, [dirname(__DIR__) . '/Middleware']);
+        $this->setVendorPaths($renderer, [dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Middleware']);
         $this->assertFalse($this->invokeMethod($renderer, 'isVendorFile', ['file' => __FILE__]));
     }
 
