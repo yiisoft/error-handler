@@ -96,7 +96,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * @var string[]|null The list of vendor paths is determined automatically.
      *
      * One path if the error handler is installed as a vendor package, or a list of package vendor paths
-     * if the error handler is installed for development in {@see https://github.com/yiisoft/yii-dev-tool}.
+     * if the error handler is installed for development in {@link https://github.com/yiisoft/yii-dev-tool}.
      */
     private ?array $vendorPaths = null;
 
