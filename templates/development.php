@@ -206,11 +206,11 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             margin-bottom: 50px;
         }
 
-        .call-stack > ul > li.call-stack-vendor-collapse {
+        .call-stack > ul > li.call-stack-vendor-group {
             background: #ededed;
         }
 
-        .call-stack > ul > li.call-stack-vendor-collapse .call-stack-vendor-state {
+        .call-stack > ul > li.call-stack-vendor-group .call-stack-vendor-state {
             display: inline-block;
             height: 22px;
             width: 22px;
@@ -222,18 +222,18 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             margin-right: 15px;
         }
 
-        .call-stack > ul > li.call-stack-vendor-collapse > ul {
+        .call-stack > ul > li.call-stack-vendor-group > ul {
             display: none;
             background: #ededed;
         }
 
-        .call-stack > ul > li.call-stack-vendor-collapse > ul > li {
+        .call-stack > ul > li.call-stack-vendor-group > ul > li {
             border-left: 0;
             border-right: 0;
             box-shadow: none;
         }
 
-        .call-stack > ul > li.call-stack-vendor-collapse > ul > li:last-child {
+        .call-stack > ul > li.call-stack-vendor-group > ul > li:last-child {
             border-bottom: 2px solid transparent;
             margin-bottom: 0;
         }
@@ -501,20 +501,20 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             box-shadow: 0 13px 20px rgba(0, 0, 0, 0.25);
         }
 
-        .dark-theme .call-stack ul li.call-stack-vendor-collapse {
+        .dark-theme .call-stack ul li.call-stack-vendor-group {
             background: rgba(46,46,46, 0.9);
             border: 2px solid #666;
         }
 
-        .dark-theme .call-stack > ul > li.call-stack-vendor-collapse .call-stack-vendor-state {
+        .dark-theme .call-stack > ul > li.call-stack-vendor-group .call-stack-vendor-state {
             background: #666;
         }
 
-        .dark-theme .call-stack > ul > li.call-stack-vendor-collapse > ul {
+        .dark-theme .call-stack > ul > li.call-stack-vendor-group > ul {
             background: rgba(46,46,46, 0.9);
         }
 
-        .dark-theme .call-stack > ul > li.call-stack-vendor-collapse > ul > li {
+        .dark-theme .call-stack > ul > li.call-stack-vendor-group > ul > li {
             border-top: 2px solid #666;
             border-bottom: 2px solid #666;
             border-left: 0;
@@ -522,7 +522,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             box-shadow: none;
         }
 
-        .dark-theme .call-stack > ul > li.call-stack-vendor-collapse > ul > li:last-child {
+        .dark-theme .call-stack > ul > li.call-stack-vendor-group > ul > li:last-child {
             border-bottom: 2px solid transparent;
         }
 
@@ -1106,11 +1106,11 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             callStackItems = document.getElementsByClassName('call-stack-item');
 
         // If there are grouped vendor package files
-        var vendorCollapse = document.getElementById('vendorCollapse');
-        if (vendorCollapse !== null) {
-            vendorCollapse.addEventListener('click', function (event) {
-                var vendorCollapseItems = document.getElementById('vendorCollapseItems');
-                var vendorCollapseState = document.getElementById('vendorCollapseState');
+        var vendorCollapse = document.getElementsByClassName('call-stack-vendor-collapse');
+        for (var i = 0, imax = vendorCollapse.length; i < imax; ++i) {
+            vendorCollapse[i].addEventListener('click', function (event) {
+                var vendorCollapseState = this.getElementsByClassName('call-stack-vendor-state')[0];
+                var vendorCollapseItems = this.parentElement.getElementsByClassName('call-stack-vendor-items')[0];
 
                 if (vendorCollapseItems.style.display === 'block') {
                     vendorCollapseItems.style.display = 'none';

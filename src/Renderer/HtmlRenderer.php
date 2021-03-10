@@ -19,10 +19,12 @@ use function file;
 use function file_exists;
 use function func_get_arg;
 use function get_class;
+use function glob;
 use function htmlspecialchars;
 use function implode;
 use function is_array;
 use function is_bool;
+use function is_file;
 use function is_object;
 use function is_resource;
 use function is_string;
@@ -37,7 +39,9 @@ use function ob_implicit_flush;
 use function ob_start;
 use function realpath;
 use function rtrim;
+use function str_replace;
 use function stripos;
+use function strlen;
 use function strpos;
 
 /**
@@ -87,6 +91,14 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * ```
      */
     private ?string $traceHeaderLine;
+
+    /**
+     * @var string[]|null The list of vendor paths is determined automatically.
+     *
+     * One path if the error handler is installed as a vendor package, or a list of package vendor paths
+     * if the error handler is installed for development in {@link https://github.com/yiisoft/yii-dev-tool}.
+     */
+    private ?array $vendorPaths = null;
 
     /**
      * @param array $settings Settings can have the following keys:
@@ -189,7 +201,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
         return $this->renderTemplate($this->defaultTemplatePath . '/_call-stack-items.php', [
             'applicationItems' => $application,
-            'vendorItems' => $vendor,
+            'vendorItemGroups' => $this->groupVendorCallStackItems($vendor),
         ]);
     }
 
@@ -444,6 +456,37 @@ final class HtmlRenderer implements ThrowableRendererInterface
     }
 
     /**
+     * Groups a vendor call stack items to render.
+     *
+     * @param array<int, string> $items The list of the vendor call stack items.
+     *
+     * @return array<int, array<int, string>> The grouped items of the vendor call stack.
+     */
+    private function groupVendorCallStackItems(array $items): array
+    {
+        $groupIndex = null;
+        $groupedItems = [];
+
+        foreach ($items as $index => $item) {
+            if ($groupIndex === null) {
+                $groupIndex = $index;
+                $groupedItems[$groupIndex][$index] = $item;
+                continue;
+            }
+
+            if (isset($items[$index - 1])) {
+                $groupedItems[$groupIndex][$index] = $item;
+                continue;
+            }
+
+            $groupIndex = $index;
+            $groupedItems[$groupIndex][$index] = $item;
+        }
+
+        return $groupedItems;
+    }
+
+    /**
      * Determines whether given name of the file belongs to the vendor package.
      *
      * @param string|null $file The name to be checked.
@@ -452,6 +495,54 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     private function isVendorFile(?string $file): bool
     {
-        return $file !== null && strpos((string) realpath($file), dirname(__DIR__, 4)) === 0;
+        if ($file === null) {
+            return false;
+        }
+
+        $file = realpath($file);
+
+        if ($file === false) {
+            return false;
+        }
+
+        foreach ($this->getVendorPaths() as $vendorPath) {
+            if (strpos($file, $vendorPath) === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns a list of vendor paths.
+     *
+     * @return string[] The list of vendor paths.
+     *
+     * @see $vendorPaths
+     */
+    private function getVendorPaths(): array
+    {
+        if ($this->vendorPaths !== null) {
+            return $this->vendorPaths;
+        }
+
+        $rootPath = dirname(__DIR__, 4);
+
+        // If the error handler is installed as a vendor package.
+        if (strlen($rootPath) > 6 && strpos($rootPath, 'vendor', -6) !== false) {
+            $this->vendorPaths = [$rootPath];
+            return $this->vendorPaths;
+        }
+
+        // If the error handler is installed for development in `yiisoft/yii-dev-tool`.
+        if (is_file("{$rootPath}/yii-dev") || is_file("{$rootPath}/yii-dev.bat")) {
+            $vendorPaths = glob("{$rootPath}/dev/*/vendor");
+            $this->vendorPaths = empty($vendorPaths) ? [] : str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $vendorPaths);
+            return $this->vendorPaths;
+        }
+
+        $this->vendorPaths = [];
+        return $this->vendorPaths;
     }
 }
