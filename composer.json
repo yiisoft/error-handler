@@ -26,7 +26,7 @@
         "ext-dom": "*",
         "ext-json": "*",
         "alexkart/curl-builder": "^1.0",
-        "psr/container": "1.0.0",
+        "psr/container": "1.1.1",
         "psr/http-message": "^1.0",
         "psr/http-server-middleware": "^1.0",
         "psr/log": "^1.1",
