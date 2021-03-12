@@ -196,6 +196,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             background: #fff;
             margin-bottom: 30px;
             border-radius: 3px;
+            overflow-x: auto;
         }
 
         .call-stack > ul > li:first-child {
