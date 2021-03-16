@@ -45,17 +45,19 @@ HTML;
         <?php endif ?>
     </div>
     <?php if (!empty($lines)): ?>
-        <div class="code-wrap">
-            <div class="error-line"></div>
-            <?php for ($i = $begin; $i <= $end; ++$i): ?><div class="hover-line"></div><?php endfor ?>
-            <div class="code">
-                <?php for ($i = $begin; $i <= $end; ++$i): ?><span class="lines-item"><?= (int) ($i + 1) ?></span><?php endfor ?>
-                <pre><?php
-                    // Fill empty lines with a whitespace to avoid rendering problems in Opera.
-                    for ($i = $begin; $i <= $end; ++$i) {
-                        echo (trim($lines[$i]) === '') ? " \n" : $this->htmlEncode($lines[$i]);
-                    }
-                    ?></pre>
+        <div class="element-code-wrap">
+            <div class="code-wrap">
+                <div class="error-line"></div>
+                <?php for ($i = $begin; $i <= $end; ++$i): ?><div class="hover-line"></div><?php endfor ?>
+                <div class="code">
+                    <?php for ($i = $begin; $i <= $end; ++$i): ?><span class="lines-item"><?= (int) ($i + 1) ?></span><?php endfor ?>
+                    <pre><?php
+                        // Fill empty lines with a whitespace to avoid rendering problems in Opera.
+                        for ($i = $begin; $i <= $end; ++$i) {
+                            echo (trim($lines[$i]) === '') ? " \n" : $this->htmlEncode($lines[$i]);
+                        }
+                        ?></pre>
+                </div>
             </div>
         </div>
     <?php endif ?>
