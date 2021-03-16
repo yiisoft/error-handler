@@ -1161,10 +1161,12 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
                 lineNumbers[i].style.top = parseInt(lines[i].top - top) + 'px';
                 hoverLines[i].style.top = parseInt(lines[i].top - top) + 'px';
                 hoverLines[i].style.height = parseInt(lines[i].bottom - lines[i].top + 6) + 'px';
+                hoverLines[i].style.width = hoverLines[i].parentElement.parentElement.scrollWidth + 'px'
 
                 if (parseInt(callStackItem.getAttribute('data-line')) == i) {
                     errorLine.style.top = parseInt(lines[i].top - top) + 'px';
                     errorLine.style.height = parseInt(lines[i].bottom - lines[i].top + 6) + 'px';
+                    errorLine.style.width = errorLine.parentElement.parentElement.scrollWidth + 'px';
                 }
             }
         };
