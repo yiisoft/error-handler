@@ -11,7 +11,8 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
         <?= $this->htmlEncode($this->getThrowableName($throwable)) ?>
     </title>
@@ -46,6 +47,9 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         }
 
         body {
+            font-family: 'Roboto', sans-serif;
+            min-width: 800px;
+            color: #505050;
             line-height: 1;
         }
 
@@ -61,11 +65,6 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
         a:hover {
             text-decoration: underline;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            color: #505050;
         }
         /* end base */
 
@@ -96,6 +95,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             box-sizing: border-box;
             border-radius: 3px;
             padding: 40px 30px;
+            word-break: break-word;
         }
 
         header .exception-class {
@@ -183,6 +183,18 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             margin-left: 100px;
             margin-right: 100px;
         }
+        
+        @media screen and (max-width: 1200px) {
+            header {
+                padding-left: 50px;
+                padding-right: 50px;
+            }
+
+            main {
+                margin-left: 50px;
+                margin-right: 50px;
+            }
+        }
 
         .flex-1 {
             flex: 1;
@@ -196,7 +208,6 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             background: #fff;
             margin-bottom: 30px;
             border-radius: 3px;
-            overflow-x: auto;
         }
 
         .call-stack > ul > li:first-child {
@@ -289,6 +300,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         .call-stack ul li .code-wrap {
             display: none;
             position: relative;
+            overflow-x: auto;
         }
 
         .call-stack ul li.application .code-wrap {
@@ -314,8 +326,8 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         }
 
         .call-stack ul li .code {
-            min-width: 860px;
-            /* 960px - 50px * 2 */
+            min-width: 700px;
+            /* 800px - 50px * 2 */
             margin: 15px auto;
             padding: 0 50px;
             position: relative;
@@ -356,6 +368,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             padding: 20px 30px;
             font-size: 14px;
             line-height: 18px;
+            overflow-x: auto;
             font-family: JetBrains Mono, Consolas, monospace;
         }
         /* end request */
@@ -393,7 +406,6 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         /* highlight.js */
         .hljs {
             display: block;
-            overflow-x: auto;
             color: #2f3337;
         }
 
