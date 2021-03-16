@@ -265,7 +265,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         }
 
         .call-stack ul li .element-wrap:hover .file-name,
-        .call-stack ul li .code-wrap .lines-item:hover {
+        .call-stack ul li .element-code-wrap .code-wrap .lines-item:hover {
             color: #086eb6;
         }
 
@@ -296,14 +296,17 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         .call-stack ul li a .external-link path {
             fill: #505050;
         }
-
-        .call-stack ul li .code-wrap {
-            display: none;
-            position: relative;
+        
+        .call-stack ul li .element-code-wrap {
             overflow-x: auto;
         }
 
-        .call-stack ul li.application .code-wrap {
+        .call-stack ul li .element-code-wrap .code-wrap {
+            display: none;
+            position: relative;
+        }
+
+        .call-stack ul li.application .element-code-wrap .code-wrap {
             display: block;
         }
 
@@ -558,7 +561,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         }
 
         .dark-theme .element-wrap:hover .file-name,
-        .dark-theme .call-stack ul li .code-wrap .lines-item:hover {
+        .dark-theme .call-stack ul li .element-code-wrap .code-wrap .lines-item:hover {
             color: #9cdcfe !important;
         }
 
