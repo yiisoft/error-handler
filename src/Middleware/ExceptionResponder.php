@@ -51,7 +51,7 @@ final class ExceptionResponder implements MiddlewareInterface
                     }
 
                     if (is_callable($responseHandler)) {
-                        return $this->injector->invoke($responseHandler);
+                        return $this->injector->invoke($responseHandler, ['exception' => $t]);
                     }
                 }
             }
