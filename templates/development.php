@@ -123,7 +123,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
         header .solution {
             margin-top: 20px;
-            white-space: pre;
+            white-space: pre-wrap;
             font-size: 16px;
             line-height: 22px;
         }
