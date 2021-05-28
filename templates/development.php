@@ -16,7 +16,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
     <title>
         <?= $this->htmlEncode($this->getThrowableName($throwable)) ?>
     </title>
-    <style type="text/css">
+    <style>
         /* reset */
         html,
         body,
@@ -123,6 +123,9 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
         header .solution {
             margin-top: 20px;
+            white-space: pre-wrap;
+            font-size: 16px;
+            line-height: 22px;
         }
 
         header .previous {
@@ -183,7 +186,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             margin-left: 100px;
             margin-right: 100px;
         }
-        
+
         @media screen and (max-width: 1200px) {
             header {
                 padding-left: 50px;
@@ -296,7 +299,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         .call-stack ul li a .external-link path {
             fill: #505050;
         }
-        
+
         .call-stack ul li .element-code-wrap {
             overflow-x: auto;
         }
@@ -692,9 +695,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             </div>
 
             <?php if ($throwable instanceof FriendlyExceptionInterface && $throwable->getSolution() !== null): ?>
-                <div class="solution">
-                    <?= nl2br($this->htmlEncode($throwable->getSolution())) ?>
-                </div>
+                <div class="solution"><?= $this->htmlEncode($throwable->getSolution()) ?></div>
             <?php endif ?>
 
             <?= $this->renderPreviousExceptions($throwable) ?>
