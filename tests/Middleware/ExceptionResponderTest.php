@@ -55,7 +55,7 @@ final class ExceptionResponderTest extends TestCase
     {
         return $middleware->process(
             (new ServerRequestFactory())->createServerRequest(Method::GET, 'http://example.com'),
-            new class() implements RequestHandlerInterface {
+            new class () implements RequestHandlerInterface {
                 public function handle(ServerRequestInterface $request): ResponseInterface
                 {
                     throw new DomainException();

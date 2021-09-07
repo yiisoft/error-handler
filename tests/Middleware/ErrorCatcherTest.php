@@ -170,7 +170,7 @@ final class ErrorCatcherTest extends TestCase
 
     private function createRequestHandlerWithThrowable(): RequestHandlerInterface
     {
-        return new class() implements RequestHandlerInterface {
+        return new class () implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 throw new RuntimeException();
