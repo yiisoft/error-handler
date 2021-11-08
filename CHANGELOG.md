@@ -1,9 +1,9 @@
 # Yii Error Handler Change Log
 
-
-## 1.0.1 under development
+## 2.0.0 under development
 
 - Enh #45: Improve appearance of solution from friendly exceptions (vjik)
+- Chg #48: Transfer `HeaderHelper` to `yiisoft/http` package (devanych)
 
 ## 1.0.0 May 13, 2021
 

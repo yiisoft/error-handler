@@ -13,7 +13,6 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\ErrorHandler;
-use Yiisoft\ErrorHandler\HeaderHelper;
 use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\Renderer\JsonRenderer;
@@ -21,6 +20,7 @@ use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\ErrorHandler\Renderer\XmlRenderer;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\Http\Header;
+use Yiisoft\Http\HeaderValueHelper;
 use Yiisoft\Http\Method;
 use Yiisoft\Http\Status;
 
@@ -183,7 +183,7 @@ final class ErrorCatcher implements MiddlewareInterface
     private function getContentType(ServerRequestInterface $request): string
     {
         try {
-            foreach (HeaderHelper::getSortedAcceptTypes($request->getHeader(Header::ACCEPT)) as $header) {
+            foreach (HeaderValueHelper::getSortedAcceptTypes($request->getHeader(Header::ACCEPT)) as $header) {
                 if (array_key_exists($header, $this->renderers)) {
                     return $header;
                 }
