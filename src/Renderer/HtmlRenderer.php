@@ -388,6 +388,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
         $obInitialLevel = ob_get_level();
         ob_start();
+        /** @psalm-suppress InvalidArgument */
         PHP_VERSION_ID >= 80000 ? ob_implicit_flush(false) : ob_implicit_flush(0);
 
         try {
