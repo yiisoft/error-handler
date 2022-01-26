@@ -1,9 +1,8 @@
 # Yii Error Handler Change Log
 
-
 ## 2.0.1 under development
 
-- no changes in this release.
+- Bug #49: Fix JSON rendering of non-UTF-8 encoded string (devanych)
 
 ## 2.0.0 November 09, 2021
 

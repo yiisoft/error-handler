@@ -33,6 +33,6 @@ final class JsonRenderer implements ThrowableRendererInterface
             'file' => $t->getFile(),
             'line' => $t->getLine(),
             'trace' => $t->getTrace(),
-        ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE));
     }
 }
