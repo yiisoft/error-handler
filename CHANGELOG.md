@@ -1,6 +1,6 @@
 # Yii Error Handler Change Log
 
-## 2.0.1 under development
+## 2.0.1 January 26, 2022
 
 - Bug #49: Fix JSON rendering of non-UTF-8 encoded string (devanych)
 
