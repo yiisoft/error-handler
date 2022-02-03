@@ -2,7 +2,7 @@
 
 ## 2.0.2 under development
 
-- no changes in this release.
+- Bug #50: Fix JSON rendering on json recursion exception (thenotsoft)
 
 ## 2.0.1 January 26, 2022
 
