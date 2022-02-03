@@ -62,7 +62,7 @@ final class JsonRendererTest extends TestCase
 
         try {
             json_encode(
-                new class {
+                new class () {
                     public self $self;
 
                     public function __construct()
@@ -74,16 +74,14 @@ final class JsonRendererTest extends TestCase
             );
         } catch (\Throwable $throwable) {
             $data = $renderer->renderVerbose($throwable);
-            $content = json_encode(
-                [
+            $content = json_encode([
                     'type' => \JsonException::class,
                     'message' => $throwable->getMessage(),
                     'code' => $throwable->getCode(),
                     'file' => $throwable->getFile(),
                     'line' => $throwable->getLine(),
                     'trace' => $throwable->getTrace(),
-                ],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR
             );
 
             $this->assertSame($content, (string)$data);
