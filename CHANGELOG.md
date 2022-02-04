@@ -1,6 +1,6 @@
 # Yii Error Handler Change Log
 
-## 2.0.2 under development
+## 2.0.2 February 04, 2022
 
 - Bug #50: Fix JSON rendering on JSON recursion exception (thenotsoft)
 
