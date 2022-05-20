@@ -299,7 +299,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
     public function renderCurl(ServerRequestInterface $request): string
     {
         try {
-            $output = (new Command())->setRequest($request)->build();
+            $output = (new Command())
+                ->setRequest($request)
+                ->build();
         } catch (Throwable $e) {
             $output = 'Error generating curl command: ' . $e->getMessage();
         }

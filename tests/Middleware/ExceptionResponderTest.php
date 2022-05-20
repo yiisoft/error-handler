@@ -27,7 +27,12 @@ final class ExceptionResponderTest extends TestCase
             DomainException::class => Status::BAD_REQUEST,
         ]);
 
-        $this->assertSame(Status::BAD_REQUEST, $this->process($middleware)->getStatusCode());
+        $this->assertSame(
+            Status::BAD_REQUEST,
+            $this
+                ->process($middleware)
+                ->getStatusCode(),
+        );
     }
 
     public function testCallable(): void
@@ -38,7 +43,12 @@ final class ExceptionResponderTest extends TestCase
             },
         ]);
 
-        $this->assertSame(Status::CREATED, $this->process($middleware)->getStatusCode());
+        $this->assertSame(
+            Status::CREATED,
+            $this
+                ->process($middleware)
+                ->getStatusCode(),
+        );
     }
 
     public function testAnotherException(): void

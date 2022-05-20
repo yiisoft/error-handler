@@ -54,7 +54,9 @@ final class ErrorData
             $response = $response->withHeader($name, $value);
         }
 
-        $response->getBody()->write($this->content);
+        $response
+            ->getBody()
+            ->write($this->content);
         return $response;
     }
 }

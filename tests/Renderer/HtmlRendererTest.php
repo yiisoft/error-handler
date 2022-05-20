@@ -191,7 +191,9 @@ final class HtmlRendererTest extends TestCase
     {
         $renderer = new HtmlRenderer();
         $serverRequestMock = $this->createServerRequestMock();
-        $serverRequestMock->method('getServerParams')->willReturn(['SERVER_SOFTWARE' => $serverSoftware]);
+        $serverRequestMock
+            ->method('getServerParams')
+            ->willReturn(['SERVER_SOFTWARE' => $serverSoftware]);
 
         $this->assertStringContainsString($expected, $renderer->createServerInformationLink($serverRequestMock));
     }
