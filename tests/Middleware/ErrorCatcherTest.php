@@ -25,12 +25,18 @@ final class ErrorCatcherTest extends TestCase
 {
     public function testProcessWithHeadRequestMethod(): void
     {
-        $response = $this->createErrorCatcher()->process(
-            $this->createServerRequest('HEAD', ['Accept' => ['test/html']]),
-            $this->createRequestHandlerWithThrowable(),
-        );
-        $response->getBody()->rewind();
-        $content = $response->getBody()->getContents();
+        $response = $this
+            ->createErrorCatcher()
+            ->process(
+                $this->createServerRequest('HEAD', ['Accept' => ['test/html']]),
+                $this->createRequestHandlerWithThrowable(),
+            );
+        $response
+            ->getBody()
+            ->rewind();
+        $content = $response
+            ->getBody()
+            ->getContents();
 
         $this->assertEmpty($content);
         $this->assertSame([HeaderRenderer::DEFAULT_ERROR_MESSAGE], $response->getHeader('X-Error-Message'));
@@ -38,12 +44,18 @@ final class ErrorCatcherTest extends TestCase
 
     public function testProcessWithFailAcceptRequestHeader(): void
     {
-        $response = $this->createErrorCatcher()->process(
-            $this->createServerRequest('GET', ['Accept' => ['text/plain;q=2.0']]),
-            $this->createRequestHandlerWithThrowable(),
-        );
-        $response->getBody()->rewind();
-        $content = $response->getBody()->getContents();
+        $response = $this
+            ->createErrorCatcher()
+            ->process(
+                $this->createServerRequest('GET', ['Accept' => ['text/plain;q=2.0']]),
+                $this->createRequestHandlerWithThrowable(),
+            );
+        $response
+            ->getBody()
+            ->rewind();
+        $content = $response
+            ->getBody()
+            ->getContents();
 
         $this->assertNotSame(PlainTextRenderer::DEFAULT_ERROR_MESSAGE, $content);
         $this->assertStringContainsString('<html', $content);
@@ -52,13 +64,19 @@ final class ErrorCatcherTest extends TestCase
     public function testAddedRenderer(): void
     {
         $mimeType = 'test/test';
-        $catcher = $this->createErrorCatcher()->withRenderer($mimeType, PlainTextRenderer::class);
+        $catcher = $this
+            ->createErrorCatcher()
+            ->withRenderer($mimeType, PlainTextRenderer::class);
         $response = $catcher->process(
             $this->createServerRequest('GET', ['Accept' => [$mimeType]]),
             $this->createRequestHandlerWithThrowable(),
         );
-        $response->getBody()->rewind();
-        $content = $response->getBody()->getContents();
+        $response
+            ->getBody()
+            ->rewind();
+        $content = $response
+            ->getBody()
+            ->getContents();
 
         $this->assertSame(PlainTextRenderer::DEFAULT_ERROR_MESSAGE, $content);
     }
@@ -69,38 +87,54 @@ final class ErrorCatcherTest extends TestCase
         $this->expectErrorMessage(
             'Class "' . self::class . '" does not implement "' . ThrowableRendererInterface::class . '".',
         );
-        $this->createErrorCatcher()->withRenderer('test/test', self::class);
+        $this
+            ->createErrorCatcher()
+            ->withRenderer('test/test', self::class);
     }
 
     public function testThrownExceptionWithInvalidContentType()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectErrorMessage('Invalid content type.');
-        $this->createErrorCatcher()->withRenderer('test invalid content type', PlainTextRenderer::class);
+        $this
+            ->createErrorCatcher()
+            ->withRenderer('test invalid content type', PlainTextRenderer::class);
     }
 
     public function testWithoutRenderers(): void
     {
-        $catcher = $this->createErrorCatcher()->withoutRenderers();
+        $catcher = $this
+            ->createErrorCatcher()
+            ->withoutRenderers();
         $response = $catcher->process(
             $this->createServerRequest('GET', ['Accept' => ['test/html']]),
             $this->createRequestHandlerWithThrowable(),
         );
-        $response->getBody()->rewind();
-        $content = $response->getBody()->getContents();
+        $response
+            ->getBody()
+            ->rewind();
+        $content = $response
+            ->getBody()
+            ->getContents();
 
         $this->assertSame(PlainTextRenderer::DEFAULT_ERROR_MESSAGE, $content);
     }
 
     public function testWithoutRenderer(): void
     {
-        $catcher = $this->createErrorCatcher()->withoutRenderers('*/*');
+        $catcher = $this
+            ->createErrorCatcher()
+            ->withoutRenderers('*/*');
         $response = $catcher->process(
             $this->createServerRequest('GET', ['Accept' => ['test/html']]),
             $this->createRequestHandlerWithThrowable(),
         );
-        $response->getBody()->rewind();
-        $content = $response->getBody()->getContents();
+        $response
+            ->getBody()
+            ->rewind();
+        $content = $response
+            ->getBody()
+            ->getContents();
 
         $this->assertSame(PlainTextRenderer::DEFAULT_ERROR_MESSAGE, $content);
     }
@@ -108,38 +142,54 @@ final class ErrorCatcherTest extends TestCase
     public function testAdvancedAcceptHeader(): void
     {
         $contentType = 'text/html;version=2';
-        $catcher = $this->createErrorCatcher()->withRenderer($contentType, PlainTextRenderer::class);
+        $catcher = $this
+            ->createErrorCatcher()
+            ->withRenderer($contentType, PlainTextRenderer::class);
         $response = $catcher->process(
             $this->createServerRequest('GET', ['Accept' => ['text/html', $contentType]]),
             $this->createRequestHandlerWithThrowable(),
         );
-        $response->getBody()->rewind();
-        $content = $response->getBody()->getContents();
+        $response
+            ->getBody()
+            ->rewind();
+        $content = $response
+            ->getBody()
+            ->getContents();
 
         $this->assertSame(PlainTextRenderer::DEFAULT_ERROR_MESSAGE, $content);
     }
 
     public function testDefaultContentType(): void
     {
-        $catcher = $this->createErrorCatcher()->withRenderer('*/*', PlainTextRenderer::class);
+        $catcher = $this
+            ->createErrorCatcher()
+            ->withRenderer('*/*', PlainTextRenderer::class);
         $response = $catcher->process(
             $this->createServerRequest('GET', ['Accept' => ['test/test']]),
             $this->createRequestHandlerWithThrowable(),
         );
-        $response->getBody()->rewind();
-        $content = $response->getBody()->getContents();
+        $response
+            ->getBody()
+            ->rewind();
+        $content = $response
+            ->getBody()
+            ->getContents();
 
         $this->assertSame(PlainTextRenderer::DEFAULT_ERROR_MESSAGE, $content);
     }
 
     public function testForceContentType(): void
     {
-        $catcher = $this->createErrorCatcher()->forceContentType('application/json');
+        $catcher = $this
+            ->createErrorCatcher()
+            ->forceContentType('application/json');
         $response = $catcher->process(
             $this->createServerRequest('GET', ['Accept' => ['text/xml']]),
             $this->createRequestHandlerWithThrowable(),
         );
-        $response->getBody()->rewind();
+        $response
+            ->getBody()
+            ->rewind();
 
         $this->assertSame('application/json', $response->getHeaderLine(Header::CONTENT_TYPE));
     }
@@ -148,7 +198,9 @@ final class ErrorCatcherTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectErrorMessage('The renderer for image/gif is not set.');
-        $this->createErrorCatcher()->forceContentType('image/gif');
+        $this
+            ->createErrorCatcher()
+            ->forceContentType('image/gif');
     }
 
     private function createErrorHandler(): ErrorHandler
