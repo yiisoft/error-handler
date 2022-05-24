@@ -1,8 +1,8 @@
 # Yii Error Handler Change Log
 
-## 2.0.3 under development
+## 2.1.0 under development
 
-- no changes in this release.
+- Enh #55: Defer exit on terminate (rustamwin)
 
 ## 2.0.2 February 04, 2022
 
