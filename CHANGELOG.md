@@ -3,7 +3,7 @@
 ## 2.1.0 under development
 
 - Enh #55: Defer exit on terminate (rustamwin)
-- Enh #53: Add shutdown event, fix cwd (rustamwin)
+- Enh #54: Add shutdown event, fix cwd (rustamwin)
 
 ## 2.0.2 February 04, 2022
 
