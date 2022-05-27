@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
+use Yiisoft\ErrorHandler\Event\ApplicationError;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\Http\Status;
@@ -37,14 +39,20 @@ final class ErrorHandler
     private int $memoryReserveSize = 262_144;
     private string $memoryReserve = '';
     private bool $debug = false;
+    private ?string $workingDirectory = null;
 
     private LoggerInterface $logger;
     private ThrowableRendererInterface $defaultRenderer;
+    private ?EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(LoggerInterface $logger, ThrowableRendererInterface $defaultRenderer)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        ThrowableRendererInterface $defaultRenderer,
+        EventDispatcherInterface $eventDispatcher = null
+    ) {
         $this->logger = $logger;
         $this->defaultRenderer = $defaultRenderer;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -136,6 +144,10 @@ final class ErrorHandler
                 $this->renderThrowableAndTerminate($error);
             }
         });
+
+        if (!(PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')) {
+            $this->workingDirectory = getcwd();
+        }
     }
 
     /**
@@ -154,12 +166,16 @@ final class ErrorHandler
      */
     private function renderThrowableAndTerminate(Throwable $t): void
     {
+        if (!empty($this->workingDirectory)) {
+            chdir($this->workingDirectory);
+        }
         // disable error capturing to avoid recursive errors while handling exceptions
         $this->unregister();
         // set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent
         http_response_code(Status::INTERNAL_SERVER_ERROR);
 
         echo $this->handle($t);
+        $this->eventDispatcher->dispatch(new ApplicationError());
         register_shutdown_function(static function (): void {
             exit(1);
         });
