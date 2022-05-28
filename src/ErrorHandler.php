@@ -176,7 +176,7 @@ final class ErrorHandler
 
         echo $this->handle($t);
         if ($this->eventDispatcher !== null) {
-            $this->eventDispatcher->dispatch(new ApplicationError());
+            $this->eventDispatcher->dispatch(new ApplicationError($t));
         }
         register_shutdown_function(static function (): void {
             exit(1);
