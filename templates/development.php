@@ -1,11 +1,17 @@
 <?php
-/* @var $throwable \Throwable */
-/* @var $request \Psr\Http\Message\ServerRequestInterface|null */
-/* @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer */
 
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
+/**
+ * @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer
+ * @var $request \Psr\Http\Message\ServerRequestInterface|null
+ * @var $throwable \Throwable
+ */
+
 $theme = $_COOKIE['yii-exception-theme'] ?? '';
+
+$isFriendlyException = $throwable instanceof FriendlyExceptionInterface;
+$solution = $isFriendlyException ? $throwable->getSolution() : null;
 ?>
 <!doctype html>
 <html lang="en">
@@ -681,7 +687,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
     <div class="exception-card">
         <div class="flex-1">
             <div class="exception-class">
-                <?php if ($throwable instanceof FriendlyExceptionInterface): ?>
+                <?php if ($isFriendlyException): ?>
                     <span><?= $this->htmlEncode($throwable->getName())?></span>
                     &mdash;
                     <?= get_class($throwable) ?>
@@ -694,8 +700,8 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
                 <?= nl2br($this->htmlEncode($throwable->getMessage())) ?>
             </div>
 
-            <?php if ($throwable instanceof FriendlyExceptionInterface && $throwable->getSolution() !== null): ?>
-                <div class="solution"><?= $this->htmlEncode($throwable->getSolution()) ?></div>
+            <?php if ($solution !== null): ?>
+                <div class="solution"><?= $this->parseMarkdown($solution) ?></div>
             <?php endif ?>
 
             <?= $this->renderPreviousExceptions($throwable) ?>
