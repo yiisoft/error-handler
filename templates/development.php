@@ -128,10 +128,31 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
         }
 
         header .solution {
-            margin-top: 20px;
-            white-space: pre-wrap;
+            margin-top: 24px;
             font-size: 16px;
             line-height: 22px;
+        }
+        header .solution h2 {
+            margin-top: 24px;
+            font-size: 22px;
+            line-height: 28px;
+            font-weight: bold;
+        }
+        header .solution p {
+            margin-top: 16px;
+        }
+        header .solution ul {
+            margin: 16px 0 0 24px;
+            list-style: inside;
+        }
+        header .solution li {
+            margin-top: 8px;
+        }
+        header .solution pre {
+            margin: 24px 0;
+        }
+        header .solution code {
+            font-family: monospace;
         }
 
         header .previous {

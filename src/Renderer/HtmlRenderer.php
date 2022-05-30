@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\ErrorHandler\Renderer;
 
 use Alexkart\CurlBuilder\Command;
-use cebe\markdown\Markdown;
+use cebe\markdown\GithubMarkdown;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Throwable;
@@ -50,7 +50,7 @@ use function strpos;
  */
 final class HtmlRenderer implements ThrowableRendererInterface
 {
-    private Markdown $markdownParser;
+    private GithubMarkdown $markdownParser;
 
     /**
      * @var string The full path to the default template directory.
@@ -113,7 +113,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     public function __construct(array $settings = [])
     {
-        $this->markdownParser = new Markdown();
+        $this->markdownParser = new GithubMarkdown();
         $this->defaultTemplatePath = dirname(__DIR__, 2) . '/templates';
         $this->template = $settings['template'] ?? $this->defaultTemplatePath . '/production.php';
         $this->verboseTemplate = $settings['verboseTemplate'] ?? $this->defaultTemplatePath . '/development.php';
