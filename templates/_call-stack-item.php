@@ -51,7 +51,7 @@ HTML;
                 <?php for ($i = $begin; $i <= $end; ++$i): ?><div class="hover-line"></div><?php endfor ?>
                 <div class="code">
                     <?php for ($i = $begin; $i <= $end; ++$i): ?><span class="lines-item"><?= (int) ($i + 1) ?></span><?php endfor ?>
-                    <pre><?php
+                    <pre class="codeBlock language-php"><?php
                         // Fill empty lines with a whitespace to avoid rendering problems in Opera.
                         for ($i = $begin; $i <= $end; ++$i) {
                             echo (trim($lines[$i]) === '') ? " \n" : $this->htmlEncode($lines[$i]);
