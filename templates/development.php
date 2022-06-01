@@ -192,9 +192,13 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
 
         header .solution blockquote {
             margin: 18px 0 18px 4px;
-            padding: 2px 0 2px 16px;
+            padding: 3px 0 2px 16px;
             border-left: 4px solid #e4e4e4;
             color: #707070;
+        }
+        .dark-theme header .solution blockquote {
+            color: #999;
+            border-color: #484c50;
         }
 
         header .solution ul,
@@ -242,6 +246,11 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
             width: max-content;
         }
 
+        .dark-theme header .solution code,
+        .dark-theme header .solution pre {
+            background: #2d333b;
+        }
+
         header .solution table {
             margin: 16px 0 0 0;
             border-collapse: collapse;
@@ -251,10 +260,18 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
             padding: 6px 12px;
             border: 1px solid #e4e4e4;
         }
+        .dark-theme header .solution td,
+        .dark-theme header .solution th {
+            border-color: #484c50;
+        }
 
         header .solution HR {
             margin: 24px 0;
             border: 1px solid #ddd;
+            border-width: 1px 0 0 0;
+        }
+        .dark-theme header .solution HR {
+            border-color: #484c50;
         }
 
         header .previous {
