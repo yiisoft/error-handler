@@ -95,7 +95,7 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
         }
 
         header .exception-card {
-            display: flex;
+            position: relative;
             background: #fafafa;
             border: 2px solid #d83c24;
             box-sizing: border-box;
@@ -105,6 +105,7 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
         }
 
         header .exception-class {
+            padding-right: 114px;
             margin-bottom: 30px;
             font-weight: 500;
             font-size: 36px;
@@ -196,22 +197,64 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
             color: #707070;
         }
 
-        header .solution ul {
-            margin: 16px 0 0 24px;
-            list-style: inside;
+        header .solution ul,
+        header .solution ol {
+            padding: 0;
+            margin: 16px 0 0 32px;
+        }
+        header .solution li ul,
+        header .solution li ol {
+            margin: 0 0 0 24px;
         }
 
         header .solution li {
-            margin-top: 8px;
+            margin: 8px 0 0 0;
         }
 
-        header .solution pre {
-            margin: 24px 0;
+        header .solution ul {
+            list-style: outside;
         }
 
         header .solution pre,
         header .solution code {
             font-family: monospace;
+        }
+
+        header .solution code {
+            padding: 2px 6px;
+            font-size: 90%;
+            background-color: #f3f3f3;
+            border-radius: 6px;
+        }
+
+        header .solution pre {
+            margin: 24px 0;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: auto;
+            padding: 14px;
+            border-radius: 8px;
+            background: #f3f3f3;
+        }
+        header .solution pre code {
+            font-size: 100%;
+            padding: 0;
+            width: max-content;
+        }
+
+        header .solution table {
+            margin: 16px 0 0 0;
+            border-collapse: collapse;
+        }
+        header .solution td,
+        header .solution th {
+            padding: 6px 12px;
+            border: 1px solid #e4e4e4;
+        }
+
+        header .solution HR {
+            margin: 24px 0;
+            border: 1px solid #ddd;
         }
 
         header .previous {
@@ -251,16 +294,21 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
             height: 150px;
         }
 
+        #copy-stacktrace {
+            position: absolute;
+            right: 40px;
+            top: 44px;
+        }
+
         #copy-stacktrace:hover svg path {
             fill: #000;
         }
 
         #copied {
             display: none;
-            float: left;
-            height: 25px;
-            padding: 5px;
-            margin-right: 5px;
+            position: absolute;
+            right: 76px;
+            top: 51px;
         }
 
         #light-mode {
@@ -765,37 +813,34 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
     </div>
 
     <div class="exception-card">
-        <div class="flex-1">
-            <div class="exception-class">
-                <?php if ($isFriendlyException): ?>
-                    <span><?= $this->htmlEncode($throwable->getName())?></span>
-                    &mdash;
-                    <?= get_class($throwable) ?>
-                <?php else: ?>
-                    <span><?= get_class($throwable) ?></span>
-                <?php endif ?>
-            </div>
-
-            <div class="exception-message">
-                <?= nl2br($this->htmlEncode($throwable->getMessage())) ?>
-            </div>
-
-            <?php if ($solution !== null): ?>
-                <div class="solution"><?= $this->parseMarkdown($solution) ?></div>
+        <div class="exception-class">
+            <?php if ($isFriendlyException): ?>
+                <span><?= $this->htmlEncode($throwable->getName())?></span>
+                &mdash;
+                <?= get_class($throwable) ?>
+            <?php else: ?>
+                <span><?= get_class($throwable) ?></span>
             <?php endif ?>
-
-            <?= $this->renderPreviousExceptions($throwable) ?>
         </div>
-        <div>
-            <textarea id="clipboard"><?= $this->htmlEncode($throwable) ?></textarea>
-            <span id="copied">Copied!</span>
 
-            <a href="#" id="copy-stacktrace" title="Copy the stacktrace for use in a bug report or pastebin">
-                <svg width="26" height="30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17.9998.333344H3.33317C1.8665.333344.666504 1.53334.666504 3.00001V20.3333c0 .7334.599996 1.3334 1.333336 1.3334.73333 0 1.33333-.6 1.33333-1.3334V4.33334c0-.73333.6-1.33333 1.33333-1.33333h13.3333c.7334 0 1.3334-.6 1.3334-1.33333 0-.733337-.6-1.333336-1.3334-1.333336zm5.3334 5.333336H8.6665c-1.46666 0-2.66666 1.2-2.66666 2.66666V27c0 1.4667 1.2 2.6667 2.66666 2.6667h14.6667c1.4666 0 2.6666-1.2 2.6666-2.6667V8.33334c0-1.46666-1.2-2.66666-2.6666-2.66666zM21.9998 27H9.99984c-.73333 0-1.33334-.6-1.33334-1.3333V9.66668c0-.73334.60001-1.33334 1.33334-1.33334H21.9998c.7334 0 1.3334.6 1.3334 1.33334V25.6667c0 .7333-.6 1.3333-1.3334 1.3333z" fill="#787878"/>
-                </svg>
-            </a>
+        <div class="exception-message">
+            <?= nl2br($this->htmlEncode($throwable->getMessage())) ?>
         </div>
+
+        <?php if ($solution !== null): ?>
+            <div class="solution"><?= $this->parseMarkdown($solution) ?></div>
+        <?php endif ?>
+
+        <?= $this->renderPreviousExceptions($throwable) ?>
+
+        <textarea id="clipboard"><?= $this->htmlEncode($throwable) ?></textarea>
+        <span id="copied">Copied!</span>
+
+        <a href="#" id="copy-stacktrace" title="Copy the stacktrace for use in a bug report or pastebin">
+            <svg width="26" height="30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.9998.333344H3.33317C1.8665.333344.666504 1.53334.666504 3.00001V20.3333c0 .7334.599996 1.3334 1.333336 1.3334.73333 0 1.33333-.6 1.33333-1.3334V4.33334c0-.73333.6-1.33333 1.33333-1.33333h13.3333c.7334 0 1.3334-.6 1.3334-1.33333 0-.733337-.6-1.333336-1.3334-1.333336zm5.3334 5.333336H8.6665c-1.46666 0-2.66666 1.2-2.66666 2.66666V27c0 1.4667 1.2 2.6667 2.66666 2.6667h14.6667c1.4666 0 2.6666-1.2 2.6666-2.6667V8.33334c0-1.46666-1.2-2.66666-2.6666-2.66666zM21.9998 27H9.99984c-.73333 0-1.33334-.6-1.33334-1.3333V9.66668c0-.73334.60001-1.33334 1.33334-1.33334H21.9998c.7334 0 1.3334.6 1.3334 1.33334V25.6667c0 .7333-.6 1.3333-1.3334 1.3333z" fill="#787878"/>
+            </svg>
+        </a>
     </div>
 </header>
 
