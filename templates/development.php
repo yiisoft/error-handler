@@ -180,6 +180,20 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
             margin-top: 16px;
         }
 
+        header .solution a {
+            color: #00617b;
+            text-decoration: underline;
+        }
+        header .solution a:hover {
+            color: #1191b3;
+        }
+        .dark-theme header .solution a {
+            color: #03a9f4;
+        }
+        .dark-theme header .solution a:hover {
+            color: #39b9f3;
+        }
+
         header .solution h1:first-child,
         header .solution h2:first-child,
         header .solution h3:first-child,
