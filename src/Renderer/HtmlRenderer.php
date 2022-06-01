@@ -155,7 +155,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
     public function parseMarkdown(string $content): string
     {
         $html = $this->markdownParser->parse($content);
-        $html = strip_tags($html, [
+        return strip_tags($html, [
             'h1',
             'h2',
             'h3',
@@ -188,7 +188,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
             'li',
             'img',
         ]);
-        return $html;
     }
 
     /**
