@@ -26,6 +26,7 @@ The package provides advanced error handling. The features are:
 - Detects response format based on mime type of the request.
 - Supports responding with HTML, plain text, JSON, XML and headers out of the box.
 - Has ability to implement your own error rendering for additional types.
+- [Friendly exceptions](https://github.com/yiisoft/friendly-exception/) support.
 
 ## Requirements
 
@@ -193,6 +194,36 @@ In the application middleware stack `Yiisoft\ErrorHandler\Middleware\ExceptionRe
 
 For use in the [Yii framework](http://www.yiiframework.com/),
 see [Yii guide to handling errors](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md).
+
+## Friendly Exceptions
+
+`HtmlRenderer` support [friendly exceptions](https://github.com/yiisoft/friendly-exception/).
+
+Code blocks in solution markdown support language syntax highlight:
+
+| Language | Aliases |
+| -------- | ------- |
+| Bash | bash, sh, zsh |
+| CSS | css |
+| HTML, XML | xml, html, xhtml, rss, atom, xjb, xsd, xsl, plist, svg |
+| JavaScript | javascript, js, jsx |
+| JSON | json |
+| PHP | php |
+| Plaintext | plaintext, txt, text |
+| SQL | sql |
+
+For example:
+
+````
+```html
+<html>
+<body>
+    <p>This text is normal.</p>
+    <p><b>This text is bold.</b></p>
+</body>
+</html>
+```
+````
 
 ## Testing
 
