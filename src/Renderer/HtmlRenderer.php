@@ -157,6 +157,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $html = $this->markdownParser->parse($content);
         /**
          * @psalm-suppress InvalidArgument
+         *
          * @link https://github.com/vimeo/psalm/issues/4317
          */
         return strip_tags($html, [
