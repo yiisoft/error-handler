@@ -197,7 +197,7 @@ see [Yii guide to handling errors](https://github.com/yiisoft/docs/blob/master/g
 
 ## Friendly Exceptions
 
-`HtmlRenderer` support [friendly exceptions](https://github.com/yiisoft/friendly-exception/).
+`HtmlRenderer` supports [friendly exceptions](https://github.com/yiisoft/friendly-exception/).
 
 Code blocks in solution markdown support language syntax highlight:
 
