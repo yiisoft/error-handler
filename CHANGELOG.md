@@ -4,6 +4,7 @@
 
 - Enh #55: Defer exit on terminate (rustamwin)
 - Enh #54: Add shutdown event, fix cwd (rustamwin)
+- Enh #57: Add markdown support for friendly exception solutions (vjik)
 
 ## 2.0.2 February 04, 2022
 

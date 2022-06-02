@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\ErrorHandler\Renderer;
 
 use Alexkart\CurlBuilder\Command;
+use cebe\markdown\GithubMarkdown;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Throwable;
@@ -49,6 +50,8 @@ use function strpos;
  */
 final class HtmlRenderer implements ThrowableRendererInterface
 {
+    private GithubMarkdown $markdownParser;
+
     /**
      * @var string The full path to the default template directory.
      */
@@ -110,11 +113,14 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     public function __construct(array $settings = [])
     {
+        $this->markdownParser = new GithubMarkdown();
+        $this->markdownParser->html5 = true;
+
         $this->defaultTemplatePath = dirname(__DIR__, 2) . '/templates';
         $this->template = $settings['template'] ?? $this->defaultTemplatePath . '/production.php';
         $this->verboseTemplate = $settings['verboseTemplate'] ?? $this->defaultTemplatePath . '/development.php';
-        $this->maxSourceLines = $settings['maxSourceLines']  ?? 19;
-        $this->maxTraceLines = $settings['maxTraceLines']  ?? 13;
+        $this->maxSourceLines = $settings['maxSourceLines'] ?? 19;
+        $this->maxTraceLines = $settings['maxTraceLines'] ?? 13;
         $this->traceHeaderLine = $settings['traceHeaderLine'] ?? null;
     }
 
@@ -144,6 +150,49 @@ final class HtmlRenderer implements ThrowableRendererInterface
     public function htmlEncode(string $content): string
     {
         return htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
+    }
+
+    public function parseMarkdown(string $content): string
+    {
+        $html = $this->markdownParser->parse($content);
+        /**
+         * @psalm-suppress InvalidArgument
+         *
+         * @link https://github.com/vimeo/psalm/issues/4317
+         */
+        return strip_tags($html, [
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'hr',
+            'pre',
+            'code',
+            'blockquote',
+            'table',
+            'tr',
+            'td',
+            'th',
+            'thead',
+            'tbody',
+            'strong',
+            'em',
+            'b',
+            'i',
+            'u',
+            's',
+            'span',
+            'a',
+            'p',
+            'br',
+            'nobr',
+            'ul',
+            'ol',
+            'li',
+            'img',
+        ]);
     }
 
     /**
@@ -286,7 +335,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
         $output .= "\n" . $request->getBody() . "\n\n";
 
-        return '<pre>' . $this->htmlEncode(rtrim($output, "\n")) . '</pre>';
+        return '<pre class="codeBlock language-text">' . $this->htmlEncode(rtrim($output, "\n")) . '</pre>';
     }
 
     /**
@@ -303,10 +352,10 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 ->setRequest($request)
                 ->build();
         } catch (Throwable $e) {
-            $output = 'Error generating curl command: ' . $e->getMessage();
+            return $this->htmlEncode('Error generating curl command: ' . $e->getMessage());
         }
 
-        return $this->htmlEncode($output);
+        return '<div class="codeBlock language-sh">' . $this->htmlEncode($output) . '</div>';
     }
 
     /**

@@ -26,6 +26,7 @@ The package provides advanced error handling. The features are:
 - Detects response format based on mime type of the request.
 - Supports responding with HTML, plain text, JSON, XML and headers out of the box.
 - Has ability to implement your own error rendering for additional types.
+- [Friendly exceptions](https://github.com/yiisoft/friendly-exception/) support.
 
 ## Requirements
 
@@ -194,6 +195,36 @@ In the application middleware stack `Yiisoft\ErrorHandler\Middleware\ExceptionRe
 For use in the [Yii framework](http://www.yiiframework.com/),
 see [Yii guide to handling errors](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md).
 
+## Friendly Exceptions
+
+`HtmlRenderer` supports [friendly exceptions](https://github.com/yiisoft/friendly-exception/).
+
+Code blocks in solution markdown support language syntax highlight:
+
+| Language | Aliases |
+| -------- | ------- |
+| Bash | bash, sh, zsh |
+| CSS | css |
+| HTML, XML | xml, html, xhtml, rss, atom, xjb, xsd, xsl, plist, svg |
+| JavaScript | javascript, js, jsx |
+| JSON | json |
+| PHP | php |
+| Plaintext | plaintext, txt, text |
+| SQL | sql |
+
+For example:
+
+````
+```html
+<html>
+<body>
+    <p>This text is normal.</p>
+    <p><b>This text is bold.</b></p>
+</body>
+</html>
+```
+````
+
 ## Testing
 
 ### Unit testing
@@ -221,9 +252,13 @@ The code is statically analyzed with [Psalm](https://psalm.dev/). To run static 
 ./vendor/bin/psalm
 ```
 
+## Credits
+
+The Yii Error Handler use code of [Highlight.js](https://highlightjs.org/) by Ivan Sagalaev and other contributors.
+
 ## License
 
-The Yii error handler is free software. It is released under the terms of the BSD License.
+The Yii Error Handler is free software. It is released under the terms of the BSD License.
 Please see [`LICENSE`](./LICENSE.md) for more information.
 
 Maintained by [Yii Software](https://www.yiiframework.com/).
