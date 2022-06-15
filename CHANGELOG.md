@@ -1,9 +1,9 @@
 # Yii Error Handler Change Log
 
-## 2.1.0 under development
+## 2.1.0 June 15, 2022
 
-- Enh #55: Defer exit on terminate (rustamwin)
 - Enh #54: Add shutdown event, fix cwd (rustamwin)
+- Enh #55: Defer exit on terminate (rustamwin)
 - Enh #57: Add markdown support for friendly exception solutions (vjik)
 - Enh #58: Add support for `2.0`, `3.0` versions of `psr/log` (rustamwin)
 
