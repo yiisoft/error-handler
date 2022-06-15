@@ -1,5 +1,9 @@
 # Yii Error Handler Change Log
 
+## 2.1.1 under development
+
+- no changes in this release.
+
 ## 2.1.0 June 15, 2022
 
 - Enh #54: Add shutdown event, fix cwd (rustamwin)
