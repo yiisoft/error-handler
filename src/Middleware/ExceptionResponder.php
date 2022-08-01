@@ -28,6 +28,35 @@ final class ExceptionResponder implements MiddlewareInterface
     private Injector $injector;
 
     /**
+     * The `$exceptionMap` specified as an array can be in one of the following two formats:
+     *
+     * - callable format: `[\LogicException::class => callable, \DomainException::class => callable, ...]`
+     * - int format: `[\Exception::class => 404, \DomainException::class => 500, ...]`
+     *
+     * When an exception is thrown, the map in callable format allows to take control of the response.
+     * Сallable must return `Psr\Http\Message\ResponseInterface`. If specified exception classes are equal,
+     * then the first one will be processed. Below are some examples:
+     *
+     * ```php
+     * $exceptionMap = [
+     *     DomainException::class => function (\Psr\Http\Message\ResponseFactoryInterface $responseFactory) {
+     *         return $responseFactory->createResponse(\Yiisoft\Http\Status::CREATED);
+     *     },
+     *     MyHttpException::class => static fn (MyHttpException $exception) => new MyResponse($exception),
+     * ]
+     * ```
+     *
+     * When an exception is thrown, the map in int format allows to send the response with set http code.
+     * If specified exception classes are equal, then the first one will be processed. Below are some examples:
+     *
+     * ```php
+     * $exceptionMap = [
+     *     \DomainException::class => \Yiisoft\Http\Status::BAD_REQUEST,
+     *     \InvalidArgumentException::class => \Yiisoft\Http\Status::BAD_REQUEST,
+     *     MyNotFoundException::class => \Yiisoft\Http\Status::NOT_FOUND,
+     * ]
+     * ```
+     *
      * @param callable[]|int[] $exceptionMap A must that should return a ResponseInterface or response status code.
      * @param ResponseFactoryInterface $responseFactory
      * @param Injector $injector
