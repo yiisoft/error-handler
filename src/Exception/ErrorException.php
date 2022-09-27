@@ -136,6 +136,6 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         }
 
         // Xdebug 3 and later, proper mode is required
-        return false !== strpos(ini_get('xdebug.mode'), 'develop');
+        return str_contains(ini_get('xdebug.mode'), 'develop');
     }
 }

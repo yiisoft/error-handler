@@ -28,7 +28,6 @@ use function array_key_exists;
 use function count;
 use function is_subclass_of;
 use function sprintf;
-use function strpos;
 use function strtolower;
 use function trim;
 
@@ -46,20 +45,10 @@ final class ErrorCatcher implements MiddlewareInterface
         'text/html' => HtmlRenderer::class,
         '*/*' => HtmlRenderer::class,
     ];
-
-    private ResponseFactoryInterface $responseFactory;
-    private ErrorHandler $errorHandler;
-    private ContainerInterface $container;
     private ?string $contentType = null;
 
-    public function __construct(
-        ResponseFactoryInterface $responseFactory,
-        ErrorHandler $errorHandler,
-        ContainerInterface $container
-    ) {
-        $this->responseFactory = $responseFactory;
-        $this->errorHandler = $errorHandler;
-        $this->container = $container;
+    public function __construct(private ResponseFactoryInterface $responseFactory, private ErrorHandler $errorHandler, private ContainerInterface $container)
+    {
     }
 
     /**
@@ -67,8 +56,6 @@ final class ErrorCatcher implements MiddlewareInterface
      *
      * @param string $contentType The content type to add associated renderers for.
      * @param string $rendererClass The classname implementing the {@see ThrowableRendererInterface}.
-     *
-     * @return self
      */
     public function withRenderer(string $contentType, string $rendererClass): self
     {
@@ -90,8 +77,6 @@ final class ErrorCatcher implements MiddlewareInterface
      *
      * @param string[] $contentTypes The content types to remove associated renderers for.
      * If not specified, all renderers will be removed.
-     *
-     * @return self
      */
     public function withoutRenderers(string ...$contentTypes): self
     {
@@ -113,8 +98,6 @@ final class ErrorCatcher implements MiddlewareInterface
      * Force content type to respond with regardless of request.
      *
      * @param string $contentType The content type to respond with regardless of request.
-     *
-     * @return self
      */
     public function forceContentType(string $contentType): self
     {
@@ -140,11 +123,6 @@ final class ErrorCatcher implements MiddlewareInterface
 
     /**
      * Generates a response with error information.
-     *
-     * @param Throwable $t
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
      */
     private function generateErrorResponse(Throwable $t, ServerRequestInterface $request): ResponseInterface
     {
@@ -161,8 +139,6 @@ final class ErrorCatcher implements MiddlewareInterface
      * Returns the renderer by the specified content type, or null if the renderer was not set.
      *
      * @param string $contentType The content type associated with the renderer.
-     *
-     * @return ThrowableRendererInterface|null
      */
     private function getRenderer(string $contentType): ?ThrowableRendererInterface
     {
@@ -176,8 +152,6 @@ final class ErrorCatcher implements MiddlewareInterface
     /**
      * Returns the priority content type from the accept request header.
      *
-     * @param ServerRequestInterface $request
-     *
      * @return string The priority content type.
      */
     private function getContentType(ServerRequestInterface $request): string
@@ -188,7 +162,7 @@ final class ErrorCatcher implements MiddlewareInterface
                     return $header;
                 }
             }
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             // The Accept header contains an invalid q factor.
         }
 
@@ -204,7 +178,7 @@ final class ErrorCatcher implements MiddlewareInterface
      */
     private function normalizeContentType(string $contentType): string
     {
-        if (strpos($contentType, '/') === false) {
+        if (!str_contains($contentType, '/')) {
             throw new InvalidArgumentException('Invalid content type.');
         }
 
