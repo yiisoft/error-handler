@@ -19,7 +19,6 @@ use function extract;
 use function file;
 use function file_exists;
 use function func_get_arg;
-use function get_class;
 use function glob;
 use function htmlspecialchars;
 use function implode;
@@ -43,7 +42,6 @@ use function rtrim;
 use function str_replace;
 use function stripos;
 use function strlen;
-use function strpos;
 
 /**
  * Formats throwable into HTML string.
@@ -315,7 +313,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
     /**
      * Renders the information about request.
      *
-     *
      * @return string The rendering result.
      */
     public function renderRequest(ServerRequestInterface $request): string
@@ -340,7 +337,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
     /**
      * Renders the information about curl request.
      *
-     *
      * @return string The rendering result.
      */
     public function renderCurl(ServerRequestInterface $request): string
@@ -359,7 +355,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
     /**
      * Creates string containing HTML link which refers to the home page
      * of determined web-server software and its full name.
-     *
      *
      * @return string The server software information hyperlink.
      */
@@ -393,7 +388,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
     /**
      * Returns the name of the throwable instance.
-     *
      *
      * @return string The name of the throwable instance.
      */

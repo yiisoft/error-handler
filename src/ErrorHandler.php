@@ -41,7 +41,7 @@ final class ErrorHandler
     private bool $debug = false;
     private ?string $workingDirectory = null;
 
-    public function __construct(private LoggerInterface $logger, private ThrowableRendererInterface $defaultRenderer, private ?\Psr\EventDispatcher\EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(private LoggerInterface $logger, private ThrowableRendererInterface $defaultRenderer, private ?EventDispatcherInterface $eventDispatcher = null)
     {
     }
 
@@ -50,7 +50,6 @@ final class ErrorHandler
      *
      * @param ThrowableRendererInterface|null $renderer
      * @param ServerRequestInterface|null $request
-     *
      */
     public function handle(
         Throwable $t,

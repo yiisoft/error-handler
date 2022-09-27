@@ -28,7 +28,6 @@ use function array_key_exists;
 use function count;
 use function is_subclass_of;
 use function sprintf;
-use function strpos;
 use function strtolower;
 use function trim;
 
@@ -124,8 +123,6 @@ final class ErrorCatcher implements MiddlewareInterface
 
     /**
      * Generates a response with error information.
-     *
-     *
      */
     private function generateErrorResponse(Throwable $t, ServerRequestInterface $request): ResponseInterface
     {
@@ -154,7 +151,6 @@ final class ErrorCatcher implements MiddlewareInterface
 
     /**
      * Returns the priority content type from the accept request header.
-     *
      *
      * @return string The priority content type.
      */

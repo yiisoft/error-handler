@@ -9,8 +9,6 @@ use Throwable;
 use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
-use function get_class;
-
 /**
  * Formats throwable into HTTP headers.
  */
