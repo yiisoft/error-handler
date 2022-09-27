@@ -24,7 +24,7 @@ final class PlainTextRenderer implements ThrowableRendererInterface
     public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(
-            get_class($t) . " with message '{$t->getMessage()}' \n\nin "
+            $t::class . " with message '{$t->getMessage()}' \n\nin "
             . $t->getFile() . ':' . $t->getLine() . "\n\n"
             . "Stack trace:\n" . $t->getTraceAsString()
         );

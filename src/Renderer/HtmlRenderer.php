@@ -279,7 +279,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             }
 
             if (is_object($value)) {
-                $args[$key] = '<span class="title">' . $this->htmlEncode(get_class($value)) . '</span>';
+                $args[$key] = '<span class="title">' . $this->htmlEncode($value::class) . '</span>';
             } elseif (is_bool($value)) {
                 $args[$key] = '<span class="keyword">' . ($value ? 'true' : 'false') . '</span>';
             } elseif (is_string($value)) {
@@ -315,7 +315,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
     /**
      * Renders the information about request.
      *
-     * @param ServerRequestInterface $request
      *
      * @return string The rendering result.
      */
@@ -341,7 +340,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
     /**
      * Renders the information about curl request.
      *
-     * @param ServerRequestInterface $request
      *
      * @return string The rendering result.
      */
@@ -362,7 +360,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * Creates string containing HTML link which refers to the home page
      * of determined web-server software and its full name.
      *
-     * @param ServerRequestInterface $request
      *
      * @return string The server software information hyperlink.
      */
@@ -397,13 +394,12 @@ final class HtmlRenderer implements ThrowableRendererInterface
     /**
      * Returns the name of the throwable instance.
      *
-     * @param Throwable $throwable
      *
      * @return string The name of the throwable instance.
      */
     public function getThrowableName(Throwable $throwable): string
     {
-        $name = get_class($throwable);
+        $name = $throwable::class;
 
         if ($throwable instanceof FriendlyExceptionInterface) {
             $name = $throwable->getName() . ' (' . $name . ')';
@@ -433,7 +429,8 @@ final class HtmlRenderer implements ThrowableRendererInterface
         }
 
         $renderer = function (): void {
-            extract(func_get_arg(1), EXTR_OVERWRITE);
+            $funcGetArg = func_get_arg(1);
+            extract($funcGetArg, EXTR_OVERWRITE);
             require func_get_arg(0);
         };
 
@@ -443,7 +440,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         PHP_VERSION_ID >= 80000 ? ob_implicit_flush(false) : ob_implicit_flush(0);
 
         try {
-            $renderer->bindTo($this)($path, $parameters);
+            $renderer->bindTo($this)();
             return ob_get_clean();
         } catch (Throwable $e) {
             while (ob_get_level() > $obInitialLevel) {
@@ -558,7 +555,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         }
 
         foreach ($this->getVendorPaths() as $vendorPath) {
-            if (strpos($file, $vendorPath) === 0) {
+            if (str_starts_with($file, $vendorPath)) {
                 return true;
             }
         }
@@ -582,7 +579,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $rootPath = dirname(__DIR__, 4);
 
         // If the error handler is installed as a vendor package.
-        if (strlen($rootPath) > 6 && strpos($rootPath, 'vendor', -6) !== false) {
+        if (strlen($rootPath) > 6 && str_contains($rootPath, 'vendor')) {
             $this->vendorPaths = [$rootPath];
             return $this->vendorPaths;
         }

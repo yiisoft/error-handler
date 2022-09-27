@@ -41,28 +41,16 @@ final class ErrorHandler
     private bool $debug = false;
     private ?string $workingDirectory = null;
 
-    private LoggerInterface $logger;
-    private ThrowableRendererInterface $defaultRenderer;
-    private ?EventDispatcherInterface $eventDispatcher;
-
-    public function __construct(
-        LoggerInterface $logger,
-        ThrowableRendererInterface $defaultRenderer,
-        EventDispatcherInterface $eventDispatcher = null
-    ) {
-        $this->logger = $logger;
-        $this->defaultRenderer = $defaultRenderer;
-        $this->eventDispatcher = $eventDispatcher;
+    public function __construct(private LoggerInterface $logger, private ThrowableRendererInterface $defaultRenderer, private ?\Psr\EventDispatcher\EventDispatcherInterface $eventDispatcher = null)
+    {
     }
 
     /**
      * Handles throwable and returns error data.
      *
-     * @param Throwable $t
      * @param ThrowableRendererInterface|null $renderer
      * @param ServerRequestInterface|null $request
      *
-     * @return ErrorData
      */
     public function handle(
         Throwable $t,
@@ -161,8 +149,6 @@ final class ErrorHandler
 
     /**
      * Renders the throwable and terminates the script.
-     *
-     * @param Throwable $t
      */
     private function renderThrowableAndTerminate(Throwable $t): void
     {

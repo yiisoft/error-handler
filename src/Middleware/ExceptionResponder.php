@@ -21,13 +21,6 @@ use function is_callable;
 final class ExceptionResponder implements MiddlewareInterface
 {
     /**
-     * @var callable[]|int[] A callable that must return a ResponseInterface or response status code.
-     */
-    private array $exceptionMap;
-    private ResponseFactoryInterface $responseFactory;
-    private Injector $injector;
-
-    /**
      * The `$exceptionMap` specified as an array can be in one of the following two formats:
      *
      * - callable format: `[\LogicException::class => callable, \DomainException::class => callable, ...]`
@@ -61,11 +54,8 @@ final class ExceptionResponder implements MiddlewareInterface
      * @param ResponseFactoryInterface $responseFactory
      * @param Injector $injector
      */
-    public function __construct(array $exceptionMap, ResponseFactoryInterface $responseFactory, Injector $injector)
+    public function __construct(private array $exceptionMap, private ResponseFactoryInterface $responseFactory, private Injector $injector)
     {
-        $this->exceptionMap = $exceptionMap;
-        $this->responseFactory = $responseFactory;
-        $this->injector = $injector;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
