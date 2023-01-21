@@ -19,8 +19,6 @@ use function function_exists;
 use function ini_set;
 use function http_response_code;
 use function register_shutdown_function;
-use function restore_error_handler;
-use function restore_exception_handler;
 use function set_error_handler;
 use function set_exception_handler;
 use function str_repeat;
