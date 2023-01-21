@@ -40,6 +40,8 @@ final class ErrorHandler
     private string $memoryReserve = '';
     private bool $debug = false;
     private ?string $workingDirectory = null;
+    private bool $enabled = false;
+    private bool $inited = false;
 
     private LoggerInterface $logger;
     private ThrowableRendererInterface $defaultRenderer;
@@ -110,6 +112,24 @@ final class ErrorHandler
      */
     public function register(): void
     {
+        $this->initHandlers();
+        $this->enabled = true;
+    }
+
+    /**
+     * Unregisters this error handler by restoring the PHP error and exception handlers.
+     */
+    public function unregister(): void
+    {
+        $this->enabled = false;
+    }
+
+    private function initHandlers(): void
+    {
+        if ($this->inited) {
+            return;
+        }
+
         // Disables the display of error.
         if (function_exists('ini_set')) {
             ini_set('display_errors', '0');
@@ -117,12 +137,14 @@ final class ErrorHandler
 
         // Handles throwable, echo output and exit.
         set_exception_handler(function (Throwable $t): void {
-            $this->renderThrowableAndTerminate($t);
+            if ($this->enabled) {
+                $this->renderThrowableAndTerminate($t);
+            }
         });
 
         // Handles PHP execution errors such as warnings and notices.
-        set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
-            if (!(error_reporting() & $severity)) {
+        set_error_handler(function (int $severity, string $message, string $file, int $line): bool {
+            if (!$this->enabled || !(error_reporting() & $severity)) {
                 // This error code is not included in error_reporting.
                 return true;
             }
@@ -136,6 +158,10 @@ final class ErrorHandler
 
         // Handles fatal error.
         register_shutdown_function(function (): void {
+            if (!$this->enabled) {
+                return;
+            }
+
             $this->memoryReserve = '';
             $e = error_get_last();
 
@@ -148,15 +174,8 @@ final class ErrorHandler
         if (!(PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')) {
             $this->workingDirectory = getcwd();
         }
-    }
 
-    /**
-     * Unregisters this error handler by restoring the PHP error and exception handlers.
-     */
-    public function unregister(): void
-    {
-        restore_error_handler();
-        restore_exception_handler();
+        $this->inited = true;
     }
 
     /**
@@ -178,6 +197,7 @@ final class ErrorHandler
         if ($this->eventDispatcher !== null) {
             $this->eventDispatcher->dispatch(new ApplicationError($t));
         }
+
         register_shutdown_function(static function (): void {
             exit(1);
         });
