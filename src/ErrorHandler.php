@@ -24,7 +24,7 @@ use function set_exception_handler;
 use function str_repeat;
 
 /**
- * ErrorHandler handles out of memory errors, fatals, warnings, notices and exceptions.
+ * `ErrorHandler` handles out of memory errors, fatals, warnings, notices and exceptions.
  */
 final class ErrorHandler
 {
@@ -39,7 +39,7 @@ final class ErrorHandler
     private bool $debug = false;
     private ?string $workingDirectory = null;
     private bool $enabled = false;
-    private bool $inited = false;
+    private bool $isHandlersInitialized = false;
 
     private LoggerInterface $logger;
     private ThrowableRendererInterface $defaultRenderer;
@@ -106,25 +106,25 @@ final class ErrorHandler
     }
 
     /**
-     * Register this error handler.
+     * Register PHP exception and error handlers (make once) and enable this error handler.
      */
     public function register(): void
     {
-        $this->initHandlers();
+        $this->initializeHandlers();
         $this->enabled = true;
     }
 
     /**
-     * Unregisters this error handler by restoring the PHP error and exception handlers.
+     * Disable this error handler.
      */
     public function unregister(): void
     {
         $this->enabled = false;
     }
 
-    private function initHandlers(): void
+    private function initializeHandlers(): void
     {
-        if ($this->inited) {
+        if ($this->isHandlersInitialized) {
             return;
         }
 
@@ -173,7 +173,7 @@ final class ErrorHandler
             $this->workingDirectory = getcwd();
         }
 
-        $this->inited = true;
+        $this->isHandlersInitialized = true;
     }
 
     /**
