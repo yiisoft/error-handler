@@ -39,7 +39,7 @@ final class ErrorHandler
     private bool $debug = false;
     private ?string $workingDirectory = null;
     private bool $enabled = false;
-    private bool $isHandlersInitialized = false;
+    private bool $isOnceInitialized = false;
 
     private LoggerInterface $logger;
     private ThrowableRendererInterface $defaultRenderer;
@@ -114,31 +114,7 @@ final class ErrorHandler
             $this->memoryReserve = str_repeat('x', $this->memoryReserveSize);
         }
 
-        $this->initializeHandlers();
-
-        $this->enabled = true;
-    }
-
-    /**
-     * Disable this error handler.
-     */
-    public function unregister(): void
-    {
-        $this->memoryReserve = '';
-
-        $this->enabled = false;
-    }
-
-    private function initializeHandlers(): void
-    {
-        if ($this->isHandlersInitialized) {
-            return;
-        }
-
-        // Disables the display of error.
-        if (function_exists('ini_set')) {
-            ini_set('display_errors', '0');
-        }
+        $this->onceInitialization();
 
         // Handles throwable, echo output and exit.
         set_exception_handler(function (Throwable $t): void {
@@ -156,6 +132,30 @@ final class ErrorHandler
 
             throw new ErrorException($message, $severity, $severity, $file, $line);
         });
+
+        $this->enabled = true;
+    }
+
+    /**
+     * Disable this error handler.
+     */
+    public function unregister(): void
+    {
+        $this->memoryReserve = '';
+
+        $this->enabled = false;
+    }
+
+    private function onceInitialization(): void
+    {
+        if ($this->isOnceInitialized) {
+            return;
+        }
+
+        // Disables the display of error.
+        if (function_exists('ini_set')) {
+            ini_set('display_errors', '0');
+        }
 
         // Handles fatal error.
         register_shutdown_function(function (): void {
@@ -176,7 +176,7 @@ final class ErrorHandler
             $this->workingDirectory = getcwd();
         }
 
-        $this->isHandlersInitialized = true;
+        $this->isOnceInitialized = true;
     }
 
     /**
