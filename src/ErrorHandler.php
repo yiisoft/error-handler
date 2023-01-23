@@ -110,7 +110,12 @@ final class ErrorHandler
      */
     public function register(): void
     {
+        if ($this->memoryReserveSize > 0) {
+            $this->memoryReserve = str_repeat('x', $this->memoryReserveSize);
+        }
+
         $this->initializeHandlers();
+
         $this->enabled = true;
     }
 
@@ -119,6 +124,8 @@ final class ErrorHandler
      */
     public function unregister(): void
     {
+        $this->memoryReserve = '';
+
         $this->enabled = false;
     }
 
@@ -149,10 +156,6 @@ final class ErrorHandler
 
             throw new ErrorException($message, $severity, $severity, $file, $line);
         });
-
-        if ($this->memoryReserveSize > 0) {
-            $this->memoryReserve = str_repeat('x', $this->memoryReserveSize);
-        }
 
         // Handles fatal error.
         register_shutdown_function(function (): void {
