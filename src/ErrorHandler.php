@@ -106,7 +106,7 @@ final class ErrorHandler
     }
 
     /**
-     * Register PHP exception and error handlers (make once) and enable this error handler.
+     * Register PHP exception and error handlers once and enable this error handler.
      */
     public function register(): void
     {
