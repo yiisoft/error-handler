@@ -118,14 +118,20 @@ final class ErrorHandler
 
         // Handles throwable, echo output and exit.
         set_exception_handler(function (Throwable $t): void {
-            if ($this->enabled) {
-                $this->renderThrowableAndTerminate($t);
+            if (!$this->enabled) {
+                return;
             }
+
+            $this->renderThrowableAndTerminate($t);
         });
 
         // Handles PHP execution errors such as warnings and notices.
         set_error_handler(function (int $severity, string $message, string $file, int $line): bool {
-            if (!$this->enabled || !(error_reporting() & $severity)) {
+            if (!$this->enabled) {
+                return false;
+            }
+
+            if (!(error_reporting() & $severity)) {
                 // This error code is not included in error_reporting.
                 return true;
             }
