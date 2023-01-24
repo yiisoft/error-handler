@@ -39,7 +39,7 @@ final class ErrorHandler
     private bool $debug = false;
     private ?string $workingDirectory = null;
     private bool $enabled = false;
-    private bool $isOnceInitialized = false;
+    private bool $initialized = false;
 
     private LoggerInterface $logger;
     private ThrowableRendererInterface $defaultRenderer;
@@ -114,7 +114,7 @@ final class ErrorHandler
             $this->memoryReserve = str_repeat('x', $this->memoryReserveSize);
         }
 
-        $this->onceInitialization();
+        $this->initializeOnce();
 
         // Handles throwable, echo output and exit.
         set_exception_handler(function (Throwable $t): void {
@@ -146,9 +146,9 @@ final class ErrorHandler
         $this->enabled = false;
     }
 
-    private function onceInitialization(): void
+    private function initializeOnce(): void
     {
-        if ($this->isOnceInitialized) {
+        if ($this->initialized) {
             return;
         }
 
@@ -176,7 +176,7 @@ final class ErrorHandler
             $this->workingDirectory = getcwd();
         }
 
-        $this->isOnceInitialized = true;
+        $this->initialized = true;
     }
 
     /**
