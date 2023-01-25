@@ -110,6 +110,10 @@ final class ErrorHandler
      */
     public function register(): void
     {
+        if ($this->enabled) {
+            return;
+        }
+
         if ($this->memoryReserveSize > 0) {
             $this->memoryReserve = str_repeat('x', $this->memoryReserveSize);
         }
@@ -147,6 +151,10 @@ final class ErrorHandler
      */
     public function unregister(): void
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $this->memoryReserve = '';
 
         $this->enabled = false;
