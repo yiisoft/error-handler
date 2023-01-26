@@ -5,30 +5,21 @@ declare(strict_types=1);
 namespace Yiisoft\ErrorHandler;
 
 use Psr\Http\Message\ResponseInterface;
+use Stringable;
 
 /**
  * ErrorData stores content and headers that are suitable for adding to response.
  */
-final class ErrorData
+final class ErrorData implements Stringable
 {
-    /**
-     * @var string The content to use as response body.
-     */
-    private string $content;
-
-    /**
-     * @var array<string, string|string[]> The headers to add to the response.
-     */
-    private array $headers;
-
     /**
      * @param string $content The content to use as response body.
      * @param array<string, string|string[]> $headers The headers to add to the response.
      */
-    public function __construct(string $content, array $headers = [])
-    {
-        $this->content = $content;
-        $this->headers = $headers;
+    public function __construct(
+        private string $content,
+        private array $headers = [],
+    ) {
     }
 
     /**
