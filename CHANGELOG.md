@@ -2,6 +2,8 @@
 
 ## 2.2.0 under development
 
+- Enh #65: Explicitly add transitive dependencies `ext-mbstring`, `psr/http-factory` and
+  `psr/http-server-handler` (@vjik) 
 - Chg #64: Raise PHP version to `^8.0` (@vjik, @xepozz)
 
 ## 2.1.1 January 26, 2023

@@ -33,6 +33,7 @@ The package provides advanced error handling. The features are:
 - PHP 8.0 or higher.
 - `DOM` PHP extension.
 - `JSON` PHP extension.
+- `mbstring` PHP extension.
 
 ## Installation
 
