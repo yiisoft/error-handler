@@ -2,7 +2,7 @@
 
 ## 2.2.0 under development
 
-- Chg #64: Raise PHP version to `^8.0` (@vjik)
+- Chg #64: Raise PHP version to `^8.0` (@vjik, @xepozz)
 - Bug #70: Prevent duplication of throwable rendering (@vjik)
 
 ## 2.1.0 June 15, 2022
