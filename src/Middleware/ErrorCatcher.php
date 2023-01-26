@@ -32,7 +32,7 @@ use function strtolower;
 use function trim;
 
 /**
- * ErrorCatcher catches all throwables from the next middlewares and renders it
+ * `ErrorCatcher` catches all throwables from the next middlewares and renders it
  * according to the content type passed by the client.
  */
 final class ErrorCatcher implements MiddlewareInterface
@@ -47,8 +47,11 @@ final class ErrorCatcher implements MiddlewareInterface
     ];
     private ?string $contentType = null;
 
-    public function __construct(private ResponseFactoryInterface $responseFactory, private ErrorHandler $errorHandler, private ContainerInterface $container)
-    {
+    public function __construct(
+        private ResponseFactoryInterface $responseFactory,
+        private ErrorHandler $errorHandler,
+        private ContainerInterface $container,
+    ) {
     }
 
     /**

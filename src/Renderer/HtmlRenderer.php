@@ -423,18 +423,16 @@ final class HtmlRenderer implements ThrowableRendererInterface
         }
 
         $renderer = function (): void {
-            $funcGetArg = func_get_arg(1);
-            extract($funcGetArg, EXTR_OVERWRITE);
+            extract(func_get_arg(1), EXTR_OVERWRITE);
             require func_get_arg(0);
         };
 
         $obInitialLevel = ob_get_level();
         ob_start();
-        /** @psalm-suppress InvalidArgument */
-        PHP_VERSION_ID >= 80000 ? ob_implicit_flush(false) : ob_implicit_flush(0);
+        ob_implicit_flush(false);
 
         try {
-            $renderer->bindTo($this)();
+            $renderer->bindTo($this)($path, $parameters);
             return ob_get_clean();
         } catch (Throwable $e) {
             while (ob_get_level() > $obInitialLevel) {

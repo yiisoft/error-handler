@@ -41,8 +41,11 @@ final class ErrorHandler
     private bool $enabled = false;
     private bool $initialized = false;
 
-    public function __construct(private LoggerInterface $logger, private ThrowableRendererInterface $defaultRenderer, private ?EventDispatcherInterface $eventDispatcher = null)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private ThrowableRendererInterface $defaultRenderer,
+        private ?EventDispatcherInterface $eventDispatcher = null,
+    ) {
     }
 
     /**

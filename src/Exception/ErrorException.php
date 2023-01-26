@@ -13,7 +13,7 @@ use function in_array;
 use function function_exists;
 
 /**
- * ErrorException represents a PHP error.
+ * `ErrorException` represents a PHP error.
  */
 class ErrorException extends \ErrorException implements FriendlyExceptionInterface
 {
@@ -78,7 +78,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
 
     /**
      * Fatal errors normally do not provide any trace making it harder to debug. In case XDebug is installed, we
-     * can get a trace using xdebug_get_function_stack().
+     * can get a trace using `xdebug_get_function_stack()`.
      */
     private function addXDebugTraceToFatalIfAvailable(): void
     {

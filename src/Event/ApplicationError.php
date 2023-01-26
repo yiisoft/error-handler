@@ -7,7 +7,7 @@ namespace Yiisoft\ErrorHandler\Event;
 use Throwable;
 
 /**
- * ApplicationError represents an application error event.
+ * `ApplicationError` represents an application error event.
  */
 final class ApplicationError
 {

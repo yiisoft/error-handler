@@ -38,7 +38,9 @@ final class ExceptionResponderTest extends TestCase
     public function testCallable(): void
     {
         $middleware = $this->createMiddleware([
-            DomainException::class => fn (ResponseFactoryInterface $responseFactory) => $responseFactory->createResponse(Status::CREATED),
+            DomainException::class => function (ResponseFactoryInterface $responseFactory) {
+                return $responseFactory->createResponse(Status::CREATED);
+            },
         ]);
 
         $this->assertSame(
