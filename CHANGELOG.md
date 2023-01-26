@@ -1,6 +1,6 @@
 # Yii Error Handler Change Log
 
-## 2.1.1 under development
+## 2.1.1 January 26, 2023
 
 - Bug #70: Prevent duplication of throwable rendering (@vjik)
 
