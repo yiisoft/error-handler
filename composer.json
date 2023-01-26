@@ -38,7 +38,6 @@
         "yiisoft/injector": "^1.0"
     },
     "require-dev": {
-        "ext-xdebug": "*",
         "httpsoft/http-message": "^1.0.9",
         "maglnet/composer-require-checker": "^4.4",
         "phpunit/phpunit": "^9.5",
