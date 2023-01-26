@@ -30,14 +30,16 @@ The package provides advanced error handling. The features are:
 
 ## Requirements
 
-- PHP 7.4 or higher.
+- PHP 8.0 or higher.
+- `DOM` PHP extension.
+- `JSON` PHP extension.
 
 ## Installation
 
 The package could be installed with composer:
 
 ```shell
-composer require yiisoft/error-handler --prefer-dist
+composer require yiisoft/error-handler
 ```
 
 ## General usage
