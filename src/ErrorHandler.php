@@ -19,14 +19,12 @@ use function function_exists;
 use function ini_set;
 use function http_response_code;
 use function register_shutdown_function;
-use function restore_error_handler;
-use function restore_exception_handler;
 use function set_error_handler;
 use function set_exception_handler;
 use function str_repeat;
 
 /**
- * ErrorHandler handles out of memory errors, fatals, warnings, notices and exceptions.
+ * `ErrorHandler` handles out of memory errors, fatals, warnings, notices and exceptions.
  */
 final class ErrorHandler
 {
@@ -40,6 +38,8 @@ final class ErrorHandler
     private string $memoryReserve = '';
     private bool $debug = false;
     private ?string $workingDirectory = null;
+    private bool $enabled = false;
+    private bool $initialized = false;
 
     private LoggerInterface $logger;
     private ThrowableRendererInterface $defaultRenderer;
@@ -106,22 +106,35 @@ final class ErrorHandler
     }
 
     /**
-     * Register this error handler.
+     * Register PHP exception and error handlers and enable this error handler.
      */
     public function register(): void
     {
-        // Disables the display of error.
-        if (function_exists('ini_set')) {
-            ini_set('display_errors', '0');
+        if ($this->enabled) {
+            return;
         }
+
+        if ($this->memoryReserveSize > 0) {
+            $this->memoryReserve = str_repeat('x', $this->memoryReserveSize);
+        }
+
+        $this->initializeOnce();
 
         // Handles throwable, echo output and exit.
         set_exception_handler(function (Throwable $t): void {
+            if (!$this->enabled) {
+                return;
+            }
+
             $this->renderThrowableAndTerminate($t);
         });
 
         // Handles PHP execution errors such as warnings and notices.
-        set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
+        set_error_handler(function (int $severity, string $message, string $file, int $line): bool {
+            if (!$this->enabled) {
+                return false;
+            }
+
             if (!(error_reporting() & $severity)) {
                 // This error code is not included in error_reporting.
                 return true;
@@ -130,12 +143,40 @@ final class ErrorHandler
             throw new ErrorException($message, $severity, $severity, $file, $line);
         });
 
-        if ($this->memoryReserveSize > 0) {
-            $this->memoryReserve = str_repeat('x', $this->memoryReserveSize);
+        $this->enabled = true;
+    }
+
+    /**
+     * Disable this error handler.
+     */
+    public function unregister(): void
+    {
+        if (!$this->enabled) {
+            return;
+        }
+
+        $this->memoryReserve = '';
+
+        $this->enabled = false;
+    }
+
+    private function initializeOnce(): void
+    {
+        if ($this->initialized) {
+            return;
+        }
+
+        // Disables the display of error.
+        if (function_exists('ini_set')) {
+            ini_set('display_errors', '0');
         }
 
         // Handles fatal error.
         register_shutdown_function(function (): void {
+            if (!$this->enabled) {
+                return;
+            }
+
             $this->memoryReserve = '';
             $e = error_get_last();
 
@@ -148,15 +189,8 @@ final class ErrorHandler
         if (!(PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')) {
             $this->workingDirectory = getcwd();
         }
-    }
 
-    /**
-     * Unregisters this error handler by restoring the PHP error and exception handlers.
-     */
-    public function unregister(): void
-    {
-        restore_error_handler();
-        restore_exception_handler();
+        $this->initialized = true;
     }
 
     /**
@@ -178,6 +212,7 @@ final class ErrorHandler
         if ($this->eventDispatcher !== null) {
             $this->eventDispatcher->dispatch(new ApplicationError($t));
         }
+
         register_shutdown_function(static function (): void {
             exit(1);
         });
