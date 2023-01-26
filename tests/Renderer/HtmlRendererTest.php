@@ -186,9 +186,6 @@ final class HtmlRendererTest extends TestCase
 
     /**
      * @dataProvider createServerInformationLinkDataProvider
-     *
-     * @param string|null $serverSoftware
-     * @param string $expected
      */
     public function testCreateServerInformationLink(?string $serverSoftware, string $expected): void
     {
@@ -228,7 +225,6 @@ final class HtmlRendererTest extends TestCase
      * @dataProvider argumentsToStringValueDataProvider
      *
      * @param mixed $args
-     * @param string $expected
      */
     public function testArgumentsToString(array $args, string $expected): void
     {
@@ -284,8 +280,6 @@ final class HtmlRendererTest extends TestCase
 
     /**
      * @dataProvider isVendorFileReturnFalseDataProvider
-     *
-     * @param string|null $file
      */
     public function testIsVendorFileReturnFalse(?string $file): void
     {

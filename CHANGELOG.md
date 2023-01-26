@@ -1,8 +1,8 @@
 # Yii Error Handler Change Log
 
-## 2.1.2 under development
+## 2.2.0 under development
 
-- no changes in this release.
+- Chg #64: Raise PHP version to `^8.0` (@vjik, @xepozz)
 
 ## 2.1.1 January 26, 2023
 
