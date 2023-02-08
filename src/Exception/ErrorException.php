@@ -85,6 +85,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         if ($this->isXdebugStackAvailable()) {
             /**
              * XDebug trace can't be modified and used directly with PHP 7
+             *
              * @see https://github.com/yiisoft/yii2/pull/11723
              * @psalm-var array<int,array>
              */
