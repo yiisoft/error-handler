@@ -9,7 +9,6 @@ use Throwable;
 use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
-use function get_class;
 use function str_replace;
 
 /**
@@ -30,7 +29,7 @@ final class XmlRenderer implements ThrowableRendererInterface
     {
         $content = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
         $content .= "\n<error>\n";
-        $content .= $this->tag('type', get_class($t));
+        $content .= $this->tag('type', $t::class);
         $content .= $this->tag('message', $this->cdata($t->getMessage()));
         $content .= $this->tag('code', $this->cdata((string) $t->getCode()));
         $content .= $this->tag('file', $t->getFile());

@@ -9,7 +9,6 @@ use Throwable;
 use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
-use function get_class;
 use function json_encode;
 
 /**
@@ -34,7 +33,7 @@ final class JsonRenderer implements ThrowableRendererInterface
         return new ErrorData(
             json_encode(
                 [
-                    'type' => get_class($t),
+                    'type' => $t::class,
                     'message' => $t->getMessage(),
                     'code' => $t->getCode(),
                     'file' => $t->getFile(),

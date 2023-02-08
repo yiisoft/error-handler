@@ -16,17 +16,10 @@ use function is_int;
 use function is_callable;
 
 /**
- * ExceptionResponder maps certain exceptions to custom responses.
+ * `ExceptionResponder` maps certain exceptions to custom responses.
  */
 final class ExceptionResponder implements MiddlewareInterface
 {
-    /**
-     * @var callable[]|int[] A callable that must return a ResponseInterface or response status code.
-     */
-    private array $exceptionMap;
-    private ResponseFactoryInterface $responseFactory;
-    private Injector $injector;
-
     /**
      * The `$exceptionMap` specified as an array can be in one of the following two formats:
      *
@@ -57,15 +50,15 @@ final class ExceptionResponder implements MiddlewareInterface
      * ]
      * ```
      *
-     * @param callable[]|int[] $exceptionMap A must that should return a ResponseInterface or response status code.
+     * @param callable[]|int[] $exceptionMap A callable that must return a `ResponseInterface` or response status code.
      * @param ResponseFactoryInterface $responseFactory
      * @param Injector $injector
      */
-    public function __construct(array $exceptionMap, ResponseFactoryInterface $responseFactory, Injector $injector)
-    {
-        $this->exceptionMap = $exceptionMap;
-        $this->responseFactory = $responseFactory;
-        $this->injector = $injector;
+    public function __construct(
+        private array $exceptionMap,
+        private ResponseFactoryInterface $responseFactory,
+        private Injector $injector,
+    ) {
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
