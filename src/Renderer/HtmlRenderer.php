@@ -538,6 +538,8 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $groupedItems[$groupIndex][$index] = $item;
         }
 
+        /** @psalm-var array<int, array<int, string>> $groupedItems It's need for Psalm <=4.30 only. */
+
         return $groupedItems;
     }
 
