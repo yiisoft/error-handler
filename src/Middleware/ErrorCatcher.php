@@ -37,6 +37,9 @@ use function trim;
  */
 final class ErrorCatcher implements MiddlewareInterface
 {
+    /**
+     * @psalm-var array<string,class-string<ThrowableRendererInterface>>
+     */
     private array $renderers = [
         'application/json' => JsonRenderer::class,
         'application/xml' => XmlRenderer::class,
@@ -146,6 +149,7 @@ final class ErrorCatcher implements MiddlewareInterface
     private function getRenderer(string $contentType): ?ThrowableRendererInterface
     {
         if (isset($this->renderers[$contentType])) {
+            /** @var ThrowableRendererInterface */
             return $this->container->get($this->renderers[$contentType]);
         }
 

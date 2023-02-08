@@ -108,6 +108,14 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * - maxSourceLines: int, maximum number of source code lines to be displayed. Defaults to 19.
      * - maxTraceLines: int, maximum number of trace source code lines to be displayed. Defaults to 13.
      * - traceHeaderLine: string, trace header line with placeholders to be be substituted. Defaults to null.
+     *
+     * @psalm-param array{
+     *   template?: string,
+     *   verboseTemplate?: string,
+     *   maxSourceLines?: int,
+     *   maxTraceLines?: int,
+     *   traceHeaderLine?: string,
+     * } $settings
      */
     public function __construct(array $settings = [])
     {
@@ -264,6 +272,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $count = 0;
         $isAssoc = $args !== array_values($args);
 
+        /**
+         * @var mixed $value
+         */
         foreach ($args as $key => $value) {
             $count++;
 
@@ -305,6 +316,8 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 $args[$key] = "<span class=\"number\">$key</span> => $args[$key]";
             }
         }
+
+        /** @var string[] $args */
 
         ksort($args);
         return implode(', ', $args);
@@ -423,6 +436,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         }
 
         $renderer = function (): void {
+            /** @psalm-suppress MixedArgument */
             extract(func_get_arg(1), EXTR_OVERWRITE);
             require func_get_arg(0);
         };
@@ -580,6 +594,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         // If the error handler is installed for development in `yiisoft/yii-dev-tool`.
         if (is_file("{$rootPath}/yii-dev") || is_file("{$rootPath}/yii-dev.bat")) {
             $vendorPaths = glob("{$rootPath}/dev/*/vendor");
+            /** @var string[] */
             $this->vendorPaths = empty($vendorPaths) ? [] : str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $vendorPaths);
             return $this->vendorPaths;
         }

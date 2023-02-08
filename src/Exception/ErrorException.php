@@ -83,8 +83,11 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
     private function addXDebugTraceToFatalIfAvailable(): void
     {
         if ($this->isXdebugStackAvailable()) {
-            // XDebug trace can't be modified and used directly with PHP 7
-            // @see https://github.com/yiisoft/yii2/pull/11723
+            /**
+             * XDebug trace can't be modified and used directly with PHP 7
+             * @see https://github.com/yiisoft/yii2/pull/11723
+             * @psalm-var array<int,array>
+             */
             $xDebugTrace = array_slice(array_reverse(xdebug_get_function_stack()), 1, -1);
             $trace = [];
 
@@ -102,6 +105,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
 
                 // XDebug has a different key name
                 if (isset($frame['params']) && !isset($frame['args'])) {
+                    /** @var mixed */
                     $frame['args'] = $frame['params'];
                 }
                 $trace[] = $frame;
