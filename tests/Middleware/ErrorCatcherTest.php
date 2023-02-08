@@ -84,7 +84,7 @@ final class ErrorCatcherTest extends TestCase
     public function testThrownExceptionWithRendererIsNotImplementThrowableRendererInterface()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectErrorMessage(
+        $this->expectExceptionMessage(
             'Class "' . self::class . '" does not implement "' . ThrowableRendererInterface::class . '".',
         );
         $this
@@ -95,7 +95,7 @@ final class ErrorCatcherTest extends TestCase
     public function testThrownExceptionWithInvalidContentType()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectErrorMessage('Invalid content type.');
+        $this->expectExceptionMessage('Invalid content type.');
         $this
             ->createErrorCatcher()
             ->withRenderer('test invalid content type', PlainTextRenderer::class);
@@ -197,7 +197,7 @@ final class ErrorCatcherTest extends TestCase
     public function testForceContentTypeSetInvalidType(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectErrorMessage('The renderer for image/gif is not set.');
+        $this->expectExceptionMessage('The renderer for image/gif is not set.');
         $this
             ->createErrorCatcher()
             ->forceContentType('image/gif');
