@@ -571,6 +571,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $rootPath = dirname(__DIR__, 4);
 
         // If the error handler is installed as a vendor package.
+        /** @psalm-suppress InvalidLiteralArgument It is Psalm bug, {@see https://github.com/vimeo/psalm/issues/9196} */
         if (strlen($rootPath) > 6 && str_contains($rootPath, 'vendor')) {
             $this->vendorPaths = [$rootPath];
             return $this->vendorPaths;
