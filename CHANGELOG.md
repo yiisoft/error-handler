@@ -5,7 +5,7 @@
 - Enh #65: Explicitly add transitive dependencies `ext-mbstring`, `psr/http-factory` and
   `psr/http-server-handler` (@vjik) 
 - Chg #64: Raise PHP version to `^8.0` (@vjik, @xepozz)
-- Chg #70: Adapt configuration group names to Yii conventions (@vjik)
+- Chg #72: Adapt configuration group names to Yii conventions (@vjik)
 
 ## 2.1.1 January 26, 2023
 
