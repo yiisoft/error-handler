@@ -1,11 +1,11 @@
 # Yii Error Handler Change Log
 
-## 3.0.0 under development
+## 3.0.0 February 14, 2023
 
-- Enh #65: Explicitly add transitive dependencies `ext-mbstring`, `psr/http-factory` and
-  `psr/http-server-handler` (@vjik) 
 - Chg #64: Raise PHP version to `^8.0` (@vjik, @xepozz)
 - Chg #72: Adapt configuration group names to Yii conventions (@vjik)
+- Enh #65: Explicitly add transitive dependencies `ext-mbstring`, `psr/http-factory` and
+  `psr/http-server-handler` (@vjik)
 
 ## 2.1.1 January 26, 2023
 
