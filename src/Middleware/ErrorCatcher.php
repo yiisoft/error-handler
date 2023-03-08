@@ -6,12 +6,14 @@ namespace Yiisoft\ErrorHandler\Middleware;
 
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
+use Yiisoft\ErrorHandler\Event\ApplicationError;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
@@ -54,6 +56,7 @@ final class ErrorCatcher implements MiddlewareInterface
         private ResponseFactoryInterface $responseFactory,
         private ErrorHandler $errorHandler,
         private ContainerInterface $container,
+        private ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 
@@ -123,6 +126,9 @@ final class ErrorCatcher implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (Throwable $t) {
+            if ($this->eventDispatcher !== null) {
+                $this->eventDispatcher->dispatch(new ApplicationError($t));
+            }
             return $this->generateErrorResponse($t, $request);
         }
     }
