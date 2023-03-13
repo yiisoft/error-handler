@@ -97,7 +97,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
                     $frame['function'] = 'unknown';
                 }
 
-                // XDebug < 2.1.1: http://bugs.xdebug.org/view.php?id=695
+                // XDebug < 2.1.1: https://bugs.xdebug.org/view.php?id=695
                 if (!isset($frame['type']) || $frame['type'] === 'static') {
                     $frame['type'] = '::';
                 } elseif ($frame['type'] === 'dynamic') {
