@@ -2,7 +2,7 @@
 
 ## 3.0.1 under development
 
-- no changes in this release.
+- Chg #75: Dispatch `ApplicationError` in `ErrorCatcher`
 
 ## 3.0.0 February 14, 2023
 
