@@ -195,7 +195,7 @@ $response = $exceptionResponder->process($request, $handler);
 In the application middleware stack `Yiisoft\ErrorHandler\Middleware\ExceptionResponder` must be placed before
 `Yiisoft\ErrorHandler\Middleware\ErrorCatcher`.
 
-For use in the [Yii framework](http://www.yiiframework.com/),
+For use in the [Yii framework](https://www.yiiframework.com/),
 see [Yii guide to handling errors](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md).
 
 ## Events
