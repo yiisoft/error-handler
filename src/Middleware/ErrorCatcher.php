@@ -123,6 +123,7 @@ final class ErrorCatcher implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $t = null;
         try {
             return $handler->handle($request);
         } catch (Throwable $t) {
