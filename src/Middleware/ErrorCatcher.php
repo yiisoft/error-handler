@@ -126,9 +126,8 @@ final class ErrorCatcher implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (Throwable $t) {
-            if ($this->eventDispatcher !== null) {
-                $this->eventDispatcher->dispatch(new ApplicationError($t));
-            }
+            $this->eventDispatcher?->dispatch(new ApplicationError($t));
+        } finally {
             return $this->generateErrorResponse($t, $request);
         }
     }

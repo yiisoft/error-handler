@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests\Middleware;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use HttpSoft\Message\ResponseFactory;
 use HttpSoft\Message\ServerRequest;
 use InvalidArgumentException;
@@ -57,6 +58,31 @@ final class ErrorCatcherTest extends TestCase
             ->getBody()
             ->getContents();
 
+        $this->assertNotSame(PlainTextRenderer::DEFAULT_ERROR_MESSAGE, $content);
+        $this->assertStringContainsString('<html', $content);
+    }
+
+    public function testProcessWithFailedEventDispatcher(): void
+    {
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->method('dispatch')->willThrowException(new \RuntimeException('Event dispatcher error'));
+        $container = new SimpleContainer([], fn (string $className): object => new $className());
+        $errorCatcher = new ErrorCatcher(
+            new ResponseFactory(),
+            $this->createErrorHandler(),
+            $container,
+            $eventDispatcher,
+        );
+        $response = $errorCatcher->process(
+            $this->createServerRequest('GET', ['Accept' => ['text/plain;q=2.0']]),
+            $this->createRequestHandlerWithThrowable(),
+        );
+        $response
+            ->getBody()
+            ->rewind();
+        $content = $response
+            ->getBody()
+            ->getContents();
         $this->assertNotSame(PlainTextRenderer::DEFAULT_ERROR_MESSAGE, $content);
         $this->assertStringContainsString('<html', $content);
     }
