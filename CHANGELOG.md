@@ -2,7 +2,7 @@
 
 ## 3.0.1 under development
 
-- Chg #75: Dispatch `ApplicationError` in `ErrorCatcher`
+- Chg #75: Dispatch `ApplicationError` in `ErrorCatcher` (@xepozz)
 
 ## 3.0.0 February 14, 2023
 

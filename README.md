@@ -200,7 +200,7 @@ see [Yii guide to handling errors](https://github.com/yiisoft/docs/blob/master/g
 
 ## Events
 
-- `\Yiisoft\ErrorHandler\Event\ApplicationError` dispatches when `ErrorCatcher` catches an error.
+- When `ErrorCatcher` catches an error it dispatches `\Yiisoft\ErrorHandler\Event\ApplicationError` event.
 
 ## Friendly Exceptions
 
