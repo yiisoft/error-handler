@@ -13,6 +13,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\ErrorHandler;
+use Yiisoft\ErrorHandler\HeadersProvider;
 use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\Renderer\JsonRenderer;
@@ -54,6 +55,7 @@ final class ErrorCatcher implements MiddlewareInterface
         private ResponseFactoryInterface $responseFactory,
         private ErrorHandler $errorHandler,
         private ContainerInterface $container,
+        private HeadersProvider $headersProvider,
     ) {
     }
 
@@ -137,7 +139,9 @@ final class ErrorCatcher implements MiddlewareInterface
 
         $data = $this->errorHandler->handle($t, $renderer, $request);
         $response = $this->responseFactory->createResponse(Status::INTERNAL_SERVER_ERROR);
-
+        foreach ($this->headersProvider->getAll() as $name => $value) {
+            $response = $response->withHeader($name, $value);
+        }
         return $data->addToResponse($response->withHeader(Header::CONTENT_TYPE, $contentType));
     }
 
