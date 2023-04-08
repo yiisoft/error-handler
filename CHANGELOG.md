@@ -2,7 +2,7 @@
 
 ## 3.0.1 under development
 
-- no changes in this release.
+- Enh #82: Add `HeadersProvider` (@xepozz)
 
 ## 3.0.0 February 14, 2023
 
