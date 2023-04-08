@@ -55,8 +55,9 @@ final class ErrorCatcher implements MiddlewareInterface
         private ResponseFactoryInterface $responseFactory,
         private ErrorHandler $errorHandler,
         private ContainerInterface $container,
-        private HeadersProvider $headersProvider,
+        private ?HeadersProvider $headersProvider = null,
     ) {
+        $this->headersProvider ??= new HeadersProvider();
     }
 
     /**
