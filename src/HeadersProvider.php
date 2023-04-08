@@ -12,6 +12,9 @@ use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
  */
 final class HeadersProvider
 {
+    /**
+     * @param array<string, string[]> $headers Default headers list.
+     */
     public function __construct(
         private array $headers = [],
     ) {
@@ -25,13 +28,13 @@ final class HeadersProvider
      */
     public function add(string $name, string|array $values): void
     {
-        $this->headers[$name] = $values;
+        $this->headers[$name] = (array)$values;
     }
 
     /**
      * Returns all headers.
      *
-     * @return array<string, string|string[]> The headers list.
+     * @return array<string, string[]> The headers list.
      */
     public function getAll(): array
     {

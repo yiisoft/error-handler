@@ -38,6 +38,8 @@ use function trim;
  */
 final class ErrorCatcher implements MiddlewareInterface
 {
+    private HeadersProvider $headersProvider;
+
     /**
      * @psalm-var array<string,class-string<ThrowableRendererInterface>>
      */
@@ -55,9 +57,9 @@ final class ErrorCatcher implements MiddlewareInterface
         private ResponseFactoryInterface $responseFactory,
         private ErrorHandler $errorHandler,
         private ContainerInterface $container,
-        private ?HeadersProvider $headersProvider = null,
+        HeadersProvider $headersProvider = null,
     ) {
-        $this->headersProvider ??= new HeadersProvider();
+        $this->headersProvider = $headersProvider ?? new HeadersProvider();
     }
 
     /**
