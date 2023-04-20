@@ -134,6 +134,7 @@ final class ErrorCatcher implements MiddlewareInterface
         } catch (Throwable $t) {
             $this->eventDispatcher?->dispatch(new ApplicationError($t));
         } finally {
+            /** @psalm-suppress PossiblyNullArgument $t is set in catch() statement */
             return $this->generateErrorResponse($t, $request);
         }
     }
