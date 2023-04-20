@@ -6,13 +6,16 @@ namespace Yiisoft\ErrorHandler\Middleware;
 
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
+use Yiisoft\ErrorHandler\Event\ApplicationError;
 use Yiisoft\ErrorHandler\ErrorHandler;
+use Yiisoft\ErrorHandler\HeadersProvider;
 use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\Renderer\JsonRenderer;
@@ -37,6 +40,8 @@ use function trim;
  */
 final class ErrorCatcher implements MiddlewareInterface
 {
+    private HeadersProvider $headersProvider;
+
     /**
      * @psalm-var array<string,class-string<ThrowableRendererInterface>>
      */
@@ -54,7 +59,10 @@ final class ErrorCatcher implements MiddlewareInterface
         private ResponseFactoryInterface $responseFactory,
         private ErrorHandler $errorHandler,
         private ContainerInterface $container,
+        private ?EventDispatcherInterface $eventDispatcher = null,
+        HeadersProvider $headersProvider = null,
     ) {
+        $this->headersProvider = $headersProvider ?? new HeadersProvider();
     }
 
     /**
@@ -120,9 +128,13 @@ final class ErrorCatcher implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $t = null;
         try {
             return $handler->handle($request);
         } catch (Throwable $t) {
+            $this->eventDispatcher?->dispatch(new ApplicationError($t));
+        } finally {
+            /** @psalm-suppress PossiblyNullArgument $t is set in catch() statement */
             return $this->generateErrorResponse($t, $request);
         }
     }
@@ -137,7 +149,9 @@ final class ErrorCatcher implements MiddlewareInterface
 
         $data = $this->errorHandler->handle($t, $renderer, $request);
         $response = $this->responseFactory->createResponse(Status::INTERNAL_SERVER_ERROR);
-
+        foreach ($this->headersProvider->getAll() as $name => $value) {
+            $response = $response->withHeader($name, $value);
+        }
         return $data->addToResponse($response->withHeader(Header::CONTENT_TYPE, $contentType));
     }
 

@@ -198,22 +198,26 @@ In the application middleware stack `Yiisoft\ErrorHandler\Middleware\ExceptionRe
 For use in the [Yii framework](https://www.yiiframework.com/),
 see [Yii guide to handling errors](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md).
 
+## Events
+
+- When `ErrorCatcher` catches an error it dispatches `\Yiisoft\ErrorHandler\Event\ApplicationError` event.
+
 ## Friendly Exceptions
 
 `HtmlRenderer` supports [friendly exceptions](https://github.com/yiisoft/friendly-exception/).
 
 Code blocks in solution markdown support language syntax highlight:
 
-| Language | Aliases |
-| -------- | ------- |
-| Bash | bash, sh, zsh |
-| CSS | css |
-| HTML, XML | xml, html, xhtml, rss, atom, xjb, xsd, xsl, plist, svg |
-| JavaScript | javascript, js, jsx |
-| JSON | json |
-| PHP | php |
-| Plaintext | plaintext, txt, text |
-| SQL | sql |
+| Language   | Aliases                                                |
+|------------|--------------------------------------------------------|
+| Bash       | bash, sh, zsh                                          |
+| CSS        | css                                                    |
+| HTML, XML  | xml, html, xhtml, rss, atom, xjb, xsd, xsl, plist, svg |
+| JavaScript | javascript, js, jsx                                    |
+| JSON       | json                                                   |
+| PHP        | php                                                    |
+| Plaintext  | plaintext, txt, text                                   |
+| SQL        | sql                                                    |
 
 For example:
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests\Middleware;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use HttpSoft\Message\ResponseFactory;
 use HttpSoft\Message\ServerRequest;
 use InvalidArgumentException;
@@ -13,8 +14,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
 use Yiisoft\ErrorHandler\ErrorHandler;
+use Yiisoft\ErrorHandler\HeadersProvider;
+use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
 use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
@@ -57,6 +59,31 @@ final class ErrorCatcherTest extends TestCase
             ->getBody()
             ->getContents();
 
+        $this->assertNotSame(PlainTextRenderer::DEFAULT_ERROR_MESSAGE, $content);
+        $this->assertStringContainsString('<html', $content);
+    }
+
+    public function testProcessWithFailedEventDispatcher(): void
+    {
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->method('dispatch')->willThrowException(new \RuntimeException('Event dispatcher error'));
+        $container = new SimpleContainer([], fn (string $className): object => new $className());
+        $errorCatcher = new ErrorCatcher(
+            new ResponseFactory(),
+            $this->createErrorHandler(),
+            $container,
+            $eventDispatcher,
+        );
+        $response = $errorCatcher->process(
+            $this->createServerRequest('GET', ['Accept' => ['text/plain;q=2.0']]),
+            $this->createRequestHandlerWithThrowable(),
+        );
+        $response
+            ->getBody()
+            ->rewind();
+        $content = $response
+            ->getBody()
+            ->getContents();
         $this->assertNotSame(PlainTextRenderer::DEFAULT_ERROR_MESSAGE, $content);
         $this->assertStringContainsString('<html', $content);
     }
@@ -203,16 +230,51 @@ final class ErrorCatcherTest extends TestCase
             ->forceContentType('image/gif');
     }
 
+    public function testAddedHeaders(): void
+    {
+        $provider = new HeadersProvider([
+            'X-Default' => 'default',
+            'Content-Type' => 'incorrect',
+        ]);
+        $provider->add('X-Test', 'test');
+        $provider->add('X-Test2', ['test2', 'test3']);
+        $catcher = $this
+            ->createErrorCatcher(provider: $provider)
+            ->withRenderer('*/*', PlainTextRenderer::class);
+        $response = $catcher->process(
+            $this->createServerRequest('GET', ['Accept' => ['test/test']]),
+            $this->createRequestHandlerWithThrowable(),
+        );
+        $headers = $response->getHeaders();
+
+        $this->assertArrayHasKey('Content-Type', $headers);
+        $this->assertNotEquals('incorrect', $headers['Content-Type']);
+
+        $this->assertArrayHasKey('X-Default', $headers);
+        $this->assertEquals(['default'], $headers['X-Default']);
+        $this->assertArrayHasKey('X-Test', $headers);
+        $this->assertEquals(['test'], $headers['X-Test']);
+        $this->assertArrayHasKey('X-Test2', $headers);
+        $this->assertEquals(['test2', 'test3'], $headers['X-Test2']);
+    }
+
+    private function createErrorCatcher(
+        HeadersProvider $provider = null,
+    ): ErrorCatcher {
+        $container = new SimpleContainer([], fn (string $className): object => new $className());
+        return new ErrorCatcher(
+            new ResponseFactory(),
+            $this->createErrorHandler(),
+            $container,
+            null,
+            $provider ?? new HeadersProvider()
+        );
+    }
+
     private function createErrorHandler(): ErrorHandler
     {
         $logger = $this->createMock(LoggerInterface::class);
         return new ErrorHandler($logger, new PlainTextRenderer());
-    }
-
-    private function createErrorCatcher(): ErrorCatcher
-    {
-        $container = new SimpleContainer([], fn (string $className): object => new $className());
-        return new ErrorCatcher(new ResponseFactory(), $this->createErrorHandler(), $container);
     }
 
     private function createServerRequest(string $method, array $headers = []): ServerRequestInterface
