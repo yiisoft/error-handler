@@ -3,6 +3,7 @@
 ## 3.0.1 under development
 
 - Chg #75: Dispatch `ApplicationError` in `ErrorCatcher` (@xepozz)
+- Enh #82: Add `HeadersProvider` (@xepozz)
 
 ## 3.0.0 February 14, 2023
 
