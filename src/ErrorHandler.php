@@ -197,9 +197,7 @@ final class ErrorHandler
         http_response_code(Status::INTERNAL_SERVER_ERROR);
 
         echo $this->handle($t);
-        if ($this->eventDispatcher !== null) {
-            $this->eventDispatcher->dispatch(new ApplicationError($t));
-        }
+        $this->eventDispatcher?->dispatch(new ApplicationError($t));
 
         register_shutdown_function(static function (): void {
             exit(1);

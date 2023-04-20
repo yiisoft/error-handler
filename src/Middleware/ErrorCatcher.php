@@ -6,12 +6,14 @@ namespace Yiisoft\ErrorHandler\Middleware;
 
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
+use Yiisoft\ErrorHandler\Event\ApplicationError;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\HeadersProvider;
 use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
@@ -57,6 +59,7 @@ final class ErrorCatcher implements MiddlewareInterface
         private ResponseFactoryInterface $responseFactory,
         private ErrorHandler $errorHandler,
         private ContainerInterface $container,
+        private ?EventDispatcherInterface $eventDispatcher = null,
         HeadersProvider $headersProvider = null,
     ) {
         $this->headersProvider = $headersProvider ?? new HeadersProvider();
@@ -125,9 +128,13 @@ final class ErrorCatcher implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $t = null;
         try {
             return $handler->handle($request);
         } catch (Throwable $t) {
+            $this->eventDispatcher?->dispatch(new ApplicationError($t));
+        } finally {
+            /** @psalm-suppress PossiblyNullArgument $t is set in catch() statement */
             return $this->generateErrorResponse($t, $request);
         }
     }
