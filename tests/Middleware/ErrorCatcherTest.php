@@ -266,6 +266,7 @@ final class ErrorCatcherTest extends TestCase
             new ResponseFactory(),
             $this->createErrorHandler(),
             $container,
+            null,
             $provider ?? new HeadersProvider()
         );
     }
