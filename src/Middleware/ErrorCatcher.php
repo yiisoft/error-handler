@@ -133,7 +133,7 @@ final class ErrorCatcher implements MiddlewareInterface
         } catch (Throwable $t) {
             try {
                 $this->eventDispatcher?->dispatch(new ApplicationError($t));
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 // ignore exceptions thrown in event handlers
             }
             return $this->generateErrorResponse($t, $request);
