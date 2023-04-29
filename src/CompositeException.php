@@ -30,6 +30,9 @@ final class CompositeException extends Exception
         return $this->first;
     }
 
+    /**
+     * @return Throwable[]
+     */
     public function getPreviousExceptions(): array
     {
         return $this->rest;
