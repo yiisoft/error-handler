@@ -18,8 +18,8 @@ final class CompositeException extends Exception
     public array $rest;
 
     public function __construct(
-        private \Throwable $first,
-        \Throwable ...$rest,
+        private Throwable $first,
+        Throwable ...$rest,
     ) {
         $this->rest = $rest;
         parent::__construct($first->getMessage(), $first->getCode(), $first);
