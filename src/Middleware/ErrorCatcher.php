@@ -13,6 +13,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
+use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\Event\ApplicationError;
 use Yiisoft\ErrorHandler\HeadersProvider;
@@ -134,7 +135,7 @@ final class ErrorCatcher implements MiddlewareInterface
             try {
                 $this->eventDispatcher?->dispatch(new ApplicationError($t));
             } catch (Throwable $e) {
-                // ignore exceptions thrown in event handlers
+                $t = new CompositeException($e, $t);
             }
             return $this->generateErrorResponse($t, $request);
         }

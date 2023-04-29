@@ -1,5 +1,6 @@
 <?php
 
+use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
 /**
@@ -10,8 +11,15 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
 $theme = $_COOKIE['yii-exception-theme'] ?? '';
 
+$originalException = $throwable;
+if ($throwable instanceof CompositeException) {
+    $throwable = $throwable->getFirstException();
+}
 $isFriendlyException = $throwable instanceof FriendlyExceptionInterface;
 $solution = $isFriendlyException ? $throwable->getSolution() : null;
+$exceptionClass = get_class($throwable);
+$exceptionMessage = $throwable->getMessage();
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -42,12 +50,12 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
             </svg>
         </a>
 
-        <a href="https://stackoverflow.com/search?<?= http_build_query(['q' => $throwable->getMessage()]) ?>" title="Search error on Stackoverflow" target="_blank">
+        <a href="https://stackoverflow.com/search?<?= http_build_query(['q' => $exceptionMessage]) ?>" title="Search error on Stackoverflow" target="_blank">
             <svg width="28" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M23.312 29.151v-8.536h2.849V32H.458008V20.615H3.29701v8.536H23.312zM6.14501 26.307H20.469v-2.848H6.14501v2.848zm.35-6.468L20.47 22.755l.599-2.76-13.96899-2.912-.605 2.756zm1.812-6.74L21.246 19.136l1.203-2.6-12.93699-6.041-1.204 2.584-.001.02zm3.61999-6.38L22.88 15.86l1.813-2.163L13.74 4.562l-1.803 2.151-.01.006zM19 0l-2.328 1.724 8.541 11.473 2.328-1.724L19 0z" fill="#787878"/>
             </svg>
         </a>
-        <a href="https://www.google.com/search?<?= http_build_query(['q' => $throwable->getMessage()]) ?>" title="Search error on Google" target="_blank">
+        <a href="https://www.google.com/search?<?= http_build_query(['q' => $exceptionMessage]) ?>" title="Search error on Google" target="_blank">
             <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M23.5313 9.825H12.2407v4.6406h6.45c-.2781 1.5-1.1219 2.7688-2.3937 3.6188-1.075.7187-2.4469 1.1437-4.0594 1.1437-3.12188 0-5.7625-2.1094-6.70625-4.9437-.2375-.7188-.375-1.4875-.375-2.2781 0-.7907.1375-1.5594.375-2.27818.94687-2.83125 3.5875-4.94062 6.70935-4.94062 1.7594 0 3.3375.60625 4.5813 1.79375l3.4375-3.44063C18.1813 1.20312 15.472.015625 12.2407.015625c-4.68435 0-8.73748 2.687495-10.70935 6.606245C.718848 8.24062.256348 10.0719.256348 12.0094s.4625 3.7656 1.275002 5.3843C3.50322 21.3125 7.55635 24 12.2407 24c3.2375 0 5.95-1.075 7.9313-2.9062 2.2656-2.0875 3.575-5.1625 3.575-8.8157 0-.85-.075-1.6656-.2157-2.4531z" fill="#787878"/>
             </svg>
@@ -56,24 +64,25 @@ $solution = $isFriendlyException ? $throwable->getSolution() : null;
 
     <div class="exception-card">
         <div class="exception-class">
-            <?php if ($isFriendlyException): ?>
+            <?php
+            if ($isFriendlyException): ?>
                 <span><?= $this->htmlEncode($throwable->getName())?></span>
                 &mdash;
-                <?= get_class($throwable) ?>
+                <?= $exceptionClass ?>
             <?php else: ?>
-                <span><?= get_class($throwable) ?></span>
+                <span><?= $exceptionClass ?></span>
             <?php endif ?>
         </div>
 
         <div class="exception-message">
-            <?= nl2br($this->htmlEncode($throwable->getMessage())) ?>
+            <?= nl2br($this->htmlEncode($exceptionMessage)) ?>
         </div>
 
         <?php if ($solution !== null): ?>
             <div class="solution"><?= $this->parseMarkdown($solution) ?></div>
         <?php endif ?>
 
-        <?= $this->renderPreviousExceptions($throwable) ?>
+        <?= $this->renderPreviousExceptions($originalException) ?>
 
         <textarea id="clipboard"><?= $this->htmlEncode($throwable) ?></textarea>
         <span id="copied">Copied!</span>

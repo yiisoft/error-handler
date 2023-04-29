@@ -16,8 +16,8 @@ use Yiisoft\Http\Status;
 use function error_get_last;
 use function error_reporting;
 use function function_exists;
-use function ini_set;
 use function http_response_code;
+use function ini_set;
 use function register_shutdown_function;
 use function set_error_handler;
 use function set_exception_handler;
@@ -59,9 +59,7 @@ final class ErrorHandler
         ThrowableRendererInterface $renderer = null,
         ServerRequestInterface $request = null
     ): ErrorData {
-        if ($renderer === null) {
-            $renderer = $this->defaultRenderer;
-        }
+        $renderer ??= $this->defaultRenderer;
 
         try {
             $this->logger->error((string) (new PlainTextRenderer())->renderVerbose($t, $request), ['throwable' => $t]);

@@ -9,6 +9,7 @@ use cebe\markdown\GithubMarkdown;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Throwable;
+use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
@@ -32,9 +33,9 @@ use function ksort;
 use function mb_strlen;
 use function mb_substr;
 use function ob_clean;
+use function ob_end_clean;
 use function ob_get_clean;
 use function ob_get_level;
-use function ob_end_clean;
 use function ob_implicit_flush;
 use function ob_start;
 use function realpath;
@@ -212,9 +213,17 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     public function renderPreviousExceptions(Throwable $t): string
     {
-        if (($previous = $t->getPrevious()) !== null) {
-            $templatePath = $this->defaultTemplatePath . '/_previous-exception.php';
-            return $this->renderTemplate($templatePath, ['throwable' => $previous]);
+        $templatePath = $this->defaultTemplatePath . '/_previous-exception.php';
+
+        if ($t instanceof CompositeException) {
+            $result=[];
+            foreach ($t->getPreviousExceptions() as $exception) {
+                $result[] = $this->renderTemplate($templatePath, ['throwable' => $exception]);
+            }
+            return implode($result);
+        }
+        if ($t->getPrevious() !== null) {
+            return $this->renderTemplate($templatePath, ['throwable' => $t->getPrevious()]);
         }
 
         return '';
