@@ -216,7 +216,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $templatePath = $this->defaultTemplatePath . '/_previous-exception.php';
 
         if ($t instanceof CompositeException) {
-            $result=[];
+            $result = [];
             foreach ($t->getPreviousExceptions() as $exception) {
                 $result[] = $this->renderTemplate($templatePath, ['throwable' => $exception]);
             }
