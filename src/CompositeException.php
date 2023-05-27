@@ -15,7 +15,7 @@ final class CompositeException extends Exception
     /**
      * @var Throwable[]
      */
-    public array $rest;
+    private array $rest;
 
     public function __construct(
         private Throwable $first,
