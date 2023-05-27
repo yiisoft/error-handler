@@ -2,6 +2,7 @@
 
 ## 3.1.0 under development
 
+- Chg #87: Add support for multiple exceptions rendering, fixed a bug with try/finally from #75 (@xepozz)
 - Chg #75: Dispatch `ApplicationError` in `ErrorCatcher` (@xepozz)
 - Enh #82: Add `HeadersProvider` (@xepozz)
 
