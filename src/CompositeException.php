@@ -22,10 +22,7 @@ final class CompositeException extends Exception
         Throwable ...$rest,
     ) {
         $this->rest = $rest;
-        /**
-         * @psalm-suppress PossiblyInvalidArgument
-         */
-        parent::__construct($first->getMessage(), $first->getCode(), $first);
+        parent::__construct($first->getMessage(), (int) $first->getCode(), $first);
     }
 
     public function getFirstException(): Throwable
