@@ -13,8 +13,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
-use Yiisoft\ErrorHandler\Event\ApplicationError;
+use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\ErrorHandler;
+use Yiisoft\ErrorHandler\Event\ApplicationError;
 use Yiisoft\ErrorHandler\HeadersProvider;
 use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
@@ -128,13 +129,14 @@ final class ErrorCatcher implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $t = null;
         try {
             return $handler->handle($request);
         } catch (Throwable $t) {
-            $this->eventDispatcher?->dispatch(new ApplicationError($t));
-        } finally {
-            /** @psalm-suppress PossiblyNullArgument $t is set in catch() statement */
+            try {
+                $this->eventDispatcher?->dispatch(new ApplicationError($t));
+            } catch (Throwable $e) {
+                $t = new CompositeException($e, $t);
+            }
             return $this->generateErrorResponse($t, $request);
         }
     }
