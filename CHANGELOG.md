@@ -2,7 +2,8 @@
 
 ## 3.1.0 under development
 
-- Chg #87: Add `CompositeException` to be able to render multiple exceptions, fixed a bug with try/finally from #75 (@xepozz)
+- New #87: Add `CompositeException` to be able to render multiple exceptions (@xepozz)
+- Bug #87: Fix a bug with try/finally from #75 (@xepozz)
 - Chg #75: Dispatch `ApplicationError` in `ErrorCatcher` (@xepozz)
 - Enh #82: Add `HeadersProvider` (@xepozz)
 
