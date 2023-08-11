@@ -51,8 +51,6 @@ final class ExceptionResponder implements MiddlewareInterface
      * ```
      *
      * @param callable[]|int[] $exceptionMap A callable that must return a `ResponseInterface` or response status code.
-     * @param ResponseFactoryInterface $responseFactory
-     * @param Injector $injector
      */
     public function __construct(
         private array $exceptionMap,
