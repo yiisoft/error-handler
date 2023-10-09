@@ -276,7 +276,7 @@ $exceptionMessage = $throwable->getMessage();
         document.getElementById('dark-mode').onclick = function(e) {
             e.preventDefault();
 
-            document.body.classList.add('dark-theme');
+            enableDarkTheme();
 
             setCookie('yii-exception-theme', 'dark-theme');
         }
@@ -284,9 +284,35 @@ $exceptionMessage = $throwable->getMessage();
         document.getElementById('light-mode').onclick = function(e) {
             e.preventDefault();
 
-            document.body.classList.remove('dark-theme');
+            enableLightTheme();
 
-            eraseCookie('yii-exception-theme');
+            setCookie('yii-exception-theme', 'light-theme');
+        }
+
+        var darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        if (!getCookie('yii-exception-theme') && darkModeMediaQuery.matches) {
+            enableDarkTheme();
+        }
+
+        darkModeMediaQuery.addEventListener('change', function (e) {
+            if (!getCookie('yii-exception-theme')) {
+                if (e.matches) {
+                    enableDarkTheme();
+                } else {
+                    enableLightTheme();
+                }
+            }
+        });
+
+        function enableDarkTheme() {
+            document.body.classList.remove('light-theme');
+            document.body.classList.add('dark-theme');
+        }
+
+        function enableLightTheme() {
+            document.body.classList.remove('dark-theme');
+            document.body.classList.add('light-theme');
         }
     };
 
