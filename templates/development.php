@@ -289,22 +289,6 @@ $exceptionMessage = $throwable->getMessage();
             setCookie('yii-exception-theme', 'light-theme');
         }
 
-        var darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-        if (!getCookie('yii-exception-theme') && darkModeMediaQuery.matches) {
-            enableDarkTheme();
-        }
-
-        darkModeMediaQuery.addEventListener('change', function (e) {
-            if (!getCookie('yii-exception-theme')) {
-                if (e.matches) {
-                    enableDarkTheme();
-                } else {
-                    enableLightTheme();
-                }
-            }
-        });
-
         function enableDarkTheme() {
             document.body.classList.remove('light-theme');
             document.body.classList.add('dark-theme');
