@@ -275,28 +275,24 @@ $exceptionMessage = $throwable->getMessage();
         // handle theme change
         document.getElementById('dark-mode').onclick = function(e) {
             e.preventDefault();
-
             enableDarkTheme();
-
-            setCookie('yii-exception-theme', 'dark-theme');
         }
 
         document.getElementById('light-mode').onclick = function(e) {
             e.preventDefault();
-
             enableLightTheme();
-
-            setCookie('yii-exception-theme', 'light-theme');
         }
 
         function enableDarkTheme() {
             document.body.classList.remove('light-theme');
             document.body.classList.add('dark-theme');
+            setCookie('yii-exception-theme', 'dark-theme');
         }
 
         function enableLightTheme() {
             document.body.classList.remove('dark-theme');
             document.body.classList.add('light-theme');
+            setCookie('yii-exception-theme', 'light-theme');
         }
     };
 
