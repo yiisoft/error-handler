@@ -6,6 +6,7 @@
 - Bug #87: Fix a bug with try/finally from #75 (@xepozz)
 - Chg #75: Dispatch `ApplicationError` in `ErrorCatcher` (@xepozz)
 - Enh #82: Add `HeadersProvider` (@xepozz)
+- Enh #86: Add color scheme definition based on system settings (@dood-)
 
 ## 3.0.0 February 14, 2023
 
