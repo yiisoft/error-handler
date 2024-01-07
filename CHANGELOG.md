@@ -1,5 +1,9 @@
 # Yii Error Handler Change Log
 
+## 3.1.1 under development
+
+- no changes in this release.
+
 ## 3.1.0 January 07, 2024
 
 - New #87: Add `CompositeException` to be able to render multiple exceptions (@xepozz)
