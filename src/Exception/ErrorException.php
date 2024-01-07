@@ -113,7 +113,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
                 $trace[] = $frame;
             }
 
-            $ref = new ReflectionProperty(\Exception::class, 'trace');
+            $ref = new ReflectionProperty(Exception::class, 'trace');
             $ref->setAccessible(true);
             $ref->setValue($this, $trace);
         }
