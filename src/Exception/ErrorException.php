@@ -35,19 +35,16 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         E_USER_DEPRECATED => 'PHP User Deprecated Warning',
     ];
 
-    private array $backtrace;
-
     public function __construct(
         string $message = '',
         int $code = 0,
         int $severity = 1,
         string $filename = __FILE__,
         int $line = __LINE__,
-        array $backtrace = [],
+        private array $backtrace = [],
         Exception $previous = null
     ) {
         parent::__construct($message, $code, $severity, $filename, $line, $previous);
-        $this->backtrace = $backtrace;
         $this->addXDebugTraceToFatalIfAvailable();
     }
 
