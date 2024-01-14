@@ -238,12 +238,13 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return string HTML content of the rendered call stack.
      */
-    public function renderCallStack(Throwable $t): string
+    public function renderCallStack(Throwable $t, array $trace): string
     {
         $application = $vendor = [];
         $application[1] = $this->renderCallStackItem($t->getFile(), $t->getLine(), null, null, [], 1, false);
 
-        for ($i = 0, $trace = $t->getTrace(), $length = count($trace); $i < $length; ++$i) {
+        $length = count($trace);
+        for ($i = 0; $i < $length; ++$i) {
             $file = !empty($trace[$i]['file']) ? $trace[$i]['file'] : null;
             $line = !empty($trace[$i]['line']) ? $trace[$i]['line'] : null;
             $class = !empty($trace[$i]['class']) ? $trace[$i]['class'] : null;

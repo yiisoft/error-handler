@@ -1,6 +1,7 @@
 <?php
 
 use Yiisoft\ErrorHandler\CompositeException;
+use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
 /**
@@ -97,7 +98,12 @@ $exceptionMessage = $throwable->getMessage();
 
 <main>
     <div class="call-stack">
-        <?= $this->renderCallStack($throwable) ?>
+        <?= $this->renderCallStack(
+            $throwable,
+            $originalException === $throwable && $originalException instanceof ErrorException
+                ? $originalException->getBacktrace()
+                : $throwable->getTrace()
+        ) ?>
     </div>
     <?php if ($request && ($requestInfo = $this->renderRequest($request)) !== ''): ?>
         <div class="request">
