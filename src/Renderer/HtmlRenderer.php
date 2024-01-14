@@ -220,7 +220,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             foreach ($t->getPreviousExceptions() as $exception) {
                 $result[] = $this->renderTemplate($templatePath, ['throwable' => $exception]);
             }
-            return implode($result);
+            return implode('', $result);
         }
         if ($t->getPrevious() !== null) {
             return $this->renderTemplate($templatePath, ['throwable' => $t->getPrevious()]);

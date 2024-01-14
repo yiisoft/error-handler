@@ -1,12 +1,16 @@
 # Yii Error Handler Change Log
 
-## 3.1.0 under development
+## 3.1.1 under development
+
+- no changes in this release.
+
+## 3.1.0 January 07, 2024
 
 - New #87: Add `CompositeException` to be able to render multiple exceptions (@xepozz)
-- Bug #87: Fix a bug with try/finally from #75 (@xepozz)
 - Chg #75: Dispatch `ApplicationError` in `ErrorCatcher` (@xepozz)
 - Enh #82: Add `HeadersProvider` (@xepozz)
 - Enh #86: Add color scheme definition based on system settings (@dood-)
+- Bug #87: Fix a bug with try/finally from #75 (@xepozz)
 
 ## 3.0.0 February 14, 2023
 
