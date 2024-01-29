@@ -33,6 +33,7 @@ jobs:
   psalm80:
     uses: yiisoft/actions/.github/workflows/psalm.yml@master
     with:
+      psalm-config: psalm80.xml
       os: >-
         ['ubuntu-latest']
       php: >-
