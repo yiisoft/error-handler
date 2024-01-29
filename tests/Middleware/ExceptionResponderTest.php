@@ -120,8 +120,7 @@ final class ExceptionResponderTest extends TestCase
     private function createMiddleware(
         array $exceptionMap = [],
         bool $performGetBodyOnResponse = false,
-    ): ExceptionResponder
-    {
+    ): ExceptionResponder {
         return new ExceptionResponder(
             $exceptionMap,
             new ResponseFactory(),
