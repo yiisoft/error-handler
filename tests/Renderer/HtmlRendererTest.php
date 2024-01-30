@@ -126,7 +126,7 @@ final class HtmlRendererTest extends TestCase
 
         $this->assertStringContainsString(
             'new RuntimeException(&#039;Some error.&#039;)',
-            $renderer->renderCallStack(new RuntimeException('Some error.'), []),
+            $renderer->renderCallStack(new RuntimeException('Some error.')),
         );
     }
 
