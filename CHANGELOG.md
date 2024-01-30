@@ -1,6 +1,6 @@
 # Yii Error Handler Change Log
 
-## 3.1.1 under development
+## 3.2.0 January 30, 2024
 
 - New #98: Add ability to execute `getBody()` on response when `ExceptionResponder` middleware is processing (@vjik)
 - Enh #96: Trace PHP errors (@xepozz, @vjik)
