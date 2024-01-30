@@ -2,7 +2,7 @@
 
 ## 3.1.1 under development
 
-- no changes in this release.
+- New #98: Add ability to execute `getBody()` on response when `ExceptionResponder` middleware is processing (@vjik)
 
 ## 3.1.0 January 07, 2024
 
