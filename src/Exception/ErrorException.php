@@ -14,6 +14,16 @@ use function function_exists;
 
 /**
  * `ErrorException` represents a PHP error.
+ *
+ * @psalm-type DebugBacktraceType = list<array{
+ *     args?: list<mixed>,
+ *     class?: class-string,
+ *     file?: string,
+ *     function: string,
+ *     line?: int,
+ *     object?: object,
+ *     type?: string
+ * }>
  */
 class ErrorException extends \ErrorException implements FriendlyExceptionInterface
 {
@@ -35,6 +45,9 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         E_USER_DEPRECATED => 'PHP User Deprecated Warning',
     ];
 
+    /**
+     * @psalm-param DebugBacktraceType $backtrace
+     */
     public function __construct(
         string $message = '',
         int $code = 0,
@@ -77,6 +90,9 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         return null;
     }
 
+    /**
+     * @psalm-return DebugBacktraceType
+     */
     public function getBacktrace(): array
     {
         return $this->backtrace;

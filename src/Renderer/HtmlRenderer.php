@@ -11,6 +11,7 @@ use RuntimeException;
 use Throwable;
 use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\ErrorData;
+use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
@@ -46,6 +47,8 @@ use function strlen;
 
 /**
  * Formats throwable into HTML string.
+ *
+ * @psalm-import-type DebugBacktraceType from ErrorException
  */
 final class HtmlRenderer implements ThrowableRendererInterface
 {
@@ -237,6 +240,8 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * @throws Throwable
      *
      * @return string HTML content of the rendered call stack.
+     *
+     * @psalm-param DebugBacktraceType $trace
      */
     public function renderCallStack(Throwable $t, array $trace): string
     {
