@@ -3,7 +3,7 @@
 ## 3.1.1 under development
 
 - New #98: Add ability to execute `getBody()` on response when `ExceptionResponder` middleware is processing (@vjik)
-- Enh #96: Add PHP errors to trace (@xepozz, @vjik)
+- Enh #96: Trace PHP errors (@xepozz, @vjik)
 
 ## 3.1.0 January 07, 2024
 
