@@ -54,8 +54,8 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         int $severity = 1,
         string $filename = __FILE__,
         int $line = __LINE__,
+        Exception $previous = null,
         private array $backtrace = [],
-        Exception $previous = null
     ) {
         parent::__construct($message, $code, $severity, $filename, $line, $previous);
         $this->addXDebugTraceToFatalIfAvailable();

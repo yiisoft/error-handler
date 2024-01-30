@@ -243,7 +243,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @psalm-param DebugBacktraceType $trace
      */
-    public function renderCallStack(Throwable $t, array $trace): string
+    public function renderCallStack(Throwable $t, array $trace = []): string
     {
         $application = $vendor = [];
         $application[1] = $this->renderCallStackItem($t->getFile(), $t->getLine(), null, null, [], 1, false);
