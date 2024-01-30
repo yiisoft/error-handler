@@ -40,7 +40,8 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
     /**
      * @psalm-param DebugBacktraceType $backtrace
      */
-    public function __construct(string $message = '', int $code = 0, int $severity = 1, string $filename = __FILE__, int $line = __LINE__, Exception $previous = null, private array $backtrace = []) {
+    public function __construct(string $message = '', int $code = 0, int $severity = 1, string $filename = __FILE__, int $line = __LINE__, Exception $previous = null, private array $backtrace = [])
+    {
         parent::__construct($message, $code, $severity, $filename, $line, $previous);
         $this->addXDebugTraceToFatalIfAvailable();
     }
