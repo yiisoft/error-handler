@@ -128,7 +128,7 @@ final class ErrorHandler
                 return true;
             }
 
-            $backtrace = function_exists('debug_backtrace') ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) : [];
+            $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             throw new ErrorException($message, $severity, $severity, $file, $line, $backtrace);
         });
 
@@ -170,7 +170,7 @@ final class ErrorHandler
             $e = error_get_last();
 
             if ($e !== null && ErrorException::isFatalError($e)) {
-                $backtrace = function_exists('debug_backtrace') ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) : [];
+                $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
                 $error = new ErrorException($e['message'], $e['type'], $e['type'], $e['file'], $e['line'], $backtrace);
                 $this->renderThrowableAndTerminate($error);
             }
