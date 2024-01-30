@@ -65,9 +65,9 @@ final class ExceptionResponderTest extends TestCase
         $this->process($middleware);
     }
 
-    public function testPerformGetBodyOnResponse(): void
+    public function testCheckResponseBody(): void
     {
-        $middleware = $this->createMiddleware(performGetBodyOnResponse: true);
+        $middleware = $this->createMiddleware(checkResponseBody: true);
         $request = (new ServerRequestFactory())->createServerRequest(Method::GET, 'http://example.com');
         $handler = new class () implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -90,7 +90,7 @@ final class ExceptionResponderTest extends TestCase
 
     public function testSuccess(): void
     {
-        $middleware = $this->createMiddleware(performGetBodyOnResponse: true);
+        $middleware = $this->createMiddleware(checkResponseBody: true);
         $request = (new ServerRequestFactory())->createServerRequest(Method::GET, 'http://example.com');
         $handler = new class () implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -119,7 +119,7 @@ final class ExceptionResponderTest extends TestCase
 
     private function createMiddleware(
         array $exceptionMap = [],
-        bool $performGetBodyOnResponse = false,
+        bool $checkResponseBody = false,
     ): ExceptionResponder {
         return new ExceptionResponder(
             $exceptionMap,
@@ -129,7 +129,7 @@ final class ExceptionResponderTest extends TestCase
                     ResponseFactoryInterface::class => new ResponseFactory(),
                 ]),
             ),
-            $performGetBodyOnResponse,
+            $checkResponseBody,
         );
     }
 }
