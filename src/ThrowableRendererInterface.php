@@ -17,9 +17,7 @@ interface ThrowableRendererInterface
     /**
      * Returns error data suitable for adding it to response in production environment.
      *
-     * @param Throwable $t
      * @param ServerRequestInterface|null $request
-     *
      * @return ErrorData
      */
     public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData;
@@ -27,9 +25,7 @@ interface ThrowableRendererInterface
     /**
      * Returns error data suitable for adding it to response in development environment.
      *
-     * @param Throwable $t
      * @param ServerRequestInterface|null $request
-     *
      * @return ErrorData
      */
     public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData;
