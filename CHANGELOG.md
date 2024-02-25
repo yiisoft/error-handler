@@ -2,7 +2,7 @@
 
 ## 3.2.1 under development
 
-- no changes in this release.
+- Enh #102: Add support for `psr/http-message` of `^2.0` version (@vjik)
 
 ## 3.2.0 January 30, 2024
 
