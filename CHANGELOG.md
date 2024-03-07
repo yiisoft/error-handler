@@ -1,6 +1,6 @@
 # Yii Error Handler Change Log
 
-## 3.2.1 under development
+## 3.2.1 March 07, 2024
 
 - Enh #102: Add support for `psr/http-message` of `^2.0` version (@vjik)
 
