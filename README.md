@@ -21,7 +21,7 @@ The package provides advanced error handling. The features are:
 - Production and debug modes.
 - Debug mode displays details, stacktrace, has dark and light themes and handy buttons to search for error without typing.  
 - Takes PHP settings into account.
-- Handles out of memory errors, fatals, warnings, notices and exceptions. 
+- Handles out of memory errors, fatals, warnings, notices and exceptions.
 - Can use any PSR-3 compatible logger for error logging.
 - Detects response format based on mime type of the request.
 - Supports responding with HTML, plain text, JSON, XML and headers out of the box.
@@ -195,9 +195,6 @@ $response = $exceptionResponder->process($request, $handler);
 In the application middleware stack `Yiisoft\ErrorHandler\Middleware\ExceptionResponder` must be placed before
 `Yiisoft\ErrorHandler\Middleware\ErrorCatcher`.
 
-For use in the [Yii framework](https://www.yiiframework.com/),
-see [Yii guide to handling errors](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md).
-
 ## Events
 
 - When `ErrorCatcher` catches an error it dispatches `\Yiisoft\ErrorHandler\Event\ApplicationError` event.
@@ -221,7 +218,6 @@ Code blocks in solution markdown support language syntax highlight:
 
 For example:
 
-````
 ```html
 <html>
 <body>
@@ -230,45 +226,21 @@ For example:
 </body>
 </html>
 ```
-````
 
-## Testing
+## Documentation
 
-### Unit testing
-
-The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
-
-```shell
-./vendor/bin/phpunit
-```
-
-### Mutation testing
-
-The package tests are checked with [Infection](https://infection.github.io/) mutation framework with
-[Infection Static Analysis Plugin](https://github.com/Roave/infection-static-analysis-plugin). To run it:
-
-```shell
-./vendor/bin/roave-infection-static-analysis-plugin
-```
-
-### Static analysis
-
-The code is statically analyzed with [Psalm](https://psalm.dev/). To run static analysis:
-
-```shell
-./vendor/bin/psalm
-```
+- [Yii guide to handling errors (English)](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md)
+- [Guia Yii para lidar com erros (Portuguese - Brazil)](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md)
+- More information can be found in the [Internals.](docs/internals.md)
 
 ## Credits
 
 The Yii Error Handler use code of [Highlight.js](https://highlightjs.org/) by Ivan Sagalaev and other contributors.
 
-## License
+## Support
 
-The Yii Error Handler is free software. It is released under the terms of the BSD License.
-Please see [`LICENSE`](./LICENSE.md) for more information.
-
-Maintained by [Yii Software](https://www.yiiframework.com/).
+If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
+You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
 
 ## Support the project
 
@@ -281,3 +253,10 @@ Maintained by [Yii Software](https://www.yiiframework.com/).
 [![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3en)
 [![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
 [![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
+
+## License
+
+The Yii Access is free software. It is released under the terms of the BSD License.
+Please see [`LICENSE`](./LICENSE.md) for more information.
+
+Maintained by [Yii Software](https://www.yiiframework.com/).
