@@ -230,8 +230,8 @@ For example:
 ## Documentation
 
 - [Yii guide to handling errors (English)](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md)
-- [Guia Yii para lidar com erros (Portuguese - Brazil)](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md)
-- More information can be found in the [Internals.](docs/internals.md)
+- [Guia Yii para lidar com erros (Português - Brasil)](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md)
+- [Internals](docs/internals.md)
 
 ## Credits
 
