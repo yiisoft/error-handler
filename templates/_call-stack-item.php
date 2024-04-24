@@ -21,7 +21,7 @@ HTML;
 <li class="<?= (!empty($lines) && ($index === 1 || !$isVendorFile)) ? 'application ' : '' ?>call-stack-item" data-line="<?= (int) ($line - $begin) ?>">
     <div class="element-wrap">
         <div class="flex-1">
-            <?php if ($file !== null) : ?>
+            <?php if ($file !== null): ?>
                 <span class="file-name">
                     <?= "{$index}. in {$this->htmlEncode($file)}" ?>
                     <?php if ($this->traceHeaderLine !== null) : ?>
