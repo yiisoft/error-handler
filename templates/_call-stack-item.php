@@ -43,7 +43,7 @@ HTML;
             <div><?= sprintf('at line %d', $line + 1) ?></div>
         <?php endif ?>
     </div>
-    <?php if (!empty($lines)) : ?>
+    <?php if (!empty($lines)): ?>
         <div class="element-code-wrap">
             <div class="code-wrap">
                 <div class="error-line"></div>
