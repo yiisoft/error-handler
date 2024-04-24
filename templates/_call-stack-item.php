@@ -24,7 +24,7 @@ HTML;
             <?php if ($file !== null): ?>
                 <span class="file-name">
                     <?= "{$index}. in {$this->htmlEncode($file)}" ?>
-                    <?php if ($this->traceHeaderLine !== null) : ?>
+                    <?php if ($this->traceHeaderLine !== null): ?>
                         <?= strtr($this->traceHeaderLine, ['{file}' => $file, '{line}' => $line + 1, '{icon}' => $icon]) ?>
                     <?php endif ?>
                 </span>
