@@ -51,7 +51,7 @@ $exceptionMessage = $throwable->getMessage();
             </a>
 
             <a href="https://stackoverflow.com/search?<?= http_build_query(['q' => $exceptionMessage]) ?>" title="Search error on Stackoverflow" target="_blank">
-                <svg width="28" height="32" fill="none" xmlns="https://www.w3.org/2000/svg">
+                <svg width="28" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M23.312 29.151v-8.536h2.849V32H.458008V20.615H3.29701v8.536H23.312zM6.14501 26.307H20.469v-2.848H6.14501v2.848zm.35-6.468L20.47 22.755l.599-2.76-13.96899-2.912-.605 2.756zm1.812-6.74L21.246 19.136l1.203-2.6-12.93699-6.041-1.204 2.584-.001.02zm3.61999-6.38L22.88 15.86l1.813-2.163L13.74 4.562l-1.803 2.151-.01.006zM19 0l-2.328 1.724 8.541 11.473 2.328-1.724L19 0z" fill="#787878" />
                 </svg>
             </a>
