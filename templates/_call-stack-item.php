@@ -51,11 +51,11 @@ HTML;
                 <div class="code">
                     <?php for ($i = $begin; $i <= $end; ++$i): ?><span class="lines-item"><?= (int) ($i + 1) ?></span><?php endfor ?>
                     <pre class="codeBlock language-php"><?php
-                                                        // Fill empty lines with a whitespace to avoid rendering problems in Opera.
-                                                        for ($i = $begin; $i <= $end; ++$i) {
-                                                            echo (trim($lines[$i]) === '') ? " \n" : $this->htmlEncode($lines[$i]);
-                                                        }
-                                                        ?></pre>
+                        // Fill empty lines with a whitespace to avoid rendering problems in Opera.
+                        for ($i = $begin; $i <= $end; ++$i) {
+                            echo (trim($lines[$i]) === '') ? " \n" : $this->htmlEncode($lines[$i]);
+                        }
+                        ?></pre>
                 </div>
             </div>
         </div>
