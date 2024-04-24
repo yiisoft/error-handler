@@ -39,7 +39,7 @@ HTML;
             <?php endif ?>
         </div>
 
-        <?php if ($line !== null) : ?>
+        <?php if ($line !== null): ?>
             <div><?= sprintf('at line %d', $line + 1) ?></div>
         <?php endif ?>
     </div>
