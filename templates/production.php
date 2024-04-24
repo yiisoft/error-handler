@@ -12,9 +12,9 @@ if ($throwable instanceof UserException) {
     $name = 'Error';
     $message = ThrowableRendererInterface::DEFAULT_ERROR_MESSAGE;
 }
-?>
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -71,4 +71,5 @@ if ($throwable instanceof UserException) {
         <?= date('Y-m-d H:i:s') ?>
     </div>
 </body>
+
 </html>
