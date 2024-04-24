@@ -30,7 +30,7 @@ HTML;
                 </span>
             <?php endif ?>
 
-            <?php if ($function !== null) : ?>
+            <?php if ($function !== null): ?>
                 <span class="function-info">
                     <?= $file === null ? "{$index}." : '&ndash;' ?>
                     <?php $function = $class === null ? $function : "$class::$function" ?>
