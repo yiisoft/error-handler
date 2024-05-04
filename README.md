@@ -37,7 +37,7 @@ The package provides advanced error handling. The features are:
 
 ## Installation
 
-The package could be installed with composer:
+The package could be installed via [composer](https://getcomposer.org/download/)
 
 ```shell
 composer require yiisoft/error-handler
@@ -229,18 +229,22 @@ For example:
 
 ## Documentation
 
-- [Yii guide to handling errors (English)](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md)
-- [Guia Yii para lidar com erros (Português - Brasil)](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md)
+- Guide: [English](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md), [Português - Brasil](https://github.com/yiisoft/docs/blob/master/guide/pt-BR/runtime/handling-errors.md)
 - [Internals](docs/internals.md)
+
+If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
+You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
+
+## License
+
+The Yii Error Handler is free software. It is released under the terms of the BSD License.
+Please see [`LICENSE`](./LICENSE.md) for more information.
+
+Maintained by [Yii Software](https://www.yiiframework.com/).
 
 ## Credits
 
 The Yii Error Handler use code of [Highlight.js](https://highlightjs.org/) by Ivan Sagalaev and other contributors.
-
-## Support
-
-If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
-You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
 
 ## Support the project
 
@@ -253,10 +257,3 @@ You may also check out other [Yii Community Resources](https://www.yiiframework.
 [![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3en)
 [![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
 [![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
-
-## License
-
-The Yii Error Handler is free software. It is released under the terms of the BSD License.
-Please see [`LICENSE`](./LICENSE.md) for more information.
-
-Maintained by [Yii Software](https://www.yiiframework.com/).
