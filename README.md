@@ -229,7 +229,7 @@ For example:
 
 ## Documentation
 
-- Guide: [English](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md), [Português - Brasil](https://github.com/yiisoft/docs/blob/master/guide/pt-BR/runtime/handling-errors.md)
+- [Yii guide to handling errors](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md)
 - [Internals](docs/internals.md)
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
