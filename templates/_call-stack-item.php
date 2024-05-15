@@ -18,7 +18,8 @@ $icon = <<<HTML
 </svg>
 HTML;
 ?>
-<li class="<?= (!empty($lines) && ($index === 1 || !$isVendorFile)) ? 'application ' : '' ?>call-stack-item" data-line="<?= (int) ($line - $begin) ?>">
+<li class="<?= (!empty($lines) && ($index === 1 || !$isVendorFile)) ? 'application ' : '' ?>call-stack-item"
+    data-line="<?= (int) ($line - $begin) ?>">
     <div class="element-wrap">
         <div class="flex-1">
             <?php if ($file !== null): ?>
