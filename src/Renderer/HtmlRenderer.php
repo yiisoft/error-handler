@@ -341,17 +341,19 @@ final class HtmlRenderer implements ThrowableRendererInterface
     {
         $output = $request->getMethod() . ' ' . $request->getUri() . "\n";
 
-        foreach ($request->getHeaders() as $name => $values) {
-            if ($name === 'Host') {
-                continue;
-            }
+        $headers = $request->getHeaders();
+        unset($headers['Host']);
+        ksort($headers);
 
+        foreach ($headers as $name => $values) {
             foreach ($values as $value) {
                 $output .= "$name: $value\n";
             }
         }
 
-        $output .= "\n" . $request->getBody() . "\n\n";
+        if (!empty($request->getBody())) {
+            $output .= "\n" . $request->getBody() . "\n\n";
+        }
 
         return '<pre class="codeBlock language-text">' . $this->htmlEncode(rtrim($output, "\n")) . '</pre>';
     }
@@ -371,7 +373,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             return $this->htmlEncode('Error generating curl command: ' . $e->getMessage());
         }
 
-        return '<div class="codeBlock language-sh">' . $this->htmlEncode($output) . '</div>';
+        return $output;
     }
 
     /**
