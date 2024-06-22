@@ -11,6 +11,7 @@ use RuntimeException;
 use Throwable;
 use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\ErrorData;
+use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
@@ -46,6 +47,8 @@ use function strlen;
 
 /**
  * Formats throwable into HTML string.
+ *
+ * @psalm-import-type DebugBacktraceType from ErrorException
  */
 final class HtmlRenderer implements ThrowableRendererInterface
 {
@@ -220,7 +223,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             foreach ($t->getPreviousExceptions() as $exception) {
                 $result[] = $this->renderTemplate($templatePath, ['throwable' => $exception]);
             }
-            return implode($result);
+            return implode('', $result);
         }
         if ($t->getPrevious() !== null) {
             return $this->renderTemplate($templatePath, ['throwable' => $t->getPrevious()]);
@@ -237,13 +240,16 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * @throws Throwable
      *
      * @return string HTML content of the rendered call stack.
+     *
+     * @psalm-param DebugBacktraceType $trace
      */
-    public function renderCallStack(Throwable $t): string
+    public function renderCallStack(Throwable $t, array $trace = []): string
     {
         $application = $vendor = [];
         $application[1] = $this->renderCallStackItem($t->getFile(), $t->getLine(), null, null, [], 1, false);
 
-        for ($i = 0, $trace = $t->getTrace(), $length = count($trace); $i < $length; ++$i) {
+        $length = count($trace);
+        for ($i = 0; $i < $length; ++$i) {
             $file = !empty($trace[$i]['file']) ? $trace[$i]['file'] : null;
             $line = !empty($trace[$i]['line']) ? $trace[$i]['line'] : null;
             $class = !empty($trace[$i]['class']) ? $trace[$i]['class'] : null;

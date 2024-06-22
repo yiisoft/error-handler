@@ -99,13 +99,16 @@ final class ErrorHandlerTest extends TestCase
         $this->errorHandler->register();
         $array = ['type' => 'undefined'];
 
+        $exception = null;
         try {
             $array['undefined'];
-        } catch (Throwable $e) {
-            $this->assertInstanceOf(ErrorException::class, $e);
-            $this->assertFalse($e::isFatalError($array));
-            $this->assertNull($e->getSolution());
+        } catch (Throwable $exception) {
         }
+
+        $this->assertInstanceOf(ErrorException::class, $exception);
+        $this->assertFalse($exception::isFatalError($array));
+        $this->assertNull($exception->getSolution());
+        $this->assertNotEmpty($exception->getBacktrace());
 
         $this->errorHandler->unregister();
     }

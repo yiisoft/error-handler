@@ -1,12 +1,25 @@
 # Yii Error Handler Change Log
 
-## 3.1.0 under development
+## 3.2.2 under development
+
+- no changes in this release.
+
+## 3.2.1 March 07, 2024
+
+- Enh #102: Add support for `psr/http-message` of `^2.0` version (@vjik)
+
+## 3.2.0 January 30, 2024
+
+- New #98: Add ability to execute `getBody()` on response when `ExceptionResponder` middleware is processing (@vjik)
+- Enh #96: Trace PHP errors (@xepozz, @vjik)
+
+## 3.1.0 January 07, 2024
 
 - New #87: Add `CompositeException` to be able to render multiple exceptions (@xepozz)
-- Bug #87: Fix a bug with try/finally from #75 (@xepozz)
 - Chg #75: Dispatch `ApplicationError` in `ErrorCatcher` (@xepozz)
 - Enh #82: Add `HeadersProvider` (@xepozz)
 - Enh #86: Add color scheme definition based on system settings (@dood-)
+- Bug #87: Fix a bug with try/finally from #75 (@xepozz)
 
 ## 3.0.0 February 14, 2023
 
