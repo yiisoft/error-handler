@@ -62,7 +62,7 @@ final class ErrorHandler
         $renderer ??= $this->defaultRenderer;
 
         try {
-            $this->logger->error((string) (new PlainTextRenderer())->renderVerbose($t, $request), ['throwable' => $t]);
+            $this->logger->error(PlainTextRenderer::throwableToString($t), ['throwable' => $t]);
             return $this->debug ? $renderer->renderVerbose($t, $request) : $renderer->render($t, $request);
         } catch (Throwable $t) {
             return new ErrorData((string) $t);

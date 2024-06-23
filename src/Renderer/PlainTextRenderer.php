@@ -22,9 +22,26 @@ final class PlainTextRenderer implements ThrowableRendererInterface
     public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(
-            $t::class . " with message '{$t->getMessage()}' \n\nin "
-            . $t->getFile() . ':' . $t->getLine() . "\n\n"
-            . "Stack trace:\n" . $t->getTraceAsString()
+            $this->throwableToString($t)
+        );
+    }
+
+    public static function throwableToString(Throwable $t): string
+    {
+        return sprintf(
+            <<<TEXT
+                %s with message "%s"
+
+                in %s:%s
+
+                Stack trace:
+                %s
+                TEXT,
+            $t::class,
+            $t->getMessage(),
+            $t->getFile(),
+            $t->getLine(),
+            $t->getTraceAsString()
         );
     }
 }
