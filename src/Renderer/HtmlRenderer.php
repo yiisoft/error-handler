@@ -40,7 +40,6 @@ use function ob_get_level;
 use function ob_implicit_flush;
 use function ob_start;
 use function realpath;
-use function rtrim;
 use function str_replace;
 use function stripos;
 use function strlen;
@@ -357,11 +356,12 @@ final class HtmlRenderer implements ThrowableRendererInterface
             }
         }
 
-        if (!empty($request->getBody())) {
-            $output .= "\n" . $request->getBody() . "\n\n";
+        $body = (string)$request->getBody();
+        if (!empty($body)) {
+            $output .= "\n" . $body . "\n\n";
         }
 
-        return '<pre class="codeBlock language-text">' . $this->htmlEncode(rtrim($output, "\n")) . '</pre>';
+        return $output;
     }
 
     /**
@@ -376,7 +376,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 ->setRequest($request)
                 ->build();
         } catch (Throwable $e) {
-            return $this->htmlEncode('Error generating curl command: ' . $e->getMessage());
+            return 'Error generating curl command: ' . $e;
         }
 
         return $output;

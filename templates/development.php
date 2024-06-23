@@ -88,7 +88,11 @@ $exceptionMessage = $throwable->getMessage();
         <textarea id="clipboard"><?= $this->htmlEncode($throwable) ?></textarea>
         <span id="copied">Copied!</span>
 
-        <a href="#" class="copy-clipboard" title="Copy the stacktrace for use in a bug report or pastebin">
+        <a href="#"
+           class="copy-clipboard"
+           data-clipboard="<?= $this->htmlEncode($throwable) ?>"
+           title="Copy the stacktrace for use in a bug report or pastebin"
+        >
             <svg width="26" height="30" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.9998.333344H3.33317C1.8665.333344.666504 1.53334.666504 3.00001V20.3333c0 .7334.599996 1.3334 1.333336 1.3334.73333 0 1.33333-.6 1.33333-1.3334V4.33334c0-.73333.6-1.33333 1.33333-1.33333h13.3333c.7334 0 1.3334-.6 1.3334-1.33333 0-.733337-.6-1.333336-1.3334-1.333336zm5.3334 5.333336H8.6665c-1.46666 0-2.66666 1.2-2.66666 2.66666V27c0 1.4667 1.2 2.6667 2.66666 2.6667h14.6667c1.4666 0 2.6666-1.2 2.6666-2.6667V8.33334c0-1.46666-1.2-2.66666-2.6666-2.66666zM21.9998 27H9.99984c-.73333 0-1.33334-.6-1.33334-1.3333V9.66668c0-.73334.60001-1.33334 1.33334-1.33334H21.9998c.7334 0 1.3334.6 1.3334 1.33334V25.6667c0 .7333-.6 1.3333-1.3334 1.3333z" fill="#787878"/>
             </svg>
@@ -109,7 +113,9 @@ $exceptionMessage = $throwable->getMessage();
         <div class="request">
             <h2>Request info</h2>
             <div class="body">
-                <?= $requestInfo ?>
+                <pre class="codeBlock language-text">
+                    <?= $this->htmlEncode(rtrim($requestInfo, "\n")) ?>
+                </pre>
             </div>
         </div>
     <?php endif ?>
@@ -118,7 +124,12 @@ $exceptionMessage = $throwable->getMessage();
             <textarea id="clipboard"><?= $curlInfo ?></textarea>
             <span id="copied" style="top: 10px">Copied!</span>
             <h2>cURL</h2>
-            <a href="#" class="copy-clipboard" title="Copy the cURL" style="right: 10px; top: 5px">
+            <a href="#"
+               class="copy-clipboard"
+               data-clipboard="<?= $curlInfo ?>"
+               title="Copy the cURL"
+               style="right: 10px; top: 5px"
+            >
                 <svg width="26" height="30" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M17.9998.333344H3.33317C1.8665.333344.666504 1.53334.666504 3.00001V20.3333c0 .7334.599996 1.3334 1.333336 1.3334.73333 0 1.33333-.6 1.33333-1.3334V4.33334c0-.73333.6-1.33333 1.33333-1.33333h13.3333c.7334 0 1.3334-.6 1.3334-1.33333 0-.733337-.6-1.333336-1.3334-1.333336zm5.3334 5.333336H8.6665c-1.46666 0-2.66666 1.2-2.66666 2.66666V27c0 1.4667 1.2 2.6667 2.66666 2.6667h14.6667c1.4666 0 2.6666-1.2 2.6666-2.6667V8.33334c0-1.46666-1.2-2.66666-2.6666-2.66666zM21.9998 27H9.99984c-.73333 0-1.33334-.6-1.33334-1.3333V9.66668c0-.73334.60001-1.33334 1.33334-1.33334H21.9998c.7334 0 1.3334.6 1.3334 1.33334V25.6667c0 .7333-.6 1.3333-1.3334 1.3333z" fill="#787878"/>
                 </svg>
@@ -270,7 +281,6 @@ $exceptionMessage = $throwable->getMessage();
         const copyIntoClipboard = function(e) {
             e.preventDefault();
             const parentContainer = e.currentTarget.parentElement;
-            console.log('parentContainer',parentContainer)
             const textarea = parentContainer.querySelector('#clipboard');
             textarea.focus();
             textarea.select();
