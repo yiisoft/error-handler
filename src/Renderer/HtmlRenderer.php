@@ -376,7 +376,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 ->setRequest($request)
                 ->build();
         } catch (Throwable $e) {
-            return 'Error generating curl command: ' . $e;
+            return 'Error generating curl command: ' . $e->getMessage();
         }
 
         return $output;
