@@ -113,9 +113,7 @@ $exceptionMessage = $throwable->getMessage();
         <div class="request">
             <h2>Request info</h2>
             <div class="body">
-                <pre class="codeBlock language-text">
-                    <?= $this->htmlEncode(rtrim($requestInfo, "\n")) ?>
-                </pre>
+                <pre class="codeBlock language-text"><?= $this->htmlEncode(rtrim($requestInfo, "\n")) ?></pre>
             </div>
         </div>
     <?php endif ?>
