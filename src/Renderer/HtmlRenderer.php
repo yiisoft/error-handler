@@ -282,7 +282,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return string The string representation of the arguments array.
      */
-    public function argumentsToString(array $args, bool $truncate): string
+    public function argumentsToString(array $args, bool $truncate = true): string
     {
         $count = 0;
         $isAssoc = $args !== array_values($args);
