@@ -2,7 +2,7 @@
 
 ## 3.2.2 under development
 
-- no changes in this release.
+- Enh #113: Simplify error log (@xepozz)
 
 ## 3.2.1 March 07, 2024
 
