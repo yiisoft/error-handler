@@ -22,7 +22,7 @@ final class PlainTextRenderer implements ThrowableRendererInterface
     public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(
-            $this->throwableToString($t)
+            self::throwableToString($t)
         );
     }
 
