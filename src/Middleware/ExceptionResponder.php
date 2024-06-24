@@ -51,18 +51,24 @@ final class ExceptionResponder implements MiddlewareInterface
      * ```
      *
      * @param callable[]|int[] $exceptionMap A callable that must return a `ResponseInterface` or response status code.
+     * @param bool $checkResponseBody Whether executing `getBody()` on response needs to be done. It's useful for
+     * catching exceptions that can be thrown in the process of body generation.
      */
     public function __construct(
         private array $exceptionMap,
         private ResponseFactoryInterface $responseFactory,
         private Injector $injector,
+        private bool $checkResponseBody = false,
     ) {
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            return $handler->handle($request);
+            $response = $handler->handle($request);
+            if ($this->checkResponseBody) {
+                $response->getBody();
+            }
         } catch (Throwable $t) {
             foreach ($this->exceptionMap as $exceptionType => $responseHandler) {
                 if ($t instanceof $exceptionType) {
@@ -78,5 +84,7 @@ final class ExceptionResponder implements MiddlewareInterface
             }
             throw $t;
         }
+
+        return $response;
     }
 }

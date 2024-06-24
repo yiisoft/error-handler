@@ -14,12 +14,22 @@
     "license": "BSD-3-Clause",
     "support": {
         "issues": "https://github.com/yiisoft/error-handler/issues?state=open",
+        "source": "https://github.com/yiisoft/error-handler",
         "forum": "https://www.yiiframework.com/forum/",
         "wiki": "https://www.yiiframework.com/wiki/",
-        "irc": "irc://irc.freenode.net/yii",
-        "chat": "https://t.me/yii3en",
-        "source": "https://github.com/yiisoft/error-handler"
+        "irc": "ircs://irc.libera.chat:6697/yii",
+        "chat": "https://t.me/yii3en"
     },
+    "funding": [
+        {
+            "type": "opencollective",
+            "url": "https://opencollective.com/yiisoft"
+        },
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/yiisoft"
+        }
+    ],
     "require": {
         "php": "^8.0",
         "ext-dom": "*",
@@ -29,7 +39,7 @@
         "cebe/markdown": "^1.2",
         "psr/container": "^1.0|^2.0",
         "psr/http-factory": "^1.0",
-        "psr/http-message": "^1.0",
+        "psr/http-message": "^1.0|^2.0",
         "psr/http-server-handler": "^1.0",
         "psr/http-server-middleware": "^1.0",
         "psr/log": "^1.1|^2.0|^3.0",
@@ -41,10 +51,10 @@
         "httpsoft/http-message": "^1.0.9",
         "maglnet/composer-require-checker": "^4.4",
         "phpunit/phpunit": "^9.5",
-        "rector/rector": "^0.18.3",
+        "rector/rector": "^1.0",
         "roave/infection-static-analysis-plugin": "^1.16",
         "spatie/phpunit-watcher": "^1.23",
-        "vimeo/psalm": "^4.30|^5.6",
+        "vimeo/psalm": "^4.30|^5.20",
         "yiisoft/di": "^1.1",
         "yiisoft/test-support": "^1.3"
     },
