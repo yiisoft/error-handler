@@ -161,8 +161,8 @@ $exceptionMessage = $throwable->getMessage();
 </script>
 <script>
     window.onload = function() {
-        var codeBlocks = document.querySelectorAll('.solution pre code,.codeBlock'),
-            callStackItems = document.getElementsByClassName('call-stack-item');
+        const codeBlocks = document.querySelectorAll('.solution pre code,.codeBlock');
+        const callStackItems = document.getElementsByClassName('call-stack-item');
 
         // If there are grouped vendor package files
         var vendorCollapse = document.getElementsByClassName('call-stack-vendor-collapse');
@@ -221,12 +221,48 @@ $exceptionMessage = $throwable->getMessage();
         };
 
         for (var i = 0, imax = callStackItems.length; i < imax; ++i) {
-            refreshCallStackItemCode(callStackItems[i]);
+            let stackItem = callStackItems[i];
+            refreshCallStackItemCode(stackItem);
 
             // toggle code block visibility
-            callStackItems[i].getElementsByClassName('element-wrap')[0].addEventListener('click', function (event) {
+            stackItem.querySelector('.show-arguments-toggle')?.addEventListener('click', function (e) {
+                e.stopPropagation()
+                console.log('click')
+                // function-arguments-wrap
+
+                stackItem.getElementsByClassName('function-arguments-wrap')[0].classList.toggle('hidden')
+            });
+
+            // toggle code block visibility
+            const arguments = stackItem.querySelector('.arguments');
+            arguments?.addEventListener('select', function (e) {
+                e.stopPropagation()
+                e.stopImmediatePropagation()
+
+            })
+            arguments?.addEventListener('click', function (e) {
+                e.stopPropagation()
+                // stop click event on selecting text
+                if (document.getSelection()?.type === 'Range') {
+                    return
+                }
+
+                const fullArguments = stackItem.querySelector('.full-arguments');
+                const shortArguments = stackItem.querySelector('.short-arguments');
+                if (fullArguments) {
+                    fullArguments.classList.toggle('hidden')
+                    shortArguments.classList.toggle('hidden')
+                }
+            });
+
+            // toggle code block visibility
+            stackItem.getElementsByClassName('element-wrap')[0].addEventListener('click', function (event) {
                 if (event.target.nodeName.toLowerCase() === 'a') {
                     return;
+                }
+                // stop click event on selecting text
+                if (document.getSelection()?.type === 'Range') {
+                    return
                 }
 
                 var callStackItem = this.parentNode,
@@ -245,6 +281,7 @@ $exceptionMessage = $throwable->getMessage();
                     refreshCallStackItemCode(callStackItem);
                 }
             });
+
         }
 
         // handle copy stacktrace action on clipboard button

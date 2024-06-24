@@ -276,7 +276,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *
      * @return string The string representation of the arguments array.
      */
-    public function argumentsToString(array $args): string
+    public function argumentsToString(array $args, bool $truncate): string
     {
         $count = 0;
         $isAssoc = $args !== array_values($args);
@@ -287,7 +287,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         foreach ($args as $key => $value) {
             $count++;
 
-            if ($count >= 5) {
+            if ($truncate && $count >= 5) {
                 if ($count > 5) {
                     unset($args[$key]);
                 } else {
@@ -302,7 +302,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 $args[$key] = '<span class="keyword">' . ($value ? 'true' : 'false') . '</span>';
             } elseif (is_string($value)) {
                 $fullValue = $this->htmlEncode($value);
-                if (mb_strlen($value, 'UTF-8') > 32) {
+                if ($truncate && mb_strlen($value, 'UTF-8') > 32) {
                     $displayValue = $this->htmlEncode(mb_substr($value, 0, 32, 'UTF-8')) . '...';
                     $args[$key] = "<span class=\"string\" title=\"$fullValue\">'$displayValue'</span>";
                 } else {
@@ -310,7 +310,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 }
             } elseif (is_array($value)) {
                 unset($args[$key]);
-                $args[$key] = '[' . $this->argumentsToString($value) . ']';
+                $args[$key] = '[' . $this->argumentsToString($value, $truncate) . ']';
             } elseif ($value === null) {
                 $args[$key] = '<span class="keyword">null</span>';
             } elseif (is_resource($value)) {
