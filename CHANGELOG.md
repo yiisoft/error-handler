@@ -2,6 +2,8 @@
 
 ## 3.2.2 under development
 
+- Bug #114: Stop `click` event on text selection (@xepozz)
+- Enh #114: Show full argument by click (@xepozz)
 - Enh #113: Simplify error log (@xepozz)
 
 ## 3.2.1 March 07, 2024
