@@ -22,12 +22,24 @@ final class PlainTextRendererTest extends TestCase
     {
         $renderer = new PlainTextRenderer();
         $throwable = new RuntimeException();
-        $data = $renderer->renderVerbose($throwable);
-        $content = RuntimeException::class . " with message '{$throwable->getMessage()}' \n\nin "
-            . $throwable->getFile() . ':' . $throwable->getLine() . "\n\n"
-            . "Stack trace:\n" . $throwable->getTraceAsString()
-        ;
+        $expectedContent = sprintf(
+            <<<TEXT
+                %s with message "%s"
 
-        $this->assertSame($content, (string) $data);
+                in %s:%s
+
+                Stack trace:
+                %s
+                TEXT,
+            $throwable::class,
+            $throwable->getMessage(),
+            $throwable->getFile(),
+            $throwable->getLine(),
+            $throwable->getTraceAsString()
+        );
+
+        $data = $renderer->renderVerbose($throwable);
+        $this->assertSame($expectedContent, (string) $data);
+        $this->assertSame($expectedContent, PlainTextRenderer::throwableToString($throwable));
     }
 }
