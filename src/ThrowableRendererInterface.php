@@ -12,6 +12,9 @@ use Throwable;
  */
 interface ThrowableRendererInterface
 {
+    /**
+     * @psalm-suppress MissingClassConstType After raise PHP version this constant will be final.
+     */
     public const DEFAULT_ERROR_MESSAGE = 'An internal server error occurred.';
 
     /**
