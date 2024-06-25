@@ -3,12 +3,6 @@ html,
 body,
 div,
 span,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
 p,
 pre,
 a,
@@ -344,13 +338,13 @@ header .previous h3 {
     height: 150px;
 }
 
-#copy-stacktrace {
+.copy-clipboard {
     position: absolute;
     right: 40px;
     top: 44px;
 }
 
-#copy-stacktrace:hover svg path {
+.copy-clipboard:hover svg path {
     fill: var(--icon-hover-color);
 }
 
@@ -389,6 +383,10 @@ main {
 
 .flex-1 {
     flex: 1;
+}
+
+.mw-100 {
+    max-width: 100%;
 }
 
 /* call stack */
@@ -468,6 +466,9 @@ main {
 
 .call-stack ul li .element-wrap .function-info {
     display: inline-block;
+    line-break: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .call-stack ul li.application .element-wrap {
@@ -565,11 +566,14 @@ main {
 
 /* request */
 .request {
-    padding: 20px 30px;
+    position: relative;
     font-size: 14px;
     line-height: 18px;
     overflow-x: auto;
     font-family: JetBrains Mono, Consolas, monospace;
+}
+.request .body {
+    overflow: auto;
 }
 /* end request */
 
