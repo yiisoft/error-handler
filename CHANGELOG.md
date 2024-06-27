@@ -2,6 +2,7 @@
 
 ## 3.2.2 under development
 
+- Enh #113: Simplify error log (@xepozz)
 - Enh #112: Add copy cURL button, sort request headers, fix UI (@xepozz)
 
 ## 3.2.1 March 07, 2024
