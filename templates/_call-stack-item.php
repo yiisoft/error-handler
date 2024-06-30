@@ -68,7 +68,6 @@ HTML;
         <?php
         if ($function !== null) {
             echo '<table class="table w-100">';
-            $isList = array_is_list($args);
             foreach ($args as $key => $argument) {
                 echo '<tr class="argument">';
                 $key = is_int($key) && isset($reflectionParameters[$key]) ? $reflectionParameters[$key]->getName() : $key;
