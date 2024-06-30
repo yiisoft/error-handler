@@ -255,8 +255,6 @@ $exceptionMessage = $throwable->getMessage();
             // toggle code block visibility
             stackItem.querySelector('.show-arguments-toggle')?.addEventListener('click', function (e) {
                 e.stopPropagation()
-                console.log('click')
-                // function-arguments-wrap
 
                 stackItem.getElementsByClassName('function-arguments-wrap')[0].classList.toggle('hidden')
             });
@@ -266,8 +264,8 @@ $exceptionMessage = $throwable->getMessage();
             arguments?.addEventListener('select', function (e) {
                 e.stopPropagation()
                 e.stopImmediatePropagation()
-
             })
+
             arguments?.addEventListener('click', function (e) {
                 e.stopPropagation()
                 // stop click event on selecting text
