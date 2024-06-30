@@ -40,6 +40,15 @@ ul {
     --page-text-color: #505050;
     --icon-color: #505050;
     --icon-hover-color: #000;
+    --table-line-even-bg: #fff;
+    --table-line-even-color: #141414;
+    --table-line-odd-bg: #eee;
+    --table-line-odd-color: #141414;
+    --table-line-hover: #ccc;
+    --button-bg: #eee;
+    --button-color: #000;
+    --button-bg-hover: #d4d4d4;
+    --button-color-hover: #333;
 }
 
 .table {
@@ -53,11 +62,19 @@ ul {
 }
 
 .table tr:nth-child(odd) {
-    background-color: #ededed;
+    border-color: var(--table-line-odd-bg);
+    background-color: var(--table-line-odd-bg);
+    color: var(--table-line-odd-color);
+}
+
+.table tr:nth-child(even) {
+    border-color: var(--table-line-even-bg);
+    background-color: var(--table-line-even-bg);
+    color: var(--table-line-even-color);
 }
 
 .table tr:hover {
-    background-color: #ddd;
+    background-color: var(--table-line-hover);
 }
 
 .argument-type {
@@ -77,19 +94,16 @@ ul {
 button.show-arguments-toggle {
     padding: 4px;
     font-size: 14px;
-    border: 1px solid #ededed;
-    /*background: transparent;*/
-    background: #ededed;
-}
-
-button.show-arguments-toggle:focus,button.show-arguments-toggle:active {
-    background: transparent;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    background: var(--button-bg);
+    color: var(--button-color)
 }
 
 button.show-arguments-toggle:hover {
-    color: var(--link-hover-color);
-    background: var(--hover-line-bg-color);
-    background: #ddd;
+    border-color: var(--button-bg-hover);
+    background: var(--button-bg-hover);
+    color: var(--button-color-hover);
 }
 
 header {
@@ -750,10 +764,21 @@ main {
 /* start dark-theme */
 
 .dark-theme {
-    --page-bg-color: rgba(46,46,46, 0.9);
+    --page-bg-color: rgba(46, 46, 46, 0.9);
     --page-text-color: #fff;
     --icon-color: #989898;
     --icon-hover-color: #fff;
+
+    --table-line-even-bg: #555;
+    --table-line-even-color: #eee;
+    --table-line-odd-bg: #999;
+    --table-line-odd-color: #eee;
+    --table-line-hover: #141414;
+
+    --button-bg: #666;
+    --button-color: #fff;
+    --button-bg-hover: #aaa;
+    --button-color-hover: #333;
 }
 
 .dark-theme header {
