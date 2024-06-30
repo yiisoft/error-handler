@@ -263,11 +263,13 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $class = !empty($trace[$i]['class']) ? $trace[$i]['class'] : null;
             $args = !empty($trace[$i]['args']) ? $trace[$i]['args'] : [];
 
+            $parameters = [];
             $function = null;
             if (!empty($trace[$i]['function']) && $trace[$i]['function'] !== 'unknown') {
                 $function = $trace[$i]['function'];
-                $reflection = new \ReflectionMethod($class, $function);
-                $parameters = $reflection->getParameters();
+                if ($class !== null) {
+                    $parameters = (new \ReflectionMethod($class, $function))->getParameters();
+                }
             }
             $index = $i + 2;
 
