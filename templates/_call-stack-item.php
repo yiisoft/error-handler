@@ -72,7 +72,7 @@ HTML;
                 echo '<tr class="argument">';
                 $key = is_int($key) && isset($reflectionParameters[$key]) ? $reflectionParameters[$key]->getName() : $key;
                 echo '<td>';
-                echo '<span class="argument-key bold">$' . $key . '</span>';
+                echo '<span class="argument-key bold">$' . $this->htmlEncode($key) . '</span>';
                 echo '</td>';
                 echo '<td>';
                 echo '<span class="argument-value word-break">';
