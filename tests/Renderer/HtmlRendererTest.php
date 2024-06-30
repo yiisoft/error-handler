@@ -149,7 +149,7 @@ final class HtmlRendererTest extends TestCase
         $output = $renderer->renderRequest($this->createServerRequestMock());
 
         $this->assertSame(
-            "<pre class=\"codeBlock language-text\">GET https:/example.com\nAccept: text/html</pre>",
+            "GET https:/example.com\nAccept: text/html\n",
             $output
         );
     }

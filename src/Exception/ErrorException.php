@@ -14,11 +14,13 @@ use function function_exists;
 
 /**
  * `ErrorException` represents a PHP error.
- *
  * @psalm-type DebugBacktraceType = list<array{args?:list<mixed>,class?:class-string,file?:string,function:string,line?:int,object?:object,type?:string}>
  */
 class ErrorException extends \ErrorException implements FriendlyExceptionInterface
 {
+    /**
+     * @psalm-suppress MissingClassConstType Private constants never change.
+     */
     private const ERROR_NAMES = [
         E_ERROR => 'PHP Fatal Error',
         E_WARNING => 'PHP Warning',
@@ -37,9 +39,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         E_USER_DEPRECATED => 'PHP User Deprecated Warning',
     ];
 
-    /**
-     * @psalm-param DebugBacktraceType $backtrace
-     */
+    /** @psalm-param DebugBacktraceType $backtrace */
     public function __construct(string $message = '', int $code = 0, int $severity = 1, string $filename = __FILE__, int $line = __LINE__, Exception $previous = null, private array $backtrace = [])
     {
         parent::__construct($message, $code, $severity, $filename, $line, $previous);
