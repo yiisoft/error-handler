@@ -35,7 +35,7 @@ HTML;
                 <span class="function-info">
                     <?php
                     echo $file === null ? "{$index}." : '&mdash;&nbsp;';
-                    $function = $class === null ? $function : "$class::$function";
+                    $function = $class === null ? $function : "{$this->wrapAnonymous($class)}::$function";
 
                     echo '<span class="function">' . $this->htmlEncode($function) . '</span>';
                     echo '<span class="arguments">(';
