@@ -42,6 +42,56 @@ ul {
     --icon-hover-color: #000;
 }
 
+.table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table td, .table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.table tr:nth-child(odd) {
+    background-color: #ededed;
+}
+
+.table tr:hover {
+    background-color: #ddd;
+}
+
+.argument-type {
+    padding-left: 4px;
+    opacity: 0.5;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    display: none;
+}
+
+.argument:hover .argument-type {
+    display: inline;
+}
+
+button.show-arguments-toggle {
+    padding: 4px;
+    font-size: 14px;
+    border: 1px solid #ededed;
+    /*background: transparent;*/
+    background: #ededed;
+}
+
+button.show-arguments-toggle:focus,button.show-arguments-toggle:active {
+    background: transparent;
+}
+
+button.show-arguments-toggle:hover {
+    color: var(--link-hover-color);
+    background: var(--hover-line-bg-color);
+    background: #ddd;
+}
+
 header {
     --header-bg-color: #ededed;
     --previous-text-color: inherit;
@@ -381,12 +431,33 @@ main {
     display: none;
 }
 
+.flex {
+    display: flex;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
 .flex-1 {
     flex: 1;
 }
 
 .mw-100 {
     max-width: 100%;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.word-break {
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* call stack */
@@ -467,8 +538,6 @@ main {
 .call-stack ul li .element-wrap .function-info {
     display: inline-block;
     line-break: normal;
-    overflow-wrap: break-word;
-    word-break: break-word;
 }
 
 .call-stack ul li.application .element-wrap {

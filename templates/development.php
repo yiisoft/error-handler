@@ -193,11 +193,11 @@ $exceptionMessage = $throwable->getMessage();
         const callStackItems = document.getElementsByClassName('call-stack-item');
 
         // If there are grouped vendor package files
-        var vendorCollapse = document.getElementsByClassName('call-stack-vendor-collapse');
-        for (var i = 0, imax = vendorCollapse.length; i < imax; ++i) {
+        const vendorCollapse = document.getElementsByClassName('call-stack-vendor-collapse');
+        for (let i = 0, imax = vendorCollapse.length; i < imax; ++i) {
             vendorCollapse[i].addEventListener('click', function (event) {
-                var vendorCollapseState = this.getElementsByClassName('call-stack-vendor-state')[0];
-                var vendorCollapseItems = this.parentElement.getElementsByClassName('call-stack-vendor-items')[0];
+                const vendorCollapseState = this.getElementsByClassName('call-stack-vendor-state')[0];
+                const vendorCollapseItems = this.parentElement.getElementsByClassName('call-stack-vendor-items')[0];
 
                 if (vendorCollapseItems.style.display === 'block') {
                     vendorCollapseItems.style.display = 'none';
@@ -216,21 +216,21 @@ $exceptionMessage = $throwable->getMessage();
         hljs.listLanguages().forEach(function(language) {
             hljs.getLanguage(language).disableAutodetect = true;
         });
-        for (var i = 0, imax = codeBlocks.length; i < imax; ++i) {
+        for (let i = 0, imax = codeBlocks.length; i < imax; ++i) {
             hljs.highlightElement(codeBlocks[i]);
         }
 
-        var refreshCallStackItemCode = function(callStackItem) {
+        const refreshCallStackItemCode = function(callStackItem) {
             if (!callStackItem.getElementsByTagName('pre')[0]) {
                 return;
             }
-            var top = callStackItem.getElementsByClassName('code-wrap')[0].offsetTop - window.pageYOffset + 3,
+            const top = callStackItem.getElementsByClassName('code-wrap')[0].offsetTop - window.pageYOffset + 3,
                 lines = callStackItem.getElementsByTagName('pre')[0].getClientRects(),
                 lineNumbers = callStackItem.getElementsByClassName('lines-item'),
                 errorLine = callStackItem.getElementsByClassName('error-line')[0],
                 hoverLines = callStackItem.getElementsByClassName('hover-line');
 
-            for (var i = 0, imax = lines.length; i < imax; ++i) {
+            for (let i = 0, imax = lines.length; i < imax; ++i) {
                 if (!lineNumbers[i]) {
                     continue;
                 }
@@ -240,7 +240,7 @@ $exceptionMessage = $throwable->getMessage();
                 hoverLines[i].style.height = parseInt(lines[i].bottom - lines[i].top + 6) + 'px';
                 hoverLines[i].style.width = hoverLines[i].parentElement.parentElement.scrollWidth + 'px'
 
-                if (parseInt(callStackItem.getAttribute('data-line')) == i) {
+                if (parseInt(callStackItem.getAttribute('data-line')) === i) {
                     errorLine.style.top = parseInt(lines[i].top - top) + 'px';
                     errorLine.style.height = parseInt(lines[i].bottom - lines[i].top + 6) + 'px';
                     errorLine.style.width = errorLine.parentElement.parentElement.scrollWidth + 'px';
