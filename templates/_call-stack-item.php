@@ -34,7 +34,7 @@ HTML;
             <?php if ($function !== null): ?>
                 <span class="function-info">
                     <?php
-                    echo $file === null ? "{$index}." : '&ndash;';
+                    echo $file === null ? "{$index}." : '&mdash;&nbsp;';
                     $function = $class === null ? $function : "$class::$function";
 
                     echo '<span class="function">' . $this->htmlEncode($function) . '</span>';
