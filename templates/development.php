@@ -254,30 +254,29 @@ $exceptionMessage = $throwable->getMessage();
 
             // toggle code block visibility
             stackItem.querySelector('.show-arguments-toggle')?.addEventListener('click', function (e) {
-                e.stopPropagation()
-
-                stackItem.getElementsByClassName('function-arguments-wrap')[0].classList.toggle('hidden')
+                e.stopPropagation();
+                stackItem.getElementsByClassName('function-arguments-wrap')[0].classList.toggle('hidden');
             });
 
             // toggle code block visibility
             const arguments = stackItem.querySelector('.arguments');
             arguments?.addEventListener('select', function (e) {
-                e.stopPropagation()
-                e.stopImmediatePropagation()
+                e.stopPropagation();
+                e.stopImmediatePropagation();
             })
 
             arguments?.addEventListener('click', function (e) {
-                e.stopPropagation()
+                e.stopPropagation();
                 // stop click event on selecting text
                 if (document.getSelection()?.type === 'Range') {
-                    return
+                    return;
                 }
 
                 const fullArguments = stackItem.querySelector('.full-arguments');
                 const shortArguments = stackItem.querySelector('.short-arguments');
                 if (fullArguments) {
-                    fullArguments.classList.toggle('hidden')
-                    shortArguments.classList.toggle('hidden')
+                    fullArguments.classList.toggle('hidden');
+                    shortArguments.classList.toggle('hidden');
                 }
             });
 
@@ -288,7 +287,7 @@ $exceptionMessage = $throwable->getMessage();
                 }
                 // stop click event on selecting text
                 if (document.getSelection()?.type === 'Range') {
-                    return
+                    return;
                 }
 
                 var callStackItem = this.parentNode,
