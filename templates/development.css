@@ -201,13 +201,16 @@ header .exception-card {
     word-break: break-word;
 }
 
-header .exception-class {
-    padding-right: 114px;
+header .exception-card-heading {
+    justify-content: space-between;
     margin-bottom: 30px;
+    color: var(--exception-class-friendly-text-color);
+}
+
+header .exception-card-heading .exception-class {
     font-weight: 500;
     font-size: 36px;
     line-height: 42px;
-    color: var(--exception-class-friendly-text-color);
 }
 
 header .exception-class a {
@@ -402,11 +405,11 @@ header .previous h3 {
     height: 150px;
 }
 
-.copy-clipboard {
-    position: absolute;
-    right: 40px;
-    top: 44px;
-}
+/*.copy-clipboard {*/
+/*    position: absolute;*/
+/*    right: 40px;*/
+/*    top: 44px;*/
+/*}*/
 
 .copy-clipboard:hover svg path {
     fill: var(--icon-hover-color);
@@ -455,6 +458,10 @@ main {
 
 .flex-1 {
     flex: 1;
+}
+
+.items-center {
+    align-items: center;
 }
 
 .mw-100 {
