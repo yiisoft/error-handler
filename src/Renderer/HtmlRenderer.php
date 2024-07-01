@@ -332,7 +332,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             }
 
             if (is_object($value)) {
-                $args[$key] = '<span class="title">' . $this->htmlEncode($this->wrapAnonymous($value::class)) . '</span>';
+                $args[$key] = '<span class="title">' . $this->htmlEncode($this->removeAnonymous($value::class)) . '</span>';
             } elseif (is_bool($value)) {
                 $args[$key] = '<span class="keyword">' . ($value ? 'true' : 'false') . '</span>';
             } elseif (is_string($value)) {
@@ -655,7 +655,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         return $this->vendorPaths;
     }
 
-    public function wrapAnonymous(string $value): string
+    public function removeAnonymous(string $value): string
     {
         $anonymousPosition = strpos($value, '@anonymous');
 

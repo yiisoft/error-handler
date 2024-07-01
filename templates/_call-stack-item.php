@@ -43,7 +43,7 @@ HTML;
                 <span class="function-info word-break">
                     <?php
                     echo $file === null ? "{$index}." : '&mdash;&nbsp;';
-                    $function = $class === null ? $function : "{$this->wrapAnonymous($class)}::$function";
+                    $function = $class === null ? $function : "{$this->removeAnonymous($class)}::$function";
 
                     echo '<span class="function">' . $this->htmlEncode($function) . '</span>';
                     echo '<span class="arguments">(';
