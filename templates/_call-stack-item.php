@@ -33,9 +33,16 @@ HTML;
 
             <?php if ($function !== null): ?>
                 <span class="function-info">
-                    <?= $file === null ? "{$index}." : '&ndash;' ?>
-                    <?php $function = $class === null ? $function : "$class::$function" ?>
-                    <?= "{$this->htmlEncode($function)}({$this->argumentsToString($args)})" ?>
+                    <?php
+                    echo $file === null ? "{$index}." : '&mdash;&nbsp;';
+                    $function = $class === null ? $function : "$class::$function";
+
+                    echo '<span class="function">' . $this->htmlEncode($function) . '</span>';
+                    echo '<span class="arguments">(';
+                    echo '<span class="short-arguments">' . $this->argumentsToString($args, true) . '</span>';
+                    echo '<span class="full-arguments hidden">' . $this->argumentsToString($args, false) . '</span>';
+                    echo ')</span>';
+                    ?>
                 </span>
             <?php endif ?>
         </div>

@@ -377,6 +377,10 @@ main {
     }
 }
 
+.hidden {
+    display: none;
+}
+
 .flex-1 {
     flex: 1;
 }
@@ -451,8 +455,12 @@ main {
     color: var(--element-wrap-text-color);
 }
 
-.call-stack ul li .element-wrap:hover .file-name,
+.call-stack ul li .element-wrap .file-name:hover,
 .call-stack ul li .element-code-wrap .code-wrap .lines-item:hover {
+    color: var(--element-wrap-hover-text-color);
+}
+
+.call-stack ul li .arguments:hover {
     color: var(--element-wrap-hover-text-color);
 }
 
