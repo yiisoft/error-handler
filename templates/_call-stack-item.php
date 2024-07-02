@@ -1,15 +1,23 @@
 <?php
-/* @var $file string|null */
-/* @var $line int|null */
-/* @var $class string|null */
-/* @var $function string|null */
-/* @var $index int */
-/* @var $lines string[] */
-/* @var $begin int */
-/* @var $end int */
-/* @var $args array */
-/* @var $isVendorFile bool */
-/* @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer */
+
+use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
+
+/**
+ * @var $file string|null
+ * @var $line int|null
+ * @var $class string|null
+ * @var $function string|null
+ * @var $index int
+ * @var $lines string[]
+ * @var $begin int
+ * @var $end int
+ * @var $args array
+ * @var $isVendorFile bool
+ * @var $reflectionParameters ReflectionMethod[]
+ * @var $this HtmlRenderer
+ */
+
+
 $icon = <<<HTML
 <svg class="external-link" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <title>Open the target page</title>
@@ -32,7 +40,7 @@ HTML;
             <?php endif ?>
 
             <?php if ($function !== null): ?>
-                <span class="function-info">
+                <span class="function-info word-break">
                     <?php
                     echo $file === null ? "{$index}." : '&mdash;&nbsp;';
                     $function = $class === null ? $function : "{$this->removeAnonymous($class)}::$function";
@@ -48,8 +56,37 @@ HTML;
         </div>
 
         <?php if ($line !== null): ?>
-            <div><?= sprintf('at line %d', $line + 1) ?></div>
+            <div class="flex flex-column">
+                <?= sprintf('at line %d', $line + 1) ?>
+                <?php if (!empty($args)): ?>
+                    <button class="show-arguments-toggle">arguments</button>
+                <?php endif ?>
+            </div>
         <?php endif ?>
+    </div>
+    <div class="function-arguments-wrap hidden">
+        <?php
+        if ($function !== null) {
+            echo '<table class="table w-100">';
+            foreach ($args as $key => $argument) {
+                echo '<tr class="argument">';
+                $key = is_int($key) && isset($reflectionParameters[$key]) ? $reflectionParameters[$key]->getName() : $key;
+                echo '<td>';
+                echo '<span class="argument-key bold">$' . $this->htmlEncode($key) . '</span>';
+                echo '</td>';
+                echo '<td>';
+                echo '<span class="argument-value word-break">';
+                echo $this->argumentsToString(is_array($argument) ? $argument : [$argument]);
+                echo '</span>';
+                echo '<span class="argument-type">';
+                echo gettype($argument);
+                echo '</span>';
+                echo '</td>';
+                echo '</tr>';
+            }
+            echo '</table>';
+        }
+        ?>
     </div>
     <?php if (!empty($lines)): ?>
         <div class="element-code-wrap">

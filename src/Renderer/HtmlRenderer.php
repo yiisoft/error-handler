@@ -245,7 +245,16 @@ final class HtmlRenderer implements ThrowableRendererInterface
     public function renderCallStack(Throwable $t, array $trace = []): string
     {
         $application = $vendor = [];
-        $application[1] = $this->renderCallStackItem($t->getFile(), $t->getLine(), null, null, [], 1, false);
+        $application[1] = $this->renderCallStackItem(
+            $t->getFile(),
+            $t->getLine(),
+            null,
+            null,
+            [],
+            1,
+            false,
+            [],
+        );
 
         $length = count($trace);
         for ($i = 0; $i < $length; ++$i) {
@@ -254,18 +263,39 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $class = !empty($trace[$i]['class']) ? $trace[$i]['class'] : null;
             $args = !empty($trace[$i]['args']) ? $trace[$i]['args'] : [];
 
+            $parameters = [];
             $function = null;
             if (!empty($trace[$i]['function']) && $trace[$i]['function'] !== 'unknown') {
                 $function = $trace[$i]['function'];
+                if ($class !== null) {
+                    $parameters = (new \ReflectionMethod($class, $function))->getParameters();
+                }
             }
             $index = $i + 2;
 
-            if ($isVendor = $this->isVendorFile($file)) {
-                $vendor[$index] = $this->renderCallStackItem($file, $line, $class, $function, $args, $index, $isVendor);
-                continue;
+            if ($this->isVendorFile($file)) {
+                $vendor[$index] = $this->renderCallStackItem(
+                    $file,
+                    $line,
+                    $class,
+                    $function,
+                    $args,
+                    $index,
+                    true,
+                    $parameters,
+                );
+            } else {
+                $application[$index] = $this->renderCallStackItem(
+                    $file,
+                    $line,
+                    $class,
+                    $function,
+                    $args,
+                    $index,
+                    false,
+                    $parameters,
+                );
             }
-
-            $application[$index] = $this->renderCallStackItem($file, $line, $class, $function, $args, $index, $isVendor);
         }
 
         return $this->renderTemplate($this->defaultTemplatePath . '/_call-stack-items.php', [
@@ -302,7 +332,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             }
 
             if (is_object($value)) {
-                $args[$key] = '<span class="title">' . $this->htmlEncode($this->removeAnonymous($value::class)) . '</span>';
+                $args[$key] = '<span class="title">' . $this->htmlEncode($this->removeAnonymous($value::class) . '#' . spl_object_id($value)) . '</span>';
             } elseif (is_bool($value)) {
                 $args[$key] = '<span class="keyword">' . ($value ? 'true' : 'false') . '</span>';
             } elseif (is_string($value)) {
@@ -498,7 +528,8 @@ final class HtmlRenderer implements ThrowableRendererInterface
         ?string $function,
         array $args,
         int $index,
-        bool $isVendorFile
+        bool $isVendorFile,
+        array $reflectionParameters,
     ): string {
         $lines = [];
         $begin = $end = 0;
@@ -525,6 +556,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             'end' => $end,
             'args' => $args,
             'isVendorFile' => $isVendorFile,
+            'reflectionParameters' => $reflectionParameters,
         ]);
     }
 

@@ -140,6 +140,7 @@ final class HtmlRendererTest extends TestCase
             'args' => [],
             'index' => 1,
             'isVendorFile' => false,
+            'reflectionParameters' => [],
         ]));
     }
 
