@@ -253,9 +253,9 @@ $exceptionMessage = $throwable->getMessage();
             refreshCallStackItemCode(stackItem);
 
             // toggle code block visibility
-            stackItem.querySelector('.show-arguments-toggle')?.addEventListener('click', function (e) {
+            stackItem.querySelector('.toggleFunctionArguments')?.addEventListener('click', function (e) {
                 e.stopPropagation();
-                stackItem.getElementsByClassName('function-arguments-wrap')[0].classList.toggle('hidden');
+                stackItem.getElementsByClassName('functionArguments')[0].classList.toggle('hidden');
             });
 
             // toggle code block visibility
@@ -295,14 +295,6 @@ $exceptionMessage = $throwable->getMessage();
 
                 if (typeof code !== 'undefined') {
                     code.style.display = window.getComputedStyle(code).display === 'block' ? 'none' : 'block';
-                    if (code.style.display === 'block') {
-                        this.style.borderBottom = document.body.classList.contains('dark-theme')
-                            ? '1px solid #141414'
-                            : '1px solid #d0d0d0'
-                        ;
-                    } else {
-                        this.style.borderBottom = 'none';
-                    }
                     refreshCallStackItemCode(callStackItem);
                 }
             });
