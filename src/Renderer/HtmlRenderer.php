@@ -332,7 +332,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             }
 
             if (is_object($value)) {
-                $args[$key] = '<span class="title">' . $this->htmlEncode($this->removeAnonymous($value::class)) . '</span>';
+                $args[$key] = '<span class="title">' . $this->htmlEncode($this->removeAnonymous($value::class) . '#' . spl_object_id($value)) . '</span>';
             } elseif (is_bool($value)) {
                 $args[$key] = '<span class="keyword">' . ($value ? 'true' : 'false') . '</span>';
             } elseif (is_string($value)) {
