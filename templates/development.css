@@ -34,10 +34,12 @@ ul {
 }
 /* end reset */
 
+
 /* light theme */
 :root {
     --page-bg-color: #fff;
     --page-text-color: #505050;
+    --page-text-muted-color: #888;
     --icon-color: #505050;
     --icon-hover-color: #000;
     --table-line-even-bg: #fff;
@@ -45,9 +47,9 @@ ul {
     --table-line-odd-bg: #eee;
     --table-line-odd-color: #141414;
     --table-line-hover: #ccc;
-    --button-bg: #eee;
-    --button-color: #000;
-    --button-bg-hover: #d4d4d4;
+    --button-bg: #e3e5e7;
+    --button-color: #333;
+    --button-bg-hover: #c4c7cb;
     --button-color-hover: #333;
 }
 
@@ -77,33 +79,63 @@ ul {
     background-color: var(--table-line-hover);
 }
 
-.argument-type {
-    padding-left: 4px;
-    opacity: 0.5;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    display: none;
-}
 
-.argument:hover .argument-type {
-    display: inline;
-}
-
-button.show-arguments-toggle {
-    padding: 4px;
+.button {
+    padding: 4px 8px;
     font-size: 14px;
     box-sizing: border-box;
-    border: 1px solid #ddd;
+    border: 0;
     background: var(--button-bg);
-    color: var(--button-color)
+    color: var(--button-color);
+    border-radius: 6px;
+    cursor: pointer;
 }
-
-button.show-arguments-toggle:hover {
-    border-color: var(--button-bg-hover);
+.button:hover {
     background: var(--button-bg-hover);
     color: var(--button-color-hover);
+}
+
+.functionArguments {
+    padding: 20px 0;
+    border-top: 1px solid var(--element-wrap-border-color);
+    --function-arguments-bg: #f8f8f8;
+    --function-arguments-border-color: #e3e3e3;
+}
+.dark-theme .functionArguments {
+    --function-arguments-bg: #303030;
+    --function-arguments-border-color: #272727;
+}
+.functionArguments_title {
+    padding: 0 30px 12px;
+    color: var(--page-text-muted-color);
+}
+.functionArguments table {
+    padding: 4px 0;
+    width: 100%;
+    background: var(--function-arguments-bg);
+    border-collapse: collapse;
+}
+.functionArguments td {
+    padding: 12px 8px;
+    border-top: 1px solid var(--function-arguments-border-color);
+}
+.functionArguments tr:first-child td {
+    border-top: 0;
+}
+.functionArguments_key {
+    padding-left: 30px !important;
+    white-space: nowrap;
+}
+.functionArguments_type {
+    color: var(--page-text-muted-color);
+    white-space: nowrap;
+}
+.functionArguments_value {
+    width: 100%;
+    padding-right: 30px !important;
+}
+.toggleFunctionArguments {
+    margin-top: 4px;
 }
 
 header {
@@ -554,10 +586,6 @@ main {
     line-break: normal;
 }
 
-.call-stack ul li.application .element-wrap {
-    border-bottom: 1px solid var(--element-wrap-border-color);
-}
-
 .call-stack ul li a {
     color: var(--link-color);
 }
@@ -579,6 +607,7 @@ main {
 }
 
 .call-stack ul li .element-code-wrap {
+    border-top: 1px solid var(--element-wrap-border-color);
     overflow-x: auto;
 }
 
@@ -766,6 +795,7 @@ main {
 .dark-theme {
     --page-bg-color: rgba(46, 46, 46, 0.9);
     --page-text-color: #fff;
+    --page-text-muted-color: #aaa;
     --icon-color: #989898;
     --icon-hover-color: #fff;
 
@@ -775,10 +805,10 @@ main {
     --table-line-odd-color: #eee;
     --table-line-hover: #141414;
 
-    --button-bg: #666;
+    --button-bg: #6c757d;
     --button-color: #fff;
-    --button-bg-hover: #aaa;
-    --button-color-hover: #333;
+    --button-bg-hover: #5c636a;
+    --button-color-hover: #fff;
 }
 
 .dark-theme header {
