@@ -41,6 +41,8 @@ use function trim;
  */
 final class ErrorCatcher implements MiddlewareInterface
 {
+    public const REQUEST_ATTRIBUTE_NAME_TIMER = self::class . 'timer';
+
     private HeadersProvider $headersProvider;
 
     /**
@@ -129,6 +131,7 @@ final class ErrorCatcher implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $startTime = microtime(true);
         try {
             return $handler->handle($request);
         } catch (Throwable $t) {
@@ -137,7 +140,13 @@ final class ErrorCatcher implements MiddlewareInterface
             } catch (Throwable $e) {
                 $t = new CompositeException($e, $t);
             }
-            return $this->generateErrorResponse($t, $request);
+            return $this->generateErrorResponse(
+                $t,
+                $request->withAttribute(
+                    self::REQUEST_ATTRIBUTE_NAME_TIMER,
+                    microtime(true) - $startTime,
+                ),
+            );
         }
     }
 
