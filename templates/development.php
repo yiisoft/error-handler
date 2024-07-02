@@ -1,13 +1,16 @@
 <?php
 
+use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
+use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
+use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
 /**
- * @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer
- * @var $request \Psr\Http\Message\ServerRequestInterface|null
- * @var $throwable \Throwable
+ * @var $this HtmlRenderer
+ * @var $request ServerRequestInterface|null
+ * @var $throwable Throwable
  */
 
 $theme = $_COOKIE['yii-exception-theme'] ?? '';
@@ -37,6 +40,12 @@ function formatSeconds(float $time): string
     $seconds = $time-$hours*60*60-$minutes*60;
     return number_format((float)$seconds, 4, '.', '') . ' sec';
 }
+$copyIcon = <<<HTML
+<svg width="26" height="30" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.9998.333344H3.33317C1.8665.333344.666504 1.53334.666504 3.00001V20.3333c0 .7334.599996 1.3334 1.333336 1.3334.73333 0 1.33333-.6 1.33333-1.3334V4.33334c0-.73333.6-1.33333 1.33333-1.33333h13.3333c.7334 0 1.3334-.6 1.3334-1.33333 0-.733337-.6-1.333336-1.3334-1.333336zm5.3334 5.333336H8.6665c-1.46666 0-2.66666 1.2-2.66666 2.66666V27c0 1.4667 1.2 2.6667 2.66666 2.6667h14.6667c1.4666 0 2.6666-1.2 2.6666-2.6667V8.33334c0-1.46666-1.2-2.66666-2.6666-2.66666zM21.9998 27H9.99984c-.73333 0-1.33334-.6-1.33334-1.3333V9.66668c0-.73334.60001-1.33334 1.33334-1.33334H21.9998c.7334 0 1.3334.6 1.3334 1.33334V25.6667c0 .7333-.6 1.3333-1.3334 1.3333z"/>
+</svg>
+HTML;
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -92,20 +101,22 @@ function formatSeconds(float $time): string
                 <?php endif ?>
             </div>
             <div class="flex items-center">
-                <span>
-                    <?= formatSeconds($request->getAttribute(\Yiisoft\ErrorHandler\Middleware\ErrorCatcher::REQUEST_ATTRIBUTE_NAME_TIMER)) ?>
-                </span>
-                <span>
-                    <?= formatBytes(memory_get_peak_usage(true), 2) ?>
-                </span>
+                <div class="flex badges w-100">
+                    <div class="flex items-center">
+                        <span class="badge">
+                            <?= formatSeconds($request->getAttribute(ErrorCatcher::REQUEST_ATTRIBUTE_NAME_TIMER)) ?>
+                        </span>
+                        <span class="badge">
+                            <?= formatBytes(memory_get_peak_usage(true), 2) ?>
+                        </span>
+                    </div>
+                </div>
                 <a href="#"
                    class="copy-clipboard"
-                   data-clipboard="<?= $this->htmlEncode($throwable) ?>"
+                   data-target="clipboard-exception"
                    title="Copy the stacktrace for use in a bug report or pastebin"
                 >
-                    <svg width="26" height="30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.9998.333344H3.33317C1.8665.333344.666504 1.53334.666504 3.00001V20.3333c0 .7334.599996 1.3334 1.333336 1.3334.73333 0 1.33333-.6 1.33333-1.3334V4.33334c0-.73333.6-1.33333 1.33333-1.33333h13.3333c.7334 0 1.3334-.6 1.3334-1.33333 0-.733337-.6-1.333336-1.3334-1.333336zm5.3334 5.333336H8.6665c-1.46666 0-2.66666 1.2-2.66666 2.66666V27c0 1.4667 1.2 2.6667 2.66666 2.6667h14.6667c1.4666 0 2.6666-1.2 2.6666-2.6667V8.33334c0-1.46666-1.2-2.66666-2.6666-2.66666zM21.9998 27H9.99984c-.73333 0-1.33334-.6-1.33334-1.3333V9.66668c0-.73334.60001-1.33334 1.33334-1.33334H21.9998c.7334 0 1.3334.6 1.3334 1.33334V25.6667c0 .7333-.6 1.3333-1.3334 1.3333z" fill="#787878"/>
-                    </svg>
+                    <?= $copyIcon ?>
                 </a>
             </div>
         </div>
@@ -120,10 +131,9 @@ function formatSeconds(float $time): string
 
         <?= $this->renderPreviousExceptions($originalException) ?>
 
-        <textarea id="clipboard"><?= $this->htmlEncode($throwable) ?></textarea>
-        <span id="copied">Copied!</span>
-
+        <textarea id="clipboard-exception" class="clipboard-content"><?= $this->htmlEncode($throwable) ?></textarea>
     </div>
+
 </header>
 
 <main>
@@ -145,19 +155,17 @@ function formatSeconds(float $time): string
     <?php endif ?>
     <?php if ($request && ($curlInfo = $this->renderCurl($request)) !== 'curl'): ?>
         <div class="request">
-            <textarea id="clipboard"><?= $curlInfo ?></textarea>
-            <span id="copied" style="top: 10px">Copied!</span>
-            <h2>cURL</h2>
-            <a href="#"
-               class="copy-clipboard"
-               data-clipboard="<?= $curlInfo ?>"
-               title="Copy the cURL"
-               style="right: 10px; top: 5px"
-            >
-                <svg width="26" height="30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17.9998.333344H3.33317C1.8665.333344.666504 1.53334.666504 3.00001V20.3333c0 .7334.599996 1.3334 1.333336 1.3334.73333 0 1.33333-.6 1.33333-1.3334V4.33334c0-.73333.6-1.33333 1.33333-1.33333h13.3333c.7334 0 1.3334-.6 1.3334-1.33333 0-.733337-.6-1.333336-1.3334-1.333336zm5.3334 5.333336H8.6665c-1.46666 0-2.66666 1.2-2.66666 2.66666V27c0 1.4667 1.2 2.6667 2.66666 2.6667h14.6667c1.4666 0 2.6666-1.2 2.6666-2.6667V8.33334c0-1.46666-1.2-2.66666-2.6666-2.66666zM21.9998 27H9.99984c-.73333 0-1.33334-.6-1.33334-1.3333V9.66668c0-.73334.60001-1.33334 1.33334-1.33334H21.9998c.7334 0 1.3334.6 1.3334 1.33334V25.6667c0 .7333-.6 1.3333-1.3334 1.3333z" fill="#787878"/>
-                </svg>
-            </a>
+            <textarea id="clipboard-curl" class="clipboard-content"><?= $curlInfo ?></textarea>
+            <div class="flex items-center" style="justify-content: space-between;">
+                <h2>cURL</h2>
+                <a href="#"
+                   class="copy-clipboard"
+                   data-target="clipboard-curl"
+                   title="Copy the cURL"
+                >
+                    <?= $copyIcon ?>
+                </a>
+            </div>
             <div class="body">
                 <div class="codeBlock language-sh"><?= $this->htmlEncode($curlInfo) ?></div>
             </div>
@@ -337,8 +345,8 @@ function formatSeconds(float $time): string
         // handle copy stacktrace action on clipboard button
         const copyIntoClipboard = function(e) {
             e.preventDefault();
-            const parentContainer = e.currentTarget.parentElement;
-            const textarea = parentContainer.querySelector('#clipboard');
+            const currentTarget = e.currentTarget;
+            const textarea = document.querySelector('#' + currentTarget.dataset.target);
             textarea.focus();
             textarea.select();
 
@@ -349,12 +357,8 @@ function formatSeconds(float $time): string
                 succeeded = false;
             }
             if (succeeded) {
-                const hint = parentContainer.querySelector('#copied');
-                if (!hint) {
-                    return
-                }
-                hint.style.display = 'block';
-                setTimeout(() => hint.style.display = 'none', 2000);
+                currentTarget.classList.add('copied')
+                setTimeout(() => currentTarget.classList.remove('copied'), 600);
             } else {
                 // fallback: show textarea if browser does not support copying directly
                 textarea.style.top = 0;

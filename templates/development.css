@@ -397,7 +397,7 @@ header .previous h3 {
     margin: 10px 0;
 }
 
-#clipboard {
+.clipboard-content {
     position: absolute;
     top: -500px;
     right: 300px;
@@ -405,21 +405,21 @@ header .previous h3 {
     height: 150px;
 }
 
-/*.copy-clipboard {*/
-/*    position: absolute;*/
-/*    right: 40px;*/
-/*    top: 44px;*/
-/*}*/
+.copy-clipboard svg path {
+    fill: var(--icon-color);
+}
 
 .copy-clipboard:hover svg path {
     fill: var(--icon-hover-color);
 }
 
-#copied {
-    display: none;
-    position: absolute;
-    right: 76px;
-    top: 51px;
+.copy-clipboard.copied svg path {
+    fill: green;
+}
+
+.copy-clipboard:hover svg,
+.copy-clipboard.copied svg {
+    zoom: 1.2;
 }
 
 #light-mode {
@@ -479,6 +479,23 @@ main {
 .word-break {
     overflow-wrap: break-word;
     word-break: break-word;
+}
+
+.badges {
+    display: flex;
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+    justify-content: end;
+}
+
+.badges .badge {
+    border: 1px solid var(--exception-card-border-color);
+    margin: auto 4px;
+    color: var(--exception-message-text-color);
+    padding: 4px 8px;
+    text-align: center;
+    border-radius: 5px;
 }
 
 /* call stack */
