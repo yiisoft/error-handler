@@ -8,6 +8,7 @@
 - Enh #114: Show full argument by click (@xepozz)
 - Enh #113: Simplify error log (@xepozz)
 - Enh #112: Add copy cURL button, sort request headers, fix UI (@xepozz)
+- Bug #122: Do `exit(1)` after all shutdown functions, even postponed ones (@samdark)
 
 ## 3.2.1 March 07, 2024
 

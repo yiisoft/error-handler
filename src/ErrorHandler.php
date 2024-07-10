@@ -108,7 +108,7 @@ final class ErrorHandler
 
         $this->initializeOnce();
 
-        // Handles throwable, echo output and exit.
+        // Handles throwable that isn't caught otherwise, echo output and exit.
         set_exception_handler(function (Throwable $t): void {
             if (!$this->enabled) {
                 return;
@@ -199,16 +199,21 @@ final class ErrorHandler
         if (!empty($this->workingDirectory)) {
             chdir($this->workingDirectory);
         }
-        // disable error capturing to avoid recursive errors while handling exceptions
+        // Disable error capturing to avoid recursive errors while handling exceptions.
         $this->unregister();
-        // set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent
+        // Set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent.
         http_response_code(Status::INTERNAL_SERVER_ERROR);
 
         echo $this->handle($t);
         $this->eventDispatcher?->dispatch(new ApplicationError($t));
 
         register_shutdown_function(static function (): void {
-            exit(1);
+            // Ensure exit(1) is called last after all other shutdown functions, even those added to the end.
+            register_shutdown_function(static function (): void {
+                register_shutdown_function(static function (): void {
+                    exit(1);
+                });
+            });
         });
     }
 }
