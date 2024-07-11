@@ -1,5 +1,9 @@
 # Yii Error Handler Change Log
 
+## 3.3.1 under development
+
+- no changes in this release.
+
 ## 3.3.0 July 11, 2024
 
 - Enh #112: Add copy cURL button, sort request headers, fix UI (@xepozz)
