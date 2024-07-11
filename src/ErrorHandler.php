@@ -41,10 +41,17 @@ final class ErrorHandler
     private bool $enabled = false;
     private bool $initialized = false;
 
+    /**
+     * @param LoggerInterface $logger Logger to write errors to.
+     * @param ThrowableRendererInterface $defaultRenderer Default throwable renderer.
+     * @param EventDispatcherInterface|null $eventDispatcher Event dispatcher for error events.
+     * @param int $exitShutdownHandlerDepth Depth of the exit() shutdown handler to ensure it's executed last.
+     */
     public function __construct(
         private LoggerInterface $logger,
         private ThrowableRendererInterface $defaultRenderer,
         private ?EventDispatcherInterface $eventDispatcher = null,
+        private int $exitShutdownHandlerDepth = 2
     ) {
     }
 
@@ -207,13 +214,33 @@ final class ErrorHandler
         echo $this->handle($t);
         $this->eventDispatcher?->dispatch(new ApplicationError($t));
 
-        register_shutdown_function(static function (): void {
-            // Ensure exit(1) is called last after all other shutdown functions, even those added to the end.
-            register_shutdown_function(static function (): void {
-                register_shutdown_function(static function (): void {
-                    exit(1);
-                });
-            });
-        });
+        $handler = $this->wrapShutdownHandler(
+            static function (): void {
+                exit(1);
+            },
+            $this->exitShutdownHandlerDepth
+        );
+
+        register_shutdown_function($handler);
+    }
+
+    /**
+     * Wraps shutdown handler into another shutdown handler to ensure it is called last after all other shutdown
+     * functions, even those added to the end.
+     *
+     * @param callable $handler Shutdown handler to wrap.
+     * @param int $depth Wrapping depth.
+     * @return callable Wrapped handler.
+     */
+    private function wrapShutdownHandler(callable $handler, int $depth): callable
+    {
+        $currentDepth = 0;
+        while ($currentDepth < $depth) {
+            $handler = static function() use ($handler): void {
+                register_shutdown_function($handler);
+            };
+            $currentDepth++;
+        }
+        return $handler;
     }
 }
