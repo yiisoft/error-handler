@@ -1,13 +1,18 @@
 # Yii Error Handler Change Log
 
-## 3.2.2 under development
+## 3.3.1 under development
 
-- Enh #117, #120: Show arguments table by click (@xepozz, @vjik)
-- Enh #116: Remove @anonymous postfix (@xepozz)
-- Bug #114: Stop `click` event on text selection (@xepozz)
-- Enh #114: Show full argument by click (@xepozz)
-- Enh #113: Simplify error log (@xepozz)
+- no changes in this release.
+
+## 3.3.0 July 11, 2024
+
 - Enh #112: Add copy cURL button, sort request headers, fix UI (@xepozz)
+- Enh #113: Simplify error log (@xepozz)
+- Enh #114: Show full argument by click (@xepozz)
+- Enh #116: Remove @anonymous postfix (@xepozz)
+- Enh #117, #120: Show arguments table by click (@xepozz, @vjik)
+- Bug #114: Stop `click` event on text selection (@xepozz)
+- Bug #122: Do `exit(1)` after all shutdown functions, even postponed ones (@samdark)
 
 ## 3.2.1 March 07, 2024
 
