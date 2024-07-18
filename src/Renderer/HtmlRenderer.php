@@ -13,7 +13,6 @@ use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Solution\SolutionGenerator;
-use Yiisoft\ErrorHandler\Solution\FriendlyExceptionSolution;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
@@ -123,8 +122,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *   maxTraceLines?: int,
      *   traceHeaderLine?: string,
      * } $settings
+     * @param \Yiisoft\ErrorHandler\Solution\SolutionProviderInterface[] $solutionProviders
      */
-    public function __construct(array $settings = [])
+    public function __construct(array $settings = [], array $solutionProviders = [])
     {
         $this->markdownParser = new GithubMarkdown();
         $this->markdownParser->html5 = true;
@@ -135,7 +135,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $this->maxSourceLines = $settings['maxSourceLines'] ?? 19;
         $this->maxTraceLines = $settings['maxTraceLines'] ?? 13;
         $this->traceHeaderLine = $settings['traceHeaderLine'] ?? null;
-        $this->solutionGenerator = new SolutionGenerator([new FriendlyExceptionSolution()]);
+        $this->solutionGenerator = new SolutionGenerator($solutionProviders);
     }
 
     public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData

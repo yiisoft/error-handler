@@ -11,4 +11,9 @@ use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
 return [
     ThrowableRendererInterface::class => HtmlRenderer::class,
+    HtmlRenderer::class => [
+        '__construct()' => [
+            'solutionProviders' => $params['yiisoft/error-handler']['solutionProviders'],
+        ],
+    ],
 ];
