@@ -279,7 +279,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
                         } elseif (function_exists($function)) {
                             $parameters = (new \ReflectionFunction($function))->getParameters();
                         }
-                    } catch (\ReflectionException $e) {
+                    } catch (\ReflectionException) {
                         // pass
                     }
                 }
