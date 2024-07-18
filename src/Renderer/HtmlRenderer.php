@@ -256,22 +256,31 @@ final class HtmlRenderer implements ThrowableRendererInterface
             [],
         );
 
+        $index = 1;
+        if ($t instanceof ErrorException) {
+            $index = 0;
+        }
+
         $length = count($trace);
-        for ($i = 0; $i < $length; ++$i) {
-            $file = !empty($trace[$i]['file']) ? $trace[$i]['file'] : null;
-            $line = !empty($trace[$i]['line']) ? $trace[$i]['line'] : null;
-            $class = !empty($trace[$i]['class']) ? $trace[$i]['class'] : null;
-            $args = !empty($trace[$i]['args']) ? $trace[$i]['args'] : [];
+        foreach ($trace as $traceItem) {
+            $file = !empty($traceItem['file']) ? $traceItem['file'] : null;
+            $line = !empty($traceItem['line']) ? $traceItem['line'] : null;
+            $class = !empty($traceItem['class']) ? $traceItem['class'] : null;
+            $args = !empty($traceItem['args']) ? $traceItem['args'] : [];
 
             $parameters = [];
             $function = null;
-            if (!empty($trace[$i]['function']) && $trace[$i]['function'] !== 'unknown') {
-                $function = $trace[$i]['function'];
-                if ($class !== null && !str_contains($function, '{closure}')) {
-                    $parameters = (new \ReflectionMethod($class, $function))->getParameters();
+            if (!empty($traceItem['function']) && $traceItem['function'] !== 'unknown') {
+                $function = $traceItem['function'];
+                if (!str_contains($function, '{closure}')) {
+                    if ($class !== null) {
+                        $parameters = (new \ReflectionMethod($class, $function))->getParameters();
+                    } else {
+                        $parameters = (new \ReflectionFunction($function))->getParameters();
+                    }
                 }
             }
-            $index = $i + 2;
+            $index++;
 
             if ($this->isVendorFile($file)) {
                 $vendor[$index] = $this->renderCallStackItem(
