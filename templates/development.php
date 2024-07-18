@@ -8,6 +8,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
  * @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer
  * @var $request \Psr\Http\Message\ServerRequestInterface|null
  * @var $throwable \Throwable
+ * @var $solutions string[]
  */
 
 $theme = $_COOKIE['yii-exception-theme'] ?? '';
@@ -17,7 +18,6 @@ if ($throwable instanceof CompositeException) {
     $throwable = $throwable->getFirstException();
 }
 $isFriendlyException = $throwable instanceof FriendlyExceptionInterface;
-$solution = $isFriendlyException ? $throwable->getSolution() : null;
 $exceptionClass = get_class($throwable);
 $exceptionMessage = $throwable->getMessage();
 
@@ -79,9 +79,16 @@ $exceptionMessage = $throwable->getMessage();
             <?= nl2br($this->htmlEncode($exceptionMessage)) ?>
         </div>
 
-        <?php if ($solution !== null): ?>
-            <div class="solution"><?= $this->parseMarkdown($solution) ?></div>
-        <?php endif ?>
+        <?php
+        if (!empty($solutions)) {
+            echo '<div class="solutions">';
+            foreach ($solutions as $i => $solution) {
+                echo '<div class="solution solution-' . $i . '">';
+                echo $this->parseMarkdown($solution);
+                echo '</div>';
+            }
+        }
+        ?>
 
         <?= $this->renderPreviousExceptions($originalException) ?>
 
