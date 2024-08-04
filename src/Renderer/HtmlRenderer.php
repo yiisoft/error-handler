@@ -209,6 +209,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
             'ol',
             'li',
             'img',
+            'form',
+            'input',
+            'button',
         ]);
     }
 
