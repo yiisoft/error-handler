@@ -261,7 +261,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $index = 0;
         }
 
-        $length = count($trace);
         foreach ($trace as $traceItem) {
             $file = !empty($traceItem['file']) ? $traceItem['file'] : null;
             $line = !empty($traceItem['line']) ? $traceItem['line'] : null;
@@ -601,7 +600,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $groupedItems[$groupIndex][$index] = $item;
         }
 
-        /** @psalm-var array<int, array<int, string>> $groupedItems It's need for Psalm <=4.30 only. */
+        /** @psalm-var array<int, array<int, string>> $groupedItems It's needed for Psalm <=4.30 only. */
 
         return $groupedItems;
     }
