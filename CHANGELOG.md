@@ -2,7 +2,7 @@
 
 ## 3.3.1 under development
 
-- Enh #130: Update ErrorHandler logger message (@olegbaturin)
+- Enh #130: Pass exception message instead of rendered exception to logger in `ErrorHandler` (@olegbaturin)
 
 ## 3.3.0 July 11, 2024
 
