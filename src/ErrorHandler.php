@@ -10,7 +10,6 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\Event\ApplicationError;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
-use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\Http\Status;
 
 use function error_get_last;
