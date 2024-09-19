@@ -2,7 +2,7 @@
 
 ## 3.3.1 under development
 
-- no changes in this release.
+- Enh #130: Pass exception message instead of rendered exception to logger in `ErrorHandler` (@olegbaturin)
 
 ## 3.3.0 July 11, 2024
 
