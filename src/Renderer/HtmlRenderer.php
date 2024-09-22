@@ -12,6 +12,7 @@ use Throwable;
 use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
+use Yiisoft\ErrorHandler\Solution\SolutionGenerator;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
@@ -104,6 +105,8 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     private ?array $vendorPaths = null;
 
+    private SolutionGenerator $solutionGenerator;
+
     /**
      * @param array $settings Settings can have the following keys:
      * - template: string, full path of the template file for rendering exceptions without call stack information.
@@ -119,8 +122,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *   maxTraceLines?: int,
      *   traceHeaderLine?: string,
      * } $settings
+     * @param \Yiisoft\ErrorHandler\Solution\SolutionProviderInterface[] $solutionProviders
      */
-    public function __construct(array $settings = [])
+    public function __construct(array $settings = [], array $solutionProviders = [])
     {
         $this->markdownParser = new GithubMarkdown();
         $this->markdownParser->html5 = true;
@@ -131,6 +135,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $this->maxSourceLines = $settings['maxSourceLines'] ?? 19;
         $this->maxTraceLines = $settings['maxTraceLines'] ?? 13;
         $this->traceHeaderLine = $settings['traceHeaderLine'] ?? null;
+        $this->solutionGenerator = new SolutionGenerator($solutionProviders);
     }
 
     public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
@@ -143,9 +148,12 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
     public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
     {
+        $solutions = $this->solutionGenerator->generate($t);
+
         return new ErrorData($this->renderTemplate($this->verboseTemplate, [
             'request' => $request,
             'throwable' => $t,
+            'solutions' => $solutions,
         ]));
     }
 
@@ -201,6 +209,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
             'ol',
             'li',
             'img',
+            'form',
+            'input',
+            'button',
         ]);
     }
 
