@@ -60,12 +60,12 @@ final class ThrowableHandler implements ThrowableHandlerInterface
         $this->headersProvider = $headersProvider ?? new HeadersProvider();
     }
 
-    public function handle(Throwable $t, ServerRequestInterface $request): ResponseInterface
+    public function handle(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
     {
         $contentType = $this->contentType ?? $this->getContentType($request);
         $renderer = $request->getMethod() === Method::HEAD ? new HeaderRenderer() : $this->getRenderer($contentType);
 
-        $data = $this->errorHandler->handle($t, $renderer, $request);
+        $data = $this->errorHandler->handle($throwable, $renderer, $request);
         $response = $this->responseFactory->createResponse(Status::INTERNAL_SERVER_ERROR);
         foreach ($this->headersProvider->getAll() as $name => $value) {
             $response = $response->withHeader($name, $value);
