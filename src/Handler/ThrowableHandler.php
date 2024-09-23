@@ -62,7 +62,6 @@ final class ThrowableHandler implements ThrowableHandlerInterface
 
     public function handle(Throwable $t, ServerRequestInterface $request): ResponseInterface
     {
-        //throw new \Exception('11');
         $contentType = $this->contentType ?? $this->getContentType($request);
         $renderer = $request->getMethod() === Method::HEAD ? new HeaderRenderer() : $this->getRenderer($contentType);
 

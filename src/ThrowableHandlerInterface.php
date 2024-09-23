@@ -11,7 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 interface ThrowableHandlerInterface
 {
     /**
-     * Handles a Throwable and produces a response.
+     * Handles a `Throwable` object and produces a response.
      */
-    public function handle(Throwable $t, ServerRequestInterface $request): ResponseInterface;
+    public function handle(Throwable $throwable, ServerRequestInterface $request): ResponseInterface;
 }
