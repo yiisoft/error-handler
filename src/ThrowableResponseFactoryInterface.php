@@ -8,10 +8,10 @@ use Throwable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface ThrowableHandlerInterface
+interface ThrowableResponseFactoryInterface
 {
     /**
      * Handles a `Throwable` object and produces a response.
      */
-    public function handle(Throwable $throwable, ServerRequestInterface $request): ResponseInterface;
+    public function create(Throwable $throwable, ServerRequestInterface $request): ResponseInterface;
 }

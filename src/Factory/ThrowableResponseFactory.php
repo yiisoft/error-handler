@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\ErrorHandler\Handler;
+namespace Yiisoft\ErrorHandler\Factory;
 
 use Throwable;
 use InvalidArgumentException;
@@ -17,8 +17,8 @@ use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\Renderer\JsonRenderer;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\ErrorHandler\Renderer\XmlRenderer;
-use Yiisoft\ErrorHandler\ThrowableHandlerInterface;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
+use Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface;
 use Yiisoft\Http\Header;
 use Yiisoft\Http\HeaderValueHelper;
 use Yiisoft\Http\Method;
@@ -32,9 +32,10 @@ use function strtolower;
 use function trim;
 
 /**
- * `ThrowableHandler` renders throwables according to the content type passed by the client.
+ * `ThrowableResponseFactory` renders `Throwable` object
+ * and produces a response according to the content type passed by the client.
  */
-final class ThrowableHandler implements ThrowableHandlerInterface
+final class ThrowableResponseFactory implements ThrowableResponseFactoryInterface
 {
     private HeadersProvider $headersProvider;
 
@@ -60,7 +61,7 @@ final class ThrowableHandler implements ThrowableHandlerInterface
         $this->headersProvider = $headersProvider ?? new HeadersProvider();
     }
 
-    public function handle(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
+    public function create(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
     {
         $contentType = $this->contentType ?? $this->getContentType($request);
         $renderer = $request->getMethod() === Method::HEAD ? new HeaderRenderer() : $this->getRenderer($contentType);

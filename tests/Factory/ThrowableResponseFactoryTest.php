@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\ErrorHandler\Tests\Handler;
+namespace Yiisoft\ErrorHandler\Tests\Factory;
 
 use HttpSoft\Message\ResponseFactory;
 use HttpSoft\Message\ServerRequest;
@@ -13,23 +13,22 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Throwable;
 use Yiisoft\ErrorHandler\ErrorHandler;
-use Yiisoft\ErrorHandler\Handler\ThrowableHandler;
+use Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory;
 use Yiisoft\ErrorHandler\HeadersProvider;
-use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
 use Yiisoft\ErrorHandler\Renderer\HeaderRenderer;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
-use Yiisoft\ErrorHandler\ThrowableHandlerInterface;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
+use Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface;
 use Yiisoft\Http\Header;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 
-final class ThrowableHandlerTest extends TestCase
+final class ThrowableResponseFactoryTest extends TestCase
 {
     public function testHandleWithHeadRequestMethod(): void
     {
         $response = $this
-            ->createThrowableHandler()
-            ->handle(
+            ->createThrowableResponseFactory()
+            ->create(
                 $this->createThrowable(),
                 $this->createServerRequest('HEAD', ['Accept' => ['test/html']])
             );
@@ -47,8 +46,8 @@ final class ThrowableHandlerTest extends TestCase
     public function testHandleWithFailAcceptRequestHeader(): void
     {
         $response = $this
-            ->createThrowableHandler()
-            ->handle(
+            ->createThrowableResponseFactory()
+            ->create(
                 $this->createThrowable(),
                 $this->createServerRequest('GET', ['Accept' => ['text/plain;q=2.0']])
             );
@@ -66,10 +65,10 @@ final class ThrowableHandlerTest extends TestCase
     public function testAddedRenderer(): void
     {
         $mimeType = 'test/test';
-        $handler = $this
-            ->createThrowableHandler()
+        $factory = $this
+            ->createThrowableResponseFactory()
             ->withRenderer($mimeType, PlainTextRenderer::class);
-        $response = $handler->handle(
+        $response = $factory->create(
             $this->createThrowable(),
             $this->createServerRequest('GET', ['Accept' => [$mimeType]])
         );
@@ -90,7 +89,7 @@ final class ThrowableHandlerTest extends TestCase
             'Class "' . self::class . '" does not implement "' . ThrowableRendererInterface::class . '".',
         );
         $this
-            ->createThrowableHandler()
+            ->createThrowableResponseFactory()
             ->withRenderer('test/test', self::class);
     }
 
@@ -99,16 +98,16 @@ final class ThrowableHandlerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid content type.');
         $this
-            ->createThrowableHandler()
+            ->createThrowableResponseFactory()
             ->withRenderer('test invalid content type', PlainTextRenderer::class);
     }
 
     public function testWithoutRenderers(): void
     {
-        $handler = $this
-            ->createThrowableHandler()
+        $factory = $this
+            ->createThrowableResponseFactory()
             ->withoutRenderers();
-        $response = $handler->handle(
+        $response = $factory->create(
             $this->createThrowable(),
             $this->createServerRequest('GET', ['Accept' => ['test/html']])
         );
@@ -124,10 +123,10 @@ final class ThrowableHandlerTest extends TestCase
 
     public function testWithoutRenderer(): void
     {
-        $handler = $this
-            ->createThrowableHandler()
+        $factory = $this
+            ->createThrowableResponseFactory()
             ->withoutRenderers('*/*');
-        $response = $handler->handle(
+        $response = $factory->create(
             $this->createThrowable(),
             $this->createServerRequest('GET', ['Accept' => ['test/html']])
         );
@@ -144,10 +143,10 @@ final class ThrowableHandlerTest extends TestCase
     public function testAdvancedAcceptHeader(): void
     {
         $contentType = 'text/html;version=2';
-        $handler = $this
-            ->createThrowableHandler()
+        $factory = $this
+            ->createThrowableResponseFactory()
             ->withRenderer($contentType, PlainTextRenderer::class);
-        $response = $handler->handle(
+        $response = $factory->create(
             $this->createThrowable(),
             $this->createServerRequest('GET', ['Accept' => ['text/html', $contentType]])
         );
@@ -163,10 +162,10 @@ final class ThrowableHandlerTest extends TestCase
 
     public function testDefaultContentType(): void
     {
-        $handler = $this
-            ->createThrowableHandler()
+        $factory = $this
+            ->createThrowableResponseFactory()
             ->withRenderer('*/*', PlainTextRenderer::class);
-        $response = $handler->handle(
+        $response = $factory->create(
             $this->createThrowable(),
             $this->createServerRequest('GET', ['Accept' => ['test/test']])
         );
@@ -182,10 +181,10 @@ final class ThrowableHandlerTest extends TestCase
 
     public function testForceContentType(): void
     {
-        $handler = $this
-            ->createThrowableHandler()
+        $factory = $this
+            ->createThrowableResponseFactory()
             ->forceContentType('application/json');
-        $response = $handler->handle(
+        $response = $factory->create(
             $this->createThrowable(),
             $this->createServerRequest('GET', ['Accept' => ['text/xml']])
         );
@@ -201,7 +200,7 @@ final class ThrowableHandlerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The renderer for image/gif is not set.');
         $this
-            ->createThrowableHandler()
+            ->createThrowableResponseFactory()
             ->forceContentType('image/gif');
     }
 
@@ -213,10 +212,10 @@ final class ThrowableHandlerTest extends TestCase
         ]);
         $provider->add('X-Test', 'test');
         $provider->add('X-Test2', ['test2', 'test3']);
-        $handler = $this
-            ->createThrowableHandler(provider: $provider)
+        $factory = $this
+            ->createThrowableResponseFactory(provider: $provider)
             ->withRenderer('*/*', PlainTextRenderer::class);
-        $response = $handler->handle(
+        $response = $factory->create(
             $this->createThrowable(),
             $this->createServerRequest('GET', ['Accept' => ['test/test']])
         );
@@ -233,11 +232,11 @@ final class ThrowableHandlerTest extends TestCase
         $this->assertEquals(['test2', 'test3'], $headers['X-Test2']);
     }
 
-    private function createThrowableHandler(
+    private function createThrowableResponseFactory(
         HeadersProvider $provider = null,
-    ): ThrowableHandlerInterface {
+    ): ThrowableResponseFactoryInterface {
         $container = new SimpleContainer([], fn (string $className): object => new $className());
-        return new ThrowableHandler(
+        return new ThrowableResponseFactory(
             new ResponseFactory(),
             $this->createErrorHandler(),
             $container,

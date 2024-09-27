@@ -3,7 +3,7 @@
 ## 3.3.1 under development
 
 - Enh #130: Pass exception message instead of rendered exception to logger in `ErrorHandler` (@olegbaturin)
-- Enh #133: Extract response generator from `ErrorCatcher` middleware to separate class `ThrowableHandler` (@olegbaturin)
+- Enh #133: Extract response generator from `ErrorCatcher` middleware to separate class `ThrowableResponseFactory` (@olegbaturin)
 
 ## 3.3.0 July 11, 2024
 
