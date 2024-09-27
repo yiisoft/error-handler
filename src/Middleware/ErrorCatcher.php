@@ -23,7 +23,8 @@ final class ErrorCatcher implements MiddlewareInterface
     public function __construct(
         private ThrowableResponseFactoryInterface $throwableResponseFactory,
         private ?EventDispatcherInterface $eventDispatcher = null,
-    ) {}
+    ) {
+    }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
