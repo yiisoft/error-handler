@@ -73,6 +73,7 @@ $exceptionMessage = $throwable->getMessage();
             <?php else: ?>
                 <span><?= $exceptionClass ?></span>
             <?php endif ?>
+            (Code #<?= $throwable->getCode() ?>)
         </div>
 
         <div class="exception-message">
