@@ -121,47 +121,73 @@ $errorHandler = new ErrorHandler($logger, $renderer);
 For more information about creating your own renders and examples of rendering error data,
 [see here](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md#rendering-error-data).
 
-### Using middleware for catching unhandled errors
+### Using a factory to create a response
+
+`Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` renders `Throwable` object and produces a response according to the content type provided by the client.
+
+```php
+use Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory;
+
+/**
+ * @var \Throwable $throwable
+ * @var \Psr\Container\ContainerInterface $container
+ * @var \Psr\Http\Message\ResponseFactoryInterface $responseFactory
+ * @var \Psr\Http\Message\ServerRequestInterface $request
+ * @var \Yiisoft\ErrorHandler\ErrorHandler $errorHandler
+ */
+
+$throwableResponseFactory = new ThrowableResponseFactory($responseFactory, $errorHandler, $container);
+
+// Creating an instance of the `Psr\Http\Message\ResponseInterface` with error information.
+$response = $throwableResponseFactory->create($throwable, $request);
+```
+
+`Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` chooses how to render an exception based on accept HTTP header.
+If it's `text/html` or any unknown content type, it will use the error or exception HTML template to display errors.
+For other mime types, the error handler will choose different renderer that is registered within the error catcher.
+By default, JSON, XML and plain text are supported. You can change this behavior as follows:
+
+```php
+// Returns a new instance without renderers by the specified content types.
+$throwableResponseFactory = $throwableResponseFactory->withoutRenderers('application/xml', 'text/xml');
+
+// Returns a new instance with the specified content type and renderer class.
+$throwableResponseFactory = $throwableResponseFactory->withRenderer('my/format', new MyRenderer());
+
+// Returns a new instance with the specified force content type to respond with regardless of request.
+$throwableResponseFactory = $throwableResponseFactory->forceContentType('application/json');
+```
+
+### Using a middleware for catching unhandled errors
 
 `Yiisoft\ErrorHandler\Middleware\ErrorCatcher` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) middleware that
-catches exceptions that appear during middleware stack execution and passes them to the handler.
+catches exceptions raised during middleware stack execution and passes them to the instance of `Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface` to create a response.
 
 ```php
 use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
 
 /**
- * @var \Psr\Container\ContainerInterface $container
- * @var \Psr\Http\Message\ResponseFactoryInterface $responseFactory
+ * @var \Psr\EventDispatcher\EventDispatcherInterface $eventDispatcher
  * @var \Psr\Http\Message\ServerRequestInterface $request
  * @var \Psr\Http\Server\RequestHandlerInterface $handler
- * @var \Yiisoft\ErrorHandler\ErrorHandler $errorHandler
- * @var \Yiisoft\ErrorHandler\ThrowableRendererInterface $renderer
+ * @var \Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface $throwableResponseFactory
  */
 
-$errorCatcher = new ErrorCatcher($responseFactory, $errorHandler, $container);
+$errorCatcher = new ErrorCatcher($throwableResponseFactory);
 
 // In any case, it will return an instance of the `Psr\Http\Message\ResponseInterface`.
 // Either the expected response, or a response with error information.
 $response = $errorCatcher->process($request, $handler);
 ```
 
-The error catcher chooses how to render an exception based on accept HTTP header. If it is `text/html`
-or any unknown content type, it will use the error or exception HTML template to display errors. For other
-mime types, the error handler will choose different renderer that is registered within the error catcher.
-By default, JSON, XML and plain text are supported. You can change this behavior as follows:
+`Yiisoft\ErrorHandler\Middleware\ErrorCatcher` can be instantiated with [PSR-14](https://www.php-fig.org/psr/psr-14/) event dispatcher as an optional dependency.
+In this case `\Yiisoft\ErrorHandler\Event\ApplicationError` will be dispatched when `ErrorCatcher` catches an error.
 
 ```php
-// Returns a new instance without renderers by the specified content types.
-$errorCatcher = $errorCatcher->withoutRenderers('application/xml', 'text/xml');
-
-// Returns a new instance with the specified content type and renderer class.
-$errorCatcher = $errorCatcher->withRenderer('my/format', new MyRenderer());
-
-// Returns a new instance with the specified force content type to respond with regardless of request.
-$errorCatcher = $errorCatcher->forceContentType('application/json');
+$errorCatcher = new ErrorCatcher($throwableResponseFactory, $eventDispatcher);
 ```
 
-### Using middleware for mapping certain exceptions to custom responses
+### Using a middleware for mapping certain exceptions to custom responses
 
 `Yiisoft\ErrorHandler\Middleware\ExceptionResponder` is a [PSR-15](https://www.php-fig.org/psr/psr-15/)
 middleware that maps certain exceptions to custom responses.
@@ -196,7 +222,7 @@ In the application middleware stack `Yiisoft\ErrorHandler\Middleware\ExceptionRe
 
 ## Events
 
-- When `ErrorCatcher` catches an error it dispatches `\Yiisoft\ErrorHandler\Event\ApplicationError` event.
+- When `ErrorCatcher` catches an error it optionally dispatches `\Yiisoft\ErrorHandler\Event\ApplicationError` event. Instance of `Psr\EventDispatcher\EventDispatcherInterface` must be provided to the `ErrorCatcher`.
 
 ## Friendly Exceptions
 
