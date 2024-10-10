@@ -121,9 +121,9 @@ $errorHandler = new ErrorHandler($logger, $renderer);
 For more information about creating your own renders and examples of rendering error data,
 [see here](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md#rendering-error-data).
 
-### Using a Factory to create a response
+### Using a factory to create a response
 
-`Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` renders `Throwable` object and produces a response according to the content type passed by the client.
+`Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` renders `Throwable` object and produces a response according to the content type provided by the client.
 
 ```php
 use Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory;
@@ -143,7 +143,7 @@ $response = $throwableResponseFactory->create($throwable, $request);
 ```
 
 `Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` chooses how to render an exception based on accept HTTP header.
-If it is `text/html` or any unknown content type, it will use the error or exception HTML template to display errors.
+If it's `text/html` or any unknown content type, it will use the error or exception HTML template to display errors.
 For other mime types, the error handler will choose different renderer that is registered within the error catcher.
 By default, JSON, XML and plain text are supported. You can change this behavior as follows:
 
@@ -158,10 +158,10 @@ $throwableResponseFactory = $throwableResponseFactory->withRenderer('my/format',
 $throwableResponseFactory = $throwableResponseFactory->forceContentType('application/json');
 ```
 
-### Using a Middleware for catching unhandled errors
+### Using a middleware for catching unhandled errors
 
 `Yiisoft\ErrorHandler\Middleware\ErrorCatcher` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) middleware that
-catches exceptions that appear during middleware stack execution and passes them to the instance of `Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface` to create a response.
+catches exceptions raised during middleware stack execution and passes them to the instance of `Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface` to create a response.
 
 ```php
 use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
@@ -180,14 +180,14 @@ $errorCatcher = new ErrorCatcher($throwableResponseFactory);
 $response = $errorCatcher->process($request, $handler);
 ```
 
-`Yiisoft\ErrorHandler\Middleware\ErrorCatcher` can be instantiated with [PSR-14](https://www.php-fig.org/psr/psr-15/) event dispatcher an optional dependency.
+`Yiisoft\ErrorHandler\Middleware\ErrorCatcher` can be instantiated with [PSR-14](https://www.php-fig.org/psr/psr-14/) event dispatcher as an optional dependency.
 In this case `\Yiisoft\ErrorHandler\Event\ApplicationError` will be dispatched when `ErrorCatcher` catches an error.
 
 ```php
 $errorCatcher = new ErrorCatcher($throwableResponseFactory, $eventDispatcher);
 ```
 
-### Using a Middleware for mapping certain exceptions to custom responses
+### Using a middleware for mapping certain exceptions to custom responses
 
 `Yiisoft\ErrorHandler\Middleware\ExceptionResponder` is a [PSR-15](https://www.php-fig.org/psr/psr-15/)
 middleware that maps certain exceptions to custom responses.

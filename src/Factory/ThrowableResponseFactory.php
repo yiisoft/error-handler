@@ -33,7 +33,7 @@ use function trim;
 
 /**
  * `ThrowableResponseFactory` renders `Throwable` object
- * and produces a response according to the content type passed by the client.
+ * and produces a response according to the content type provided by the client.
  */
 final class ThrowableResponseFactory implements ThrowableResponseFactoryInterface
 {
