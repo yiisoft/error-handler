@@ -8,6 +8,9 @@ use Throwable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * ThrowableResponseFactoryInterface produces a response for `Throwable` object.
+ */
 interface ThrowableResponseFactoryInterface
 {
     /**
