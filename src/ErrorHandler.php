@@ -10,7 +10,6 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\Event\ApplicationError;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
-use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\Http\Status;
 
 use function error_get_last;
@@ -69,7 +68,7 @@ final class ErrorHandler
         $renderer ??= $this->defaultRenderer;
 
         try {
-            $this->logger->error(PlainTextRenderer::throwableToString($t), ['throwable' => $t]);
+            $this->logger->error($t->getMessage(), ['throwable' => $t]);
             return $this->debug ? $renderer->renderVerbose($t, $request) : $renderer->render($t, $request);
         } catch (Throwable $t) {
             return new ErrorData((string) $t);
