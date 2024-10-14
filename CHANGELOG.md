@@ -1,8 +1,8 @@
 # Yii Error Handler Change Log
 
-## 3.3.1 under development
+## 3.4.0 under development
 
-- no changes in this release.
+- Enh #125: Add error code & show function arguments (@xepozz)
 
 ## 3.3.0 July 11, 2024
 
