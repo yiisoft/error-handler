@@ -3,6 +3,8 @@
 ## 3.4.0 under development
 
 - Enh #125: Add error code & show function arguments (@xepozz)
+- Enh #130: Pass exception message instead of rendered exception to logger in `ErrorHandler` (@olegbaturin)
+- Enh #133: Extract response generator from `ErrorCatcher` middleware into separate `ThrowableResponseFactory` class (@olegbaturin)
 
 ## 3.3.0 July 11, 2024
 
