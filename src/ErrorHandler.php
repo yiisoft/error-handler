@@ -134,7 +134,7 @@ final class ErrorHandler
                 return true;
             }
 
-            $backtrace = debug_backtrace();
+            $backtrace = debug_backtrace(0);
             array_shift($backtrace);
             throw new ErrorException($message, $severity, $severity, $file, $line, null, $backtrace);
         });
