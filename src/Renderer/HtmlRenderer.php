@@ -267,22 +267,34 @@ final class HtmlRenderer implements ThrowableRendererInterface
             [],
         );
 
-        $length = count($trace);
-        for ($i = 0; $i < $length; ++$i) {
-            $file = !empty($trace[$i]['file']) ? $trace[$i]['file'] : null;
-            $line = !empty($trace[$i]['line']) ? $trace[$i]['line'] : null;
-            $class = !empty($trace[$i]['class']) ? $trace[$i]['class'] : null;
-            $args = !empty($trace[$i]['args']) ? $trace[$i]['args'] : [];
+        $index = 1;
+        if ($t instanceof ErrorException) {
+            $index = 0;
+        }
+
+        foreach ($trace as $traceItem) {
+            $file = !empty($traceItem['file']) ? $traceItem['file'] : null;
+            $line = !empty($traceItem['line']) ? $traceItem['line'] : null;
+            $class = !empty($traceItem['class']) ? $traceItem['class'] : null;
+            $args = !empty($traceItem['args']) ? $traceItem['args'] : [];
 
             $parameters = [];
             $function = null;
-            if (!empty($trace[$i]['function']) && $trace[$i]['function'] !== 'unknown') {
-                $function = $trace[$i]['function'];
-                if ($class !== null && !str_contains($function, '{closure}')) {
-                    $parameters = (new \ReflectionMethod($class, $function))->getParameters();
+            if (!empty($traceItem['function']) && $traceItem['function'] !== 'unknown') {
+                $function = $traceItem['function'];
+                if (!str_contains($function, '{closure}')) {
+                    try {
+                        if ($class !== null && class_exists($class)) {
+                            $parameters = (new \ReflectionMethod($class, $function))->getParameters();
+                        } elseif (function_exists($function)) {
+                            $parameters = (new \ReflectionFunction($function))->getParameters();
+                        }
+                    } catch (\ReflectionException) {
+                        // pass
+                    }
                 }
             }
-            $index = $i + 2;
+            $index++;
 
             if ($this->isVendorFile($file)) {
                 $vendor[$index] = $this->renderCallStackItem(
@@ -599,7 +611,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $groupedItems[$groupIndex][$index] = $item;
         }
 
-        /** @psalm-var array<int, array<int, string>> $groupedItems It's need for Psalm <=4.30 only. */
+        /** @psalm-var array<int, array<int, string>> $groupedItems It's needed for Psalm <=4.30 only. */
 
         return $groupedItems;
     }
