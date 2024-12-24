@@ -13,5 +13,10 @@ use Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface;
 
 return [
     ThrowableRendererInterface::class => HtmlRenderer::class,
+    HtmlRenderer::class => [
+        '__construct()' => [
+            'solutionProviders' => $params['yiisoft/error-handler']['solutionProviders'],
+        ],
+    ],
     ThrowableResponseFactoryInterface::class => ThrowableResponseFactory::class,
 ];

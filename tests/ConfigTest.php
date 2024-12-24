@@ -32,6 +32,9 @@ final class ConfigTest extends TestCase
 
     private function getDiConfig(?string $postfix = null): array
     {
+        $params = [
+            'yiisoft/error-handler' => ['solutionProviders' => []],
+        ];
         return require dirname(__DIR__) . '/config/di' . ($postfix !== null ? '-' . $postfix : '') . '.php';
     }
 }
