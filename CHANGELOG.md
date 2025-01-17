@@ -4,7 +4,10 @@
 
 - Enh #125: Add error code & show function arguments (@xepozz)
 - Enh #130: Pass exception message instead of rendered exception to logger in `ErrorHandler` (@olegbaturin)
-- Enh #133: Extract response generator from `ErrorCatcher` middleware into separate `ThrowableResponseFactory` class (@olegbaturin)
+- Enh #133: Extract response generator from `ErrorCatcher` middleware into separate `ThrowableResponseFactory` 
+  class (@olegbaturin)
+- Chg #137: Add separate parameters for each of `HtmlRenderer` settings in constructor. Mark `$settings` parameter as
+  deprecated (@vjik) 
 
 ## 3.3.0 July 11, 2024
 
