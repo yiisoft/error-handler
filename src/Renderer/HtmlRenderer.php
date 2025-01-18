@@ -105,12 +105,19 @@ final class HtmlRenderer implements ThrowableRendererInterface
     private ?array $vendorPaths = null;
 
     /**
-     * @param array $settings Settings can have the following keys:
+     * @param array $settings (deprecated) Settings can have the following keys:
      * - template: string, full path of the template file for rendering exceptions without call stack information.
      * - verboseTemplate: string, full path of the template file for rendering exceptions with call stack information.
      * - maxSourceLines: int, maximum number of source code lines to be displayed. Defaults to 19.
      * - maxTraceLines: int, maximum number of trace source code lines to be displayed. Defaults to 13.
-     * - traceHeaderLine: string, trace header line with placeholders to be be substituted. Defaults to null.
+     * - traceHeaderLine: string, trace header line with placeholders to be substituted. Defaults to null.
+     * @param string|null $template The full path of the template file for rendering exceptions without call stack
+     * information.
+     * @param string|null $verboseTemplate The full path of the template file for rendering exceptions with call stack
+     * information.
+     * @param int|null $maxSourceLines The maximum number of source code lines to be displayed. Defaults to 19.
+     * @param int|null $maxTraceLines The maximum number of trace source code lines to be displayed. Defaults to 13.
+     * @param string|null $traceHeaderLine The trace header line with placeholders to be substituted. Defaults to null.
      *
      * @psalm-param array{
      *   template?: string,
@@ -120,17 +127,33 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *   traceHeaderLine?: string,
      * } $settings
      */
-    public function __construct(array $settings = [])
-    {
+    public function __construct(
+        array $settings = [],
+        ?string $template = null,
+        ?string $verboseTemplate = null,
+        ?int $maxSourceLines = null,
+        ?int $maxTraceLines = null,
+        ?string $traceHeaderLine = null,
+    ) {
         $this->markdownParser = new GithubMarkdown();
         $this->markdownParser->html5 = true;
 
         $this->defaultTemplatePath = dirname(__DIR__, 2) . '/templates';
-        $this->template = $settings['template'] ?? $this->defaultTemplatePath . '/production.php';
-        $this->verboseTemplate = $settings['verboseTemplate'] ?? $this->defaultTemplatePath . '/development.php';
-        $this->maxSourceLines = $settings['maxSourceLines'] ?? 19;
-        $this->maxTraceLines = $settings['maxTraceLines'] ?? 13;
-        $this->traceHeaderLine = $settings['traceHeaderLine'] ?? null;
+        $this->template = $template
+            ?? $settings['template']
+            ?? $this->defaultTemplatePath . '/production.php';
+        $this->verboseTemplate = $verboseTemplate
+            ?? $settings['verboseTemplate']
+            ?? $this->defaultTemplatePath . '/development.php';
+        $this->maxSourceLines = $maxSourceLines
+            ?? $settings['maxSourceLines']
+            ?? 19;
+        $this->maxTraceLines = $maxTraceLines
+            ?? $settings['maxTraceLines']
+            ?? 13;
+        $this->traceHeaderLine = $traceHeaderLine
+            ?? $settings['traceHeaderLine']
+            ?? null;
     }
 
     public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
