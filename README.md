@@ -29,9 +29,8 @@ The package provides advanced error handling. The features are:
 
 ## Requirements
 
-- PHP 8.0 or higher.
+- PHP 8.1 or higher.
 - `DOM` PHP extension.
-- `JSON` PHP extension.
 - `mbstring` PHP extension.
 
 ## Installation
