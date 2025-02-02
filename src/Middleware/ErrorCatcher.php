@@ -21,8 +21,8 @@ use Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface;
 final class ErrorCatcher implements MiddlewareInterface
 {
     public function __construct(
-        private ThrowableResponseFactoryInterface $throwableResponseFactory,
-        private ?EventDispatcherInterface $eventDispatcher = null,
+        private readonly ThrowableResponseFactoryInterface $throwableResponseFactory,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 

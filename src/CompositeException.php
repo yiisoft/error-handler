@@ -15,10 +15,10 @@ final class CompositeException extends Exception
     /**
      * @var Throwable[]
      */
-    private array $rest;
+    private readonly array $rest;
 
     public function __construct(
-        private Throwable $first,
+        private readonly Throwable $first,
         Throwable ...$rest,
     ) {
         $this->rest = $rest;

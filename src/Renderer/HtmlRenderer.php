@@ -51,36 +51,36 @@ use function strlen;
  */
 final class HtmlRenderer implements ThrowableRendererInterface
 {
-    private GithubMarkdown $markdownParser;
+    private readonly GithubMarkdown $markdownParser;
 
     /**
      * @var string The full path to the default template directory.
      */
-    private string $defaultTemplatePath;
+    private readonly string $defaultTemplatePath;
 
     /**
      * @var string The full path of the template file for rendering exceptions without call stack information.
      *
      * This template should be used in production.
      */
-    private string $template;
+    private readonly string $template;
 
     /**
      * @var string The full path of the template file for rendering exceptions with call stack information.
      *
      * This template should be used in development.
      */
-    private string $verboseTemplate;
+    private readonly string $verboseTemplate;
 
     /**
      * @var int The maximum number of source code lines to be displayed. Defaults to 19.
      */
-    private int $maxSourceLines;
+    private readonly int $maxSourceLines;
 
     /**
      * @var int The maximum number of trace source code lines to be displayed. Defaults to 13.
      */
-    private int $maxTraceLines;
+    private readonly int $maxTraceLines;
 
     /**
      * @var string|null The trace header line with placeholders to be be substituted. Defaults to null.
@@ -94,7 +94,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * <a href="ide://open?file={file}&line={line}">{icon}</a>
      * ```
      */
-    private ?string $traceHeaderLine;
+    private readonly ?string $traceHeaderLine;
 
     /**
      * @var string[]|null The list of vendor paths is determined automatically.

@@ -55,10 +55,10 @@ final class ExceptionResponder implements MiddlewareInterface
      * catching exceptions that can be thrown in the process of body generation.
      */
     public function __construct(
-        private array $exceptionMap,
-        private ResponseFactoryInterface $responseFactory,
-        private Injector $injector,
-        private bool $checkResponseBody = false,
+        private readonly array $exceptionMap,
+        private readonly ResponseFactoryInterface $responseFactory,
+        private readonly Injector $injector,
+        private readonly bool $checkResponseBody = false,
     ) {
     }
 
