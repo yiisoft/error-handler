@@ -6,6 +6,7 @@ namespace Yiisoft\ErrorHandler\Tests\Renderer;
 
 use Exception;
 use HttpSoft\Message\Uri;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
@@ -171,7 +172,7 @@ final class HtmlRendererTest extends TestCase
         $this->assertSame('Error (' . ErrorException::class . ')', $name);
     }
 
-    public function createServerInformationLinkDataProvider(): array
+    public static function createServerInformationLinkDataProvider(): array
     {
         return [
             'not-exist' => [null, ''],
@@ -185,9 +186,7 @@ final class HtmlRendererTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider createServerInformationLinkDataProvider
-     */
+    #[DataProvider('createServerInformationLinkDataProvider')]
     public function testCreateServerInformationLink(?string $serverSoftware, string $expected): void
     {
         $renderer = new HtmlRenderer();
@@ -199,7 +198,7 @@ final class HtmlRendererTest extends TestCase
         $this->assertStringContainsString($expected, $renderer->createServerInformationLink($serverRequestMock));
     }
 
-    public function argumentsToStringValueDataProvider(): array
+    public static function argumentsToStringValueDataProvider(): array
     {
         return [
             'int' => [[1], '1'],
@@ -222,11 +221,7 @@ final class HtmlRendererTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider argumentsToStringValueDataProvider
-     *
-     * @param mixed $args
-     */
+    #[DataProvider('argumentsToStringValueDataProvider')]
     public function testArgumentsToString(array $args, string $expected): void
     {
         $renderer = new HtmlRenderer();
@@ -270,7 +265,7 @@ final class HtmlRendererTest extends TestCase
         ]));
     }
 
-    public function isVendorFileReturnFalseDataProvider(): array
+    public static function isVendorFileReturnFalseDataProvider(): array
     {
         return [
             'null' => [null],
@@ -279,9 +274,7 @@ final class HtmlRendererTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider isVendorFileReturnFalseDataProvider
-     */
+    #[DataProvider('isVendorFileReturnFalseDataProvider')]
     public function testIsVendorFileReturnFalse(?string $file): void
     {
         $this->assertFalse($this->invokeMethod(new HtmlRenderer(), 'isVendorFile', ['file' => $file]));
