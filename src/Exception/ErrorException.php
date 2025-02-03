@@ -11,7 +11,6 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 use function array_slice;
 use function in_array;
 use function function_exists;
-use function ini_get;
 
 /**
  * `ErrorException` represents a PHP error.
@@ -150,6 +149,6 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         }
 
         // Xdebug 3 and later, proper mode is required
-        return str_contains((string) ini_get('xdebug.mode'), 'develop');
+        return str_contains((string) \ini_get('xdebug.mode'), 'develop');
     }
 }
