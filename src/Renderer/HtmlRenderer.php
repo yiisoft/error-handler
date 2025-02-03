@@ -156,7 +156,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             ?? null;
     }
 
-    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData($this->renderTemplate($this->template, [
             'request' => $request,
@@ -164,7 +164,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         ]));
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData($this->renderTemplate($this->verboseTemplate, [
             'request' => $request,

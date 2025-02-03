@@ -16,7 +16,7 @@ use function json_encode;
  */
 final class JsonRenderer implements ThrowableRendererInterface
 {
-    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(
             json_encode(
@@ -28,7 +28,7 @@ final class JsonRenderer implements ThrowableRendererInterface
         );
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(
             json_encode(

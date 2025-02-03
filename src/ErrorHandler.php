@@ -62,8 +62,8 @@ final class ErrorHandler
      */
     public function handle(
         Throwable $t,
-        ThrowableRendererInterface $renderer = null,
-        ServerRequestInterface $request = null
+        ?ThrowableRendererInterface $renderer = null,
+        ?ServerRequestInterface $request = null
     ): ErrorData {
         $renderer ??= $this->defaultRenderer;
 
