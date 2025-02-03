@@ -50,8 +50,12 @@ final class ThrowableResponseFactory implements ThrowableResponseFactoryInterfac
     ];
     private ?string $contentType = null;
 
-    public function __construct(private ResponseFactoryInterface $responseFactory, private ErrorHandler $errorHandler, private ContainerInterface $container, private HeadersProvider $headersProvider = new HeadersProvider())
-    {
+    public function __construct(
+        private readonly ResponseFactoryInterface $responseFactory,
+        private readonly ErrorHandler $errorHandler,
+        private readonly ContainerInterface $container,
+        private readonly HeadersProvider $headersProvider = new HeadersProvider(),
+    ) {
     }
 
     public function create(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
