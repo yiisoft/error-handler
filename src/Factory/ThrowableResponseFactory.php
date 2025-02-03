@@ -37,8 +37,6 @@ use function trim;
  */
 final class ThrowableResponseFactory implements ThrowableResponseFactoryInterface
 {
-    private HeadersProvider $headersProvider;
-
     /**
      * @psalm-var array<string,class-string<ThrowableRendererInterface>>
      */
@@ -52,13 +50,8 @@ final class ThrowableResponseFactory implements ThrowableResponseFactoryInterfac
     ];
     private ?string $contentType = null;
 
-    public function __construct(
-        private ResponseFactoryInterface $responseFactory,
-        private ErrorHandler $errorHandler,
-        private ContainerInterface $container,
-        ?HeadersProvider $headersProvider = null,
-    ) {
-        $this->headersProvider = $headersProvider ?? new HeadersProvider();
+    public function __construct(private ResponseFactoryInterface $responseFactory, private ErrorHandler $errorHandler, private ContainerInterface $container, private HeadersProvider $headersProvider = new HeadersProvider())
+    {
     }
 
     public function create(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
