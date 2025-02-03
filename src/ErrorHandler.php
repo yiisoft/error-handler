@@ -192,6 +192,9 @@ final class ErrorHandler
         });
 
         if (!(PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')) {
+            /**
+             * @var string
+             */
             $this->workingDirectory = getcwd();
         }
 

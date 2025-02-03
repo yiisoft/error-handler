@@ -11,6 +11,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 use function array_slice;
 use function in_array;
 use function function_exists;
+use function ini_get;
 
 /**
  * `ErrorException` represents a PHP error.
@@ -40,7 +41,7 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
     ];
 
     /** @psalm-param DebugBacktraceType $backtrace */
-    public function __construct(string $message = '', int $code = 0, int $severity = 1, string $filename = __FILE__, int $line = __LINE__, Exception $previous = null, private readonly array $backtrace = [])
+    public function __construct(string $message = '', int $code = 0, int $severity = 1, string $filename = __FILE__, int $line = __LINE__, ?Exception $previous = null, private readonly array $backtrace = [])
     {
         parent::__construct($message, $code, $severity, $filename, $line, $previous);
         $this->addXDebugTraceToFatalIfAvailable();
@@ -149,6 +150,6 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         }
 
         // Xdebug 3 and later, proper mode is required
-        return str_contains(ini_get('xdebug.mode'), 'develop');
+        return str_contains((string) ini_get('xdebug.mode'), 'develop');
     }
 }

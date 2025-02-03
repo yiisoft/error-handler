@@ -530,7 +530,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         try {
             /** @psalm-suppress PossiblyNullFunctionCall */
             $renderer->bindTo($this)($path, $parameters);
-            return ob_get_clean();
+            return (string) ob_get_clean();
         } catch (Throwable $e) {
             while (ob_get_level() > $obInitialLevel) {
                 if (!@ob_end_clean()) {

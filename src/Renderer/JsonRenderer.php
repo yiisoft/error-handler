@@ -40,7 +40,7 @@ final class JsonRenderer implements ThrowableRendererInterface
                     'line' => $t->getLine(),
                     'trace' => $t->getTrace(),
                 ],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR
+                JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR
             )
         );
     }
