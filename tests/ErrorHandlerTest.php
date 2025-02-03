@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests;
 
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -85,6 +86,7 @@ final class ErrorHandlerTest extends TestCase
         $this->errorHandler->handle($throwable);
     }
 
+    #[WithoutErrorHandler]
     public function testHandleError(): void
     {
         $array = [];
@@ -94,6 +96,7 @@ final class ErrorHandlerTest extends TestCase
         $this->errorHandler->unregister();
     }
 
+    #[WithoutErrorHandler]
     public function testHandleErrorWithCatching(): void
     {
         $this->errorHandler->register();

@@ -17,8 +17,8 @@ final class ErrorData implements Stringable
      * @param array<string, string|string[]> $headers The headers to add to the response.
      */
     public function __construct(
-        private string $content,
-        private array $headers = [],
+        private readonly string $content,
+        private readonly array $headers = [],
     ) {
     }
 

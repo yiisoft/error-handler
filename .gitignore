@@ -16,9 +16,7 @@ Thumbs.db
 composer.phar
 composer.lock
 
-# phpunit itself is not needed
-phpunit.phar
-# local phpunit config
+# PHPUnit
+/phpunit.phar
 /phpunit.xml
-# phpunit cache
-.phpunit.result.cache
+/.phpunit.cache

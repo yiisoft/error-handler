@@ -47,10 +47,10 @@ final class ErrorHandler
      * @param int $exitShutdownHandlerDepth Depth of the exit() shutdown handler to ensure it's executed last.
      */
     public function __construct(
-        private LoggerInterface $logger,
-        private ThrowableRendererInterface $defaultRenderer,
-        private ?EventDispatcherInterface $eventDispatcher = null,
-        private int $exitShutdownHandlerDepth = 2
+        private readonly LoggerInterface $logger,
+        private readonly ThrowableRendererInterface $defaultRenderer,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
+        private readonly int $exitShutdownHandlerDepth = 2
     ) {
     }
 
