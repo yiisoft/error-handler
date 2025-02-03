@@ -33,14 +33,14 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         E_USER_ERROR => 'PHP User Error',
         E_USER_WARNING => 'PHP User Warning',
         E_USER_NOTICE => 'PHP User Notice',
-        E_STRICT => 'PHP Strict Warning',
+        2048 => 'PHP Strict Warning', // E_STRICT
         E_RECOVERABLE_ERROR => 'PHP Recoverable Error',
         E_DEPRECATED => 'PHP Deprecated Warning',
         E_USER_DEPRECATED => 'PHP User Deprecated Warning',
     ];
 
     /** @psalm-param DebugBacktraceType $backtrace */
-    public function __construct(string $message = '', int $code = 0, int $severity = 1, string $filename = __FILE__, int $line = __LINE__, Exception $previous = null, private readonly array $backtrace = [])
+    public function __construct(string $message = '', int $code = 0, int $severity = 1, string $filename = __FILE__, int $line = __LINE__, ?Exception $previous = null, private readonly array $backtrace = [])
     {
         parent::__construct($message, $code, $severity, $filename, $line, $previous);
         $this->addXDebugTraceToFatalIfAvailable();
@@ -149,6 +149,6 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         }
 
         // Xdebug 3 and later, proper mode is required
-        return str_contains(ini_get('xdebug.mode'), 'develop');
+        return str_contains((string) \ini_get('xdebug.mode'), 'develop');
     }
 }

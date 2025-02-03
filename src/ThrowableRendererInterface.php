@@ -23,7 +23,7 @@ interface ThrowableRendererInterface
      * @param ServerRequestInterface|null $request
      * @return ErrorData
      */
-    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData;
+    public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData;
 
     /**
      * Returns error data suitable for adding it to response in development environment.
@@ -31,5 +31,5 @@ interface ThrowableRendererInterface
      * @param ServerRequestInterface|null $request
      * @return ErrorData
      */
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData;
+    public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData;
 }

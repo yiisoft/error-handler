@@ -233,7 +233,7 @@ final class ThrowableResponseFactoryTest extends TestCase
     }
 
     private function createThrowableResponseFactory(
-        HeadersProvider $provider = null,
+        ?HeadersProvider $provider = null,
     ): ThrowableResponseFactoryInterface {
         $container = new SimpleContainer([], fn (string $className): object => new $className());
         return new ThrowableResponseFactory(
