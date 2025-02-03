@@ -56,7 +56,7 @@ final class ThrowableResponseFactory implements ThrowableResponseFactoryInterfac
         private ResponseFactoryInterface $responseFactory,
         private ErrorHandler $errorHandler,
         private ContainerInterface $container,
-        HeadersProvider $headersProvider = null,
+        ?HeadersProvider $headersProvider = null,
     ) {
         $this->headersProvider = $headersProvider ?? new HeadersProvider();
     }
