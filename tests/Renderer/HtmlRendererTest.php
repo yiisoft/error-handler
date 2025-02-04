@@ -7,6 +7,7 @@ namespace Yiisoft\ErrorHandler\Tests\Renderer;
 use Exception;
 use HttpSoft\Message\Uri;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
@@ -131,9 +132,16 @@ final class HtmlRendererTest extends TestCase
         );
     }
 
+    #[WithoutErrorHandler]
     public function testRenderCallStackItemIfFileIsNotExistAndLineMoreZero(): void
     {
-        $this->assertEmpty($this->invokeMethod(new HtmlRenderer(), 'renderCallStackItem', [
+        $errorMessage = null;
+        set_error_handler(
+            static function (int $code, string $message) use (&$errorMessage) {
+                $errorMessage = $message;
+            }
+        );
+        $result = $this->invokeMethod(new HtmlRenderer(), 'renderCallStackItem', [
             'file' => 'not-exist',
             'line' => 1,
             'class' => null,
@@ -142,7 +150,11 @@ final class HtmlRendererTest extends TestCase
             'index' => 1,
             'isVendorFile' => false,
             'reflectionParameters' => [],
-        ]));
+        ]);
+        restore_error_handler();
+
+        $this->assertSame('', $result);
+        $this->assertSame('file(not-exist): Failed to open stream: No such file or directory', $errorMessage);
     }
 
     public function testRenderRequest(): void

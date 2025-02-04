@@ -14,12 +14,12 @@ use Yiisoft\ErrorHandler\ThrowableRendererInterface;
  */
 final class HeaderRenderer implements ThrowableRendererInterface
 {
-    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData('', ['X-Error-Message' => self::DEFAULT_ERROR_MESSAGE]);
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData('', [
             'X-Error-Type' => $t::class,

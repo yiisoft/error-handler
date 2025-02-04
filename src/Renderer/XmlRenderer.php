@@ -16,7 +16,7 @@ use function str_replace;
  */
 final class XmlRenderer implements ThrowableRendererInterface
 {
-    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         $content = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
         $content .= "\n<error>\n";
@@ -25,7 +25,7 @@ final class XmlRenderer implements ThrowableRendererInterface
         return new ErrorData($content);
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         $content = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
         $content .= "\n<error>\n";

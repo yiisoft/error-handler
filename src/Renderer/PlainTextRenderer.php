@@ -14,12 +14,12 @@ use Yiisoft\ErrorHandler\ThrowableRendererInterface;
  */
 final class PlainTextRenderer implements ThrowableRendererInterface
 {
-    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(self::DEFAULT_ERROR_MESSAGE);
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(
             self::throwableToString($t)

@@ -16,7 +16,7 @@ use function json_encode;
  */
 final class JsonRenderer implements ThrowableRendererInterface
 {
-    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(
             json_encode(
@@ -28,7 +28,7 @@ final class JsonRenderer implements ThrowableRendererInterface
         );
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(
             json_encode(
@@ -40,7 +40,7 @@ final class JsonRenderer implements ThrowableRendererInterface
                     'line' => $t->getLine(),
                     'trace' => $t->getTrace(),
                 ],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR
+                JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR
             )
         );
     }

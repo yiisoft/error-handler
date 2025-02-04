@@ -62,8 +62,8 @@ final class ErrorHandler
      */
     public function handle(
         Throwable $t,
-        ThrowableRendererInterface $renderer = null,
-        ServerRequestInterface $request = null
+        ?ThrowableRendererInterface $renderer = null,
+        ?ServerRequestInterface $request = null
     ): ErrorData {
         $renderer ??= $this->defaultRenderer;
 
@@ -192,6 +192,9 @@ final class ErrorHandler
         });
 
         if (!(PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')) {
+            /**
+             * @var string
+             */
             $this->workingDirectory = getcwd();
         }
 

@@ -8,7 +8,9 @@
   class (@olegbaturin)
 - Chg #137: Add separate parameters for each of `HtmlRenderer` settings in constructor. Mark `$settings` parameter as
   deprecated (@vjik) 
-- Enh #138: Raise the minimum PHP version to 8.1 and minor refactoring (@vjik) 
+- Enh #138, #139: Raise the minimum PHP version to 8.1 and minor refactoring (@vjik)
+- Chg #139: Change PHP constraint in `composer.json` to `~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0` (@vjik)
+- Bug #139: Explicitly mark nullable parameters (@vjik)
 
 ## 3.3.0 July 11, 2024
 
