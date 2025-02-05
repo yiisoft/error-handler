@@ -1,15 +1,15 @@
 # Yii Error Handler Change Log
 
-## 3.4.0 under development
+## 3.4.0 February 05, 2025
 
+- Chg #137: Add separate parameters for each of `HtmlRenderer` settings in constructor. Mark `$settings` parameter as
+  deprecated (@vjik)
+- Chg #139: Change PHP constraint in `composer.json` to `~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0` (@vjik)
 - Enh #125: Add error code & show function arguments (@xepozz)
 - Enh #130: Pass exception message instead of rendered exception to logger in `ErrorHandler` (@olegbaturin)
 - Enh #133: Extract response generator from `ErrorCatcher` middleware into separate `ThrowableResponseFactory` 
   class (@olegbaturin)
-- Chg #137: Add separate parameters for each of `HtmlRenderer` settings in constructor. Mark `$settings` parameter as
-  deprecated (@vjik) 
 - Enh #138, #139: Raise the minimum PHP version to 8.1 and minor refactoring (@vjik)
-- Chg #139: Change PHP constraint in `composer.json` to `~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0` (@vjik)
 - Bug #139: Explicitly mark nullable parameters (@vjik)
 
 ## 3.3.0 July 11, 2024
