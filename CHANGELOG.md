@@ -1,5 +1,9 @@
 # Yii Error Handler Change Log
 
+## 3.4.1 under development
+
+- no changes in this release.
+
 ## 3.4.0 February 05, 2025
 
 - Chg #137: Add separate parameters for each of `HtmlRenderer` settings in constructor. Mark `$settings` parameter as
