@@ -1,13 +1,15 @@
 <?php
 
+use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
+use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
 /**
- * @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer
- * @var $request \Psr\Http\Message\ServerRequestInterface|null
- * @var $throwable \Throwable
+ * @var $this HtmlRenderer
+ * @var $request ServerRequestInterface|null
+ * @var $throwable Throwable
  */
 
 $theme = $_COOKIE['yii-exception-theme'] ?? '';
@@ -363,28 +365,42 @@ $exceptionMessage = $throwable->getMessage();
     document.onmouseup = function() { document.getElementsByTagName('body')[0].classList.remove('mousedown'); }
 
     <?php if (empty($theme)): ?>
-    var theme = getCookie('yii-exception-theme');
+    const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+    const theme = getCookie('yii-exception-theme');
 
     if (theme) {
+        applyTheme(theme);
+    } else {
+        applyTheme((themeMedia.matches ? 'dark-theme' : 'light-theme'));
+    }
+
+    themeMedia.addEventListener('change', event => {
+        if (!theme) {
+            applyTheme((event.matches ? 'dark-theme' : 'light-theme'));
+        }
+    });
+
+    function applyTheme(theme){
         document.body.classList.add(theme);
     }
+
     <?php endif; ?>
 
     function setCookie(name, value) {
-        var date = new Date(2100, 0, 1);
-        var expires = "; expires=" + date.toUTCString();
+        const date = new Date(2100, 0, 1);
+        const expires = "; expires=" + date.toUTCString();
 
         document.cookie = name + "=" + (value || "")  + expires + "; path=/";
     }
 
     function getCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
 
-        for (var i=0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0)==' ') c = c.substring(1,c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        for (let i=0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length,c.length);
         }
 
         return null;
