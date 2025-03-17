@@ -873,5 +873,77 @@ main {
     display: inline;
 }
 
+@media (prefers-color-scheme: dark) {
+    body:not(.light-theme) {
+        --page-bg-color: rgba(46,46,46, 0.9);
+        --page-text-color: #fff;
+        --icon-color: #989898;
+        --icon-hover-color: #fff;
+    }
+
+    body:not(.light-theme) header {
+        --header-bg-color: #2e2e2e;
+        --previous-text-color: rgba(255, 255, 255, 0.8);
+        --previous-arrow-color: #fff;
+    }
+
+    body:not(.light-theme) .exception-card {
+        --exception-card-bg-color: #222;
+        --exception-card-border-color: #591e15;
+        --exception-class-text-color: #fff;
+        --exception-class-friendly-text-color: rgba(255, 255, 255, 0.5);
+        --exception-class-friendly-link-color: #E57373;
+        --exception-message-text-color: rgba(255, 255, 255, 0.8);
+    }
+
+    body:not(.light-theme) header .solution {
+        --text-color: rgba(255, 255, 255, 0.8);
+        --link-color: #03a9f4;
+        --link-hover-color: #39b9f3;
+        --blockquote-text-color: #999;
+        --blockquote-border-color: #484c50;
+        --code-bg-color: #2d333b;
+        --pre-bg-color: #2d333b;
+        --table-border-color: #484c50;
+        --separator-color: #484c50;
+    }
+
+    body:not(.light-theme) .call-stack {
+        --bg-color: #1e1e1e;
+        --border-color: transparent;
+        --box-shadow: 0 13px 20px rgba(0, 0, 0, 0.25);
+        --link-color: rgba(255, 255, 255, 0.5);
+        --error-line-bg-color: #422c2c;
+        --hover-line-bg-color: #292929;
+        --element-wrap-border-color: #141414;
+        --element-wrap-text-color: #fff;
+        --element-wrap-hover-text-color: #9cdcfe;
+        --vendor-bg-color: rgba(46,46,46, 0.9);
+        --vendor-border-color: #666;
+        --vendor-state-bg-color: #666;
+        --vendor-content-bg-color: rgba(46,46,46, 0.9);
+    }
+
+    body:not(.light-theme) .hljs {
+        --hljs-text-color: #fff;
+        --hljs-comment-text-color: #999;
+        --hljs-keyword-text-color: #88aece;
+        --hljs-attribute-text-color: #c59bc1;
+        --hljs-name-text-color: #f08d49;
+        --hljs-string-text-color: #b5bd68;
+        --hljs-code-text-color: #cccccc;
+        --hljs-delition-text-color: #de7176;
+        --hljs-addition-text-color: #76c490;
+    }
+
+    body:not(.light-theme) #dark-mode {
+        display: none;
+    }
+
+    body:not(.light-theme) #light-mode {
+        display: inline;
+    }
+}
+
 
 /* end dark-theme */
