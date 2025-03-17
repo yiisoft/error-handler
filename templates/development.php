@@ -381,6 +381,7 @@ $exceptionMessage = $throwable->getMessage();
     });
 
     function applyTheme(theme){
+        document.body.classList.remove('dark-theme', 'light-theme');
         document.body.classList.add(theme);
     }
 
