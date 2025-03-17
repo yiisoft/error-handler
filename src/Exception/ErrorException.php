@@ -15,12 +15,12 @@ use function function_exists;
 /**
  * `ErrorException` represents a PHP error.
  * @psalm-type DebugBacktraceType = list<array{args?:list<mixed>,class?:class-string,file?:string,function:string,line?:int,object?:object,type?:string}>
+ *
+ * @final
  */
 class ErrorException extends \ErrorException implements FriendlyExceptionInterface
 {
-    /**
-     * @psalm-suppress MissingClassConstType Private constants never change.
-     */
+    /** @psalm-suppress MissingClassConstType Private constants never change. */
     private const ERROR_NAMES = [
         E_ERROR => 'PHP Fatal Error',
         E_WARNING => 'PHP Warning',
