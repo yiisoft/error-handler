@@ -191,6 +191,9 @@ $exceptionMessage = $throwable->getMessage();
     <?= file_get_contents(__DIR__ . '/highlight.min.js') ?>
 </script>
 <script>
+    const LIGHT_THEME = 'light-theme';
+    const DARK_THEME = 'dark-theme';
+
     window.onload = function() {
         const codeBlocks = document.querySelectorAll('.solution pre code,.codeBlock');
         const callStackItems = document.getElementsByClassName('call-stack-item');
@@ -348,15 +351,13 @@ $exceptionMessage = $throwable->getMessage();
         }
 
         function enableDarkTheme() {
-            document.body.classList.remove('light-theme');
-            document.body.classList.add('dark-theme');
-            setCookie('yii-exception-theme', 'dark-theme');
+            applyTheme(DARK_THEME);
+            setCookie('yii-exception-theme', DARK_THEME);
         }
 
         function enableLightTheme() {
-            document.body.classList.remove('dark-theme');
-            document.body.classList.add('light-theme');
-            setCookie('yii-exception-theme', 'light-theme');
+            applyTheme(LIGHT_THEME);
+            setCookie('yii-exception-theme', LIGHT_THEME);
         }
     };
 
@@ -364,28 +365,25 @@ $exceptionMessage = $throwable->getMessage();
     document.onmousedown = function() { document.getElementsByTagName('body')[0].classList.add('mousedown'); }
     document.onmouseup = function() { document.getElementsByTagName('body')[0].classList.remove('mousedown'); }
 
-    <?php if (empty($theme)): ?>
     const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
     const theme = getCookie('yii-exception-theme');
 
     if (theme) {
         applyTheme(theme);
     } else {
-        applyTheme((themeMedia.matches ? 'dark-theme' : 'light-theme'));
+        applyTheme((themeMedia.matches ? DARK_THEME : LIGHT_THEME));
     }
 
     themeMedia.addEventListener('change', event => {
         if (!theme) {
-            applyTheme((event.matches ? 'dark-theme' : 'light-theme'));
+            applyTheme((event.matches ? DARK_THEME : LIGHT_THEME));
         }
     });
 
     function applyTheme(theme){
-        document.body.classList.remove('dark-theme', 'light-theme');
+        document.body.classList.remove(DARK_THEME, LIGHT_THEME);
         document.body.classList.add(theme);
     }
-
-    <?php endif; ?>
 
     function setCookie(name, value) {
         const date = new Date(2100, 0, 1);
