@@ -37,6 +37,16 @@ $exceptionMessage = $throwable->getMessage();
         <?= file_get_contents(__DIR__ . '/development.css') ?>
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700">
+    <noscript>
+        <style>
+            .call-stack-vendor-items, .functionArguments {
+                display: block !important;
+            }
+            .call-stack-vendor-collapse .flex-1 {
+                display: none;
+            }
+        </style>
+    </noscript>
 </head>
 <body<?= !empty($theme) ? " class=\"{$this->htmlEncode($theme)}\"" : '' ?>>
 <header>
@@ -365,20 +375,12 @@ $exceptionMessage = $throwable->getMessage();
     document.onmousedown = function() { document.getElementsByTagName('body')[0].classList.add('mousedown'); }
     document.onmouseup = function() { document.getElementsByTagName('body')[0].classList.remove('mousedown'); }
 
-    const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+    <?php if (empty($theme)): ?>
     const theme = getCookie('yii-exception-theme');
-
     if (theme) {
         applyTheme(theme);
-    } else {
-        applyTheme((themeMedia.matches ? DARK_THEME : LIGHT_THEME));
     }
-
-    themeMedia.addEventListener('change', event => {
-        if (!theme) {
-            applyTheme((event.matches ? DARK_THEME : LIGHT_THEME));
-        }
-    });
+    <?php endif; ?>
 
     function applyTheme(theme){
         document.body.classList.remove(DARK_THEME, LIGHT_THEME);
