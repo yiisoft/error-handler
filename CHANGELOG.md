@@ -2,7 +2,7 @@
 
 ## 4.0.1 under development
 
-- no changes in this release.
+- Bug #142: fixed show dark mode (@pamparam83)
 
 ## 4.0.0 February 05, 2025
 
