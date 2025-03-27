@@ -2,7 +2,7 @@
 
 ## 4.0.1 under development
 
-- Bug #142: fixed show dark mode (@pamparam83)
+- Bug #142: Fix dark mode arument display issues (@pamparam83)
 
 ## 4.0.0 February 05, 2025
 
