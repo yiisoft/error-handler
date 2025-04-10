@@ -12,7 +12,7 @@ final class CompositeRendererProvider implements RendererProviderInterface
     /**
      * @psalm-var list<RendererProviderInterface>
      */
-    private array $providers;
+    private readonly array $providers;
 
     /**
      * @no-named-arguments
