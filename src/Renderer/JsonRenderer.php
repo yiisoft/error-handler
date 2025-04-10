@@ -8,7 +8,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
-
 use Yiisoft\Http\Header;
 
 use function json_encode;

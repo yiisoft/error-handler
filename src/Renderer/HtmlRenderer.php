@@ -14,7 +14,6 @@ use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
-
 use Yiisoft\Http\Header;
 
 use function array_values;
@@ -164,7 +163,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
     {
         return new ErrorData(
             $this->renderTemplate($this->template, [
-            'request' => $request,
+                'request' => $request,
                 'throwable' => $t,
             ]),
             [Header::CONTENT_TYPE => self::CONTENT_TYPE],
