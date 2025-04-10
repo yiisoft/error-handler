@@ -34,6 +34,8 @@ use function trim;
 /**
  * `ThrowableResponseFactory` renders `Throwable` object
  * and produces a response according to the content type provided by the client.
+ *
+ * @deprecated Use {@see \Yiisoft\ErrorHandler\ThrowableResponseFactory} instead.
  */
 final class ThrowableResponseFactory implements ThrowableResponseFactoryInterface
 {
