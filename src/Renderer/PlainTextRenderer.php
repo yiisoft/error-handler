@@ -8,21 +8,30 @@ use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
+use Yiisoft\Http\Header;
+
+use function sprintf;
 
 /**
  * Formats throwable into plain text string.
  */
 final class PlainTextRenderer implements ThrowableRendererInterface
 {
+    private const CONTENT_TYPE = 'text/plain';
+
     public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
-        return new ErrorData(self::DEFAULT_ERROR_MESSAGE);
+        return new ErrorData(
+            self::DEFAULT_ERROR_MESSAGE,
+            [Header::CONTENT_TYPE => self::CONTENT_TYPE],
+        );
     }
 
     public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(
-            self::throwableToString($t)
+            self::throwableToString($t),
+            [Header::CONTENT_TYPE => self::CONTENT_TYPE],
         );
     }
 
