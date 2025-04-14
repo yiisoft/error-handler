@@ -15,25 +15,40 @@ use Yiisoft\Http\Header;
  */
 final class HeaderRenderer implements ThrowableRendererInterface
 {
-    private const CONTENT_TYPE = '*/*';
+    public function __construct(
+        private readonly ?string $contentType = null,
+    ) {
+    }
 
     public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
-        return new ErrorData('', [
-            'X-Error-Message' => self::DEFAULT_ERROR_MESSAGE,
-            Header::CONTENT_TYPE => self::CONTENT_TYPE,
-        ]);
+        return new ErrorData(
+            '',
+            $this->addContentTypeHeader([
+                'X-Error-Message' => self::DEFAULT_ERROR_MESSAGE,
+            ]),
+        );
     }
 
     public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
-        return new ErrorData('', [
-            'X-Error-Type' => $t::class,
-            'X-Error-Message' => $t->getMessage(),
-            'X-Error-Code' => (string) $t->getCode(),
-            'X-Error-File' => $t->getFile(),
-            'X-Error-Line' => (string) $t->getLine(),
-            Header::CONTENT_TYPE => self::CONTENT_TYPE,
-        ]);
+        return new ErrorData(
+            '',
+            $this->addContentTypeHeader([
+                'X-Error-Type' => $t::class,
+                'X-Error-Message' => $t->getMessage(),
+                'X-Error-Code' => (string) $t->getCode(),
+                'X-Error-File' => $t->getFile(),
+                'X-Error-Line' => (string) $t->getLine(),
+            ]),
+        );
+    }
+
+    private function addContentTypeHeader(array $headers): array
+    {
+        if ($this->contentType !== null) {
+            $headers[Header::CONTENT_TYPE] = $this->contentType;
+        }
+        return $headers;
     }
 }

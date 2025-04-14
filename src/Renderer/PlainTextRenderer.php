@@ -17,13 +17,16 @@ use function sprintf;
  */
 final class PlainTextRenderer implements ThrowableRendererInterface
 {
-    private const CONTENT_TYPE = 'text/plain';
+    public function __construct(
+        private readonly string $contentType = 'text/plain',
+    ) {
+    }
 
     public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         return new ErrorData(
             self::DEFAULT_ERROR_MESSAGE,
-            [Header::CONTENT_TYPE => self::CONTENT_TYPE],
+            [Header::CONTENT_TYPE => $this->contentType],
         );
     }
 
@@ -31,7 +34,7 @@ final class PlainTextRenderer implements ThrowableRendererInterface
     {
         return new ErrorData(
             self::throwableToString($t),
-            [Header::CONTENT_TYPE => self::CONTENT_TYPE],
+            [Header::CONTENT_TYPE => $this->contentType],
         );
     }
 
