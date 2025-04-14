@@ -44,6 +44,10 @@ final class HeaderRenderer implements ThrowableRendererInterface
         );
     }
 
+    /**
+     * @param array<string, string|string[]> $headers
+     * @return array<string, string|string[]>
+     */
     private function addContentTypeHeader(array $headers): array
     {
         if ($this->contentType !== null) {
