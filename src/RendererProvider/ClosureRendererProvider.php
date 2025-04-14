@@ -12,6 +12,8 @@ use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use function is_string;
 
 /**
+ * Provides a renderer based on a closure that returns a `ThrowableRendererInterface` or its class name.
+ *
  * @psalm-type TClosure = Closure(ServerRequestInterface $request): (class-string<ThrowableRendererInterface>|ThrowableRendererInterface|null)
  */
 final class ClosureRendererProvider implements RendererProviderInterface

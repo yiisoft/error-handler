@@ -15,6 +15,9 @@ use Yiisoft\Http\Header;
  */
 final class HeaderRenderer implements ThrowableRendererInterface
 {
+    /**
+     * @param string|null $contentType The content type to be set in the response header.
+     */
     public function __construct(
         private readonly ?string $contentType = null,
     ) {

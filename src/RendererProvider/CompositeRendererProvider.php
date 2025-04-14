@@ -7,6 +7,9 @@ namespace Yiisoft\ErrorHandler\RendererProvider;
 use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
+/**
+ * `CompositeRendererProvider` aggregates multiple `RendererProviderInterface` implementations.
+ */
 final class CompositeRendererProvider implements RendererProviderInterface
 {
     /**

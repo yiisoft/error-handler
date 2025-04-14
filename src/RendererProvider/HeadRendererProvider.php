@@ -12,6 +12,9 @@ use Yiisoft\Http\Header;
 use Yiisoft\Http\HeaderValueHelper;
 use Yiisoft\Http\Method;
 
+/**
+ * Provides a renderer for HEAD requests.
+ */
 final class HeadRendererProvider implements RendererProviderInterface
 {
     public function get(ServerRequestInterface $request): ?ThrowableRendererInterface

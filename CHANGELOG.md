@@ -1,8 +1,12 @@
 # Yii Error Handler Change Log
 
-## 4.0.1 under development
+## 4.1.0 under development
 
 - Bug #142: Fix dark mode argument display issues (@pamparam83)
+- Enh #145: Set content type header in renderers (@vjik)
+- New #145: Add `Yiisoft\ErrorHandler\ThrowableResponseFactory` that provides a response for `Throwable` object with
+  renderer provider usage (@vjik)
+- Chg #145: Mark `Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` as deprecated (@vjik)
 
 ## 4.0.0 February 05, 2025
 
@@ -11,7 +15,7 @@
 - Chg #139: Change PHP constraint in `composer.json` to `~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0` (@vjik)
 - Enh #125: Add error code & show function arguments (@xepozz)
 - Enh #130: Pass exception message instead of rendered exception to logger in `ErrorHandler` (@olegbaturin)
-- Enh #133: Extract response generator from `ErrorCatcher` middleware into separate `ThrowableResponseFactory` 
+- Enh #133: Extract response generator from `ErrorCatcher` middleware into separate `ThrowableResponseFactory`
   class (@olegbaturin)
 - Enh #138, #139: Raise the minimum PHP version to 8.1 and minor refactoring (@vjik)
 - Bug #139: Explicitly mark nullable parameters (@vjik)

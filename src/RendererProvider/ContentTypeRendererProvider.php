@@ -17,6 +17,9 @@ use Yiisoft\Http\HeaderValueHelper;
 
 use function array_key_exists;
 
+/**
+ * Provides a renderer based on the "Accept" header of the request.
+ */
 final class ContentTypeRendererProvider implements RendererProviderInterface
 {
     /**

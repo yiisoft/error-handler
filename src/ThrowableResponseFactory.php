@@ -11,6 +11,9 @@ use Throwable;
 use Yiisoft\ErrorHandler\RendererProvider\RendererProviderInterface;
 use Yiisoft\Http\Status;
 
+/**
+ * `ThrowableResponseFactory` produces a response with rendered `Throwable` object.
+ */
 final class ThrowableResponseFactory implements ThrowableResponseFactoryInterface
 {
     private readonly HeadersProvider $headersProvider;
