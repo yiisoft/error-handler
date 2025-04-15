@@ -19,8 +19,8 @@ final class ThrowableResponseFactory implements ThrowableResponseFactoryInterfac
     private readonly HeadersProvider $headersProvider;
 
     public function __construct(
-        private readonly ErrorHandler $errorHandler,
         private readonly ResponseFactoryInterface $responseFactory,
+        private readonly ErrorHandler $errorHandler,
         private readonly RendererProviderInterface $rendererProvider,
         ?HeadersProvider $headersProvider = null,
     ) {
