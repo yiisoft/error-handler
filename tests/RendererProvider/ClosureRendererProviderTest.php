@@ -28,7 +28,7 @@ final class ClosureRendererProviderTest extends TestCase
                 return PlainTextRenderer::class;
             },
             new SimpleContainer([
-                PlainTextRenderer::class => new PlainTextRenderer()
+                PlainTextRenderer::class => new PlainTextRenderer(),
             ]),
         );
 
