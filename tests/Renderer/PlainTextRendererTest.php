@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests\Renderer;
 
+use HttpSoft\Message\Response;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
+
+use function PHPUnit\Framework\assertSame;
 
 final class PlainTextRendererTest extends TestCase
 {
@@ -41,5 +44,16 @@ final class PlainTextRendererTest extends TestCase
         $data = $renderer->renderVerbose($throwable);
         $this->assertSame($expectedContent, (string) $data);
         $this->assertSame($expectedContent, PlainTextRenderer::throwableToString($throwable));
+    }
+
+    public function testContentType(): void
+    {
+        $renderer = new PlainTextRenderer('text/html');
+
+        $response = $renderer
+            ->render(new RuntimeException())
+            ->addToResponse(new Response());
+
+        assertSame('text/html', $response->getHeaderLine('Content-Type'));
     }
 }

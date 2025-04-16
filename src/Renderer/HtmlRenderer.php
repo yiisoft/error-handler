@@ -14,6 +14,7 @@ use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
+use Yiisoft\Http\Header;
 
 use function array_values;
 use function dirname;
@@ -51,6 +52,8 @@ use function strlen;
  */
 final class HtmlRenderer implements ThrowableRendererInterface
 {
+    private const CONTENT_TYPE = 'text/html';
+
     private readonly GithubMarkdown $markdownParser;
 
     /**
@@ -158,18 +161,24 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
     public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
-        return new ErrorData($this->renderTemplate($this->template, [
-            'request' => $request,
-            'throwable' => $t,
-        ]));
+        return new ErrorData(
+            $this->renderTemplate($this->template, [
+                'request' => $request,
+                'throwable' => $t,
+            ]),
+            [Header::CONTENT_TYPE => self::CONTENT_TYPE],
+        );
     }
 
     public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
-        return new ErrorData($this->renderTemplate($this->verboseTemplate, [
-            'request' => $request,
-            'throwable' => $t,
-        ]));
+        return new ErrorData(
+            $this->renderTemplate($this->verboseTemplate, [
+                'request' => $request,
+                'throwable' => $t,
+            ]),
+            [Header::CONTENT_TYPE => self::CONTENT_TYPE],
+        );
     }
 
     /**
