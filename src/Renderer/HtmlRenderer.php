@@ -517,7 +517,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
                         $name = $friendlyExceptionAttribute->name . ' (' . $name . ')';
                     }
                 }
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 // Ignore exception and keep default name
             }
         }
