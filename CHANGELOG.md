@@ -1,5 +1,9 @@
 # Yii Error Handler Change Log
 
+## 4.1.1 under development
+
+- no changes in this release.
+
 ## 4.1.0 April 18, 2025
 
 - New #145: Add `Yiisoft\ErrorHandler\ThrowableResponseFactory` that provides a response for `Throwable` object with
