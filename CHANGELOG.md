@@ -1,12 +1,12 @@
 # Yii Error Handler Change Log
 
-## 4.1.0 under development
+## 4.1.0 April 18, 2025
 
-- Bug #142: Fix dark mode argument display issues (@pamparam83)
-- Enh #145: Set content type header in renderers (@vjik)
 - New #145: Add `Yiisoft\ErrorHandler\ThrowableResponseFactory` that provides a response for `Throwable` object with
   renderer provider usage (@vjik)
 - Chg #145: Mark `Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` as deprecated (@vjik)
+- Enh #145: Set content type header in renderers (@vjik)
+- Bug #142: Fix dark mode argument display issues (@pamparam83)
 
 ## 4.0.0 February 05, 2025
 
