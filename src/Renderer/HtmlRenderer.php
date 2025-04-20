@@ -507,18 +507,14 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $name = $throwable->getName() . ' (' . $name . ')';
         } else {
             // Check if the exception class has FriendlyException attribute
-            try {
-                $reflectionClass = new ReflectionClass($throwable);
-                if (class_exists('Yiisoft\FriendlyException\Attribute\FriendlyException')) {
-                    $attributes = $reflectionClass->getAttributes('Yiisoft\FriendlyException\Attribute\FriendlyException');
-                    
-                    if (!empty($attributes)) {
-                        $friendlyExceptionAttribute = $attributes[0]->newInstance();
-                        $name = $friendlyExceptionAttribute->name . ' (' . $name . ')';
-                    }
+            $reflectionClass = new ReflectionClass($throwable);
+            if (class_exists(\Yiisoft\FriendlyException\Attribute\FriendlyException::class)) {
+                $attributes = $reflectionClass->getAttributes(\Yiisoft\FriendlyException\Attribute\FriendlyException::class);
+                
+                if (!empty($attributes)) {
+                    $friendlyExceptionAttribute = $attributes[0]->newInstance();
+                    $name = $friendlyExceptionAttribute->name . ' (' . $name . ')';
                 }
-            } catch (\Throwable $e) {
-                // Ignore exception and keep default name
             }
         }
 

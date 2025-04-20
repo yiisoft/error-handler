@@ -27,10 +27,10 @@ $isFriendlyException = $throwable instanceof FriendlyExceptionInterface;
 $solution = $isFriendlyException ? $throwable->getSolution() : null;
 
 // Check if the exception class has FriendlyException attribute
-if ($solution === null && class_exists('Yiisoft\FriendlyException\Attribute\FriendlyException')) {
+if ($solution === null && class_exists(\Yiisoft\FriendlyException\Attribute\FriendlyException::class)) {
     try {
         $reflectionClass = new ReflectionClass($throwable);
-        $attributes = $reflectionClass->getAttributes('Yiisoft\FriendlyException\Attribute\FriendlyException');
+        $attributes = $reflectionClass->getAttributes(\Yiisoft\FriendlyException\Attribute\FriendlyException::class);
         
         if (!empty($attributes)) {
             $friendlyExceptionAttribute = $attributes[0]->newInstance();
@@ -111,10 +111,10 @@ $exceptionMessage = $throwable->getMessage();
                 // Check if the exception class has FriendlyException attribute
                 $hasFriendlyNameFromAttribute = false;
                 
-                if (class_exists('Yiisoft\FriendlyException\Attribute\FriendlyException')) {
+                if (class_exists(\Yiisoft\FriendlyException\Attribute\FriendlyException::class)) {
                     try {
                         $reflectionClass = new ReflectionClass($throwable);
-                        $attributes = $reflectionClass->getAttributes('Yiisoft\FriendlyException\Attribute\FriendlyException');
+                        $attributes = $reflectionClass->getAttributes(\Yiisoft\FriendlyException\Attribute\FriendlyException::class);
                         
                         if (!empty($attributes)) {
                             $friendlyExceptionAttribute = $attributes[0]->newInstance();
