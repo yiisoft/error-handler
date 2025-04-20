@@ -1,8 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionClass;
+use Throwable;
 use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
+use Yiisoft\ErrorHandler\HeadersProvider;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
@@ -20,6 +25,22 @@ if ($throwable instanceof CompositeException) {
 }
 $isFriendlyException = $throwable instanceof FriendlyExceptionInterface;
 $solution = $isFriendlyException ? $throwable->getSolution() : null;
+
+// Check if the exception class has FriendlyException attribute
+if ($solution === null && class_exists(\Yiisoft\FriendlyException\Attribute\FriendlyException::class)) {
+    try {
+        $reflectionClass = new ReflectionClass($throwable);
+        $attributes = $reflectionClass->getAttributes(\Yiisoft\FriendlyException\Attribute\FriendlyException::class);
+        
+        if (!empty($attributes)) {
+            $friendlyExceptionAttribute = $attributes[0]->newInstance();
+            $solution = $friendlyExceptionAttribute->solution;
+        }
+    } catch (\Throwable $e) {
+        // Ignore exception
+    }
+}
+
 $exceptionClass = get_class($throwable);
 $exceptionMessage = $throwable->getMessage();
 
@@ -78,13 +99,44 @@ $exceptionMessage = $throwable->getMessage();
     <div class="exception-card">
         <div class="exception-class">
             <?php
-            if ($isFriendlyException): ?>
+            $hasFriendlyName = false;
+            if ($isFriendlyException) {
+                $hasFriendlyName = true;
+                ?>
                 <span><?= $this->htmlEncode($throwable->getName())?></span>
                 &mdash;
                 <?= $exceptionClass ?>
-            <?php else: ?>
-                <span><?= $exceptionClass ?></span>
-            <?php endif ?>
+            <?php 
+            } else {
+                // Check if the exception class has FriendlyException attribute
+                $hasFriendlyNameFromAttribute = false;
+                
+                if (class_exists(\Yiisoft\FriendlyException\Attribute\FriendlyException::class)) {
+                    try {
+                        $reflectionClass = new ReflectionClass($throwable);
+                        $attributes = $reflectionClass->getAttributes(\Yiisoft\FriendlyException\Attribute\FriendlyException::class);
+                        
+                        if (!empty($attributes)) {
+                            $friendlyExceptionAttribute = $attributes[0]->newInstance();
+                            $hasFriendlyNameFromAttribute = true;
+                            ?>
+                            <span><?= $this->htmlEncode($friendlyExceptionAttribute->name) ?></span>
+                            &mdash;
+                            <?= $exceptionClass ?>
+                        <?php
+                        }
+                    } catch (\Throwable $e) {
+                        // Ignore exception
+                    }
+                }
+                
+                if (!$hasFriendlyName && !$hasFriendlyNameFromAttribute) {
+                    ?>
+                    <span><?= $exceptionClass ?></span>
+                    <?php 
+                }
+            } 
+            ?>
             (Code #<?= $throwable->getCode() ?>)
         </div>
 
@@ -98,12 +150,12 @@ $exceptionMessage = $throwable->getMessage();
 
         <?= $this->renderPreviousExceptions($originalException) ?>
 
-        <textarea id="clipboard"><?= $this->htmlEncode($throwable) ?></textarea>
+        <textarea id="clipboard"><?= $this->htmlEncode((string)$throwable) ?></textarea>
         <span id="copied">Copied!</span>
 
         <a href="#"
            class="copy-clipboard"
-           data-clipboard="<?= $this->htmlEncode($throwable) ?>"
+           data-clipboard="<?= $this->htmlEncode((string)$throwable) ?>"
            title="Copy the stacktrace for use in a bug report or pastebin"
         >
             <svg width="26" height="30" fill="none" xmlns="http://www.w3.org/2000/svg">

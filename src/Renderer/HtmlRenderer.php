@@ -14,7 +14,9 @@ use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
+use Yiisoft\FriendlyException\Attribute\FriendlyException;
 use Yiisoft\Http\Header;
+use ReflectionClass;
 
 use function array_values;
 use function dirname;
@@ -491,9 +493,11 @@ final class HtmlRenderer implements ThrowableRendererInterface
     }
 
     /**
-     * Returns the name of the throwable instance.
+     * Returns string representation of the throwable name.
      *
-     * @return string The name of the throwable instance.
+     * @param Throwable $throwable The throwable.
+     *
+     * @return string The throwable name.
      */
     public function getThrowableName(Throwable $throwable): string
     {
@@ -501,6 +505,17 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
         if ($throwable instanceof FriendlyExceptionInterface) {
             $name = $throwable->getName() . ' (' . $name . ')';
+        } else {
+            // Check if the exception class has FriendlyException attribute
+            $reflectionClass = new ReflectionClass($throwable);
+            if (class_exists(\Yiisoft\FriendlyException\Attribute\FriendlyException::class)) {
+                $attributes = $reflectionClass->getAttributes(\Yiisoft\FriendlyException\Attribute\FriendlyException::class);
+                
+                if (!empty($attributes)) {
+                    $friendlyExceptionAttribute = $attributes[0]->newInstance();
+                    $name = $friendlyExceptionAttribute->name . ' (' . $name . ')';
+                }
+            }
         }
 
         return $name;
