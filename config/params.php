@@ -10,7 +10,7 @@ declare(strict_types=1);
 return [
     'yiisoft/error-handler' => [
         'solutionProviders' => [
-            \Yiisoft\Definitions\Reference::to(\Yiisoft\ErrorHandler\Solution\FriendlyExceptionSolution::class),
+            Yiisoft\Definitions\Reference::to(Yiisoft\ErrorHandler\Solution\FriendlyExceptionSolution::class),
         ],
     ],
 ];
