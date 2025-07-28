@@ -109,11 +109,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
     private ?array $vendorPaths = null;
 
     /**
-     * @var SolutionProviderInterface[]
-     */
-    private array $solutionProviders;
-
-    /**
      * @param array $settings (deprecated) Settings can have the following keys:
      * - template: string, full path of the template file for rendering exceptions without call stack information.
      * - verboseTemplate: string, full path of the template file for rendering exceptions with call stack information.
@@ -144,7 +139,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         ?int $maxSourceLines = null,
         ?int $maxTraceLines = null,
         ?string $traceHeaderLine = null,
-        array $solutionProviders = []
+        private readonly array $solutionProviders = []
     ) {
         $this->markdownParser = new GithubMarkdown();
         $this->markdownParser->html5 = true;
@@ -166,8 +161,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $this->traceHeaderLine = $traceHeaderLine
             ?? $settings['traceHeaderLine']
             ?? null;
-
-        $this->solutionProviders = $solutionProviders;
     }
 
     public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
