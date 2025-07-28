@@ -15,6 +15,7 @@ use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Solution\SolutionGenerator;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
+use Yiisoft\Http\Header;
 
 use function array_values;
 use function dirname;
@@ -52,36 +53,38 @@ use function strlen;
  */
 final class HtmlRenderer implements ThrowableRendererInterface
 {
-    private GithubMarkdown $markdownParser;
+    private const CONTENT_TYPE = 'text/html';
+
+    private readonly GithubMarkdown $markdownParser;
 
     /**
      * @var string The full path to the default template directory.
      */
-    private string $defaultTemplatePath;
+    private readonly string $defaultTemplatePath;
 
     /**
      * @var string The full path of the template file for rendering exceptions without call stack information.
      *
      * This template should be used in production.
      */
-    private string $template;
+    private readonly string $template;
 
     /**
      * @var string The full path of the template file for rendering exceptions with call stack information.
      *
      * This template should be used in development.
      */
-    private string $verboseTemplate;
+    private readonly string $verboseTemplate;
 
     /**
      * @var int The maximum number of source code lines to be displayed. Defaults to 19.
      */
-    private int $maxSourceLines;
+    private readonly int $maxSourceLines;
 
     /**
      * @var int The maximum number of trace source code lines to be displayed. Defaults to 13.
      */
-    private int $maxTraceLines;
+    private readonly int $maxTraceLines;
 
     /**
      * @var string|null The trace header line with placeholders to be be substituted. Defaults to null.
@@ -95,7 +98,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * <a href="ide://open?file={file}&line={line}">{icon}</a>
      * ```
      */
-    private ?string $traceHeaderLine;
+    private readonly ?string $traceHeaderLine;
 
     /**
      * @var string[]|null The list of vendor paths is determined automatically.
@@ -108,12 +111,19 @@ final class HtmlRenderer implements ThrowableRendererInterface
     private SolutionGenerator $solutionGenerator;
 
     /**
-     * @param array $settings Settings can have the following keys:
+     * @param array $settings (deprecated) Settings can have the following keys:
      * - template: string, full path of the template file for rendering exceptions without call stack information.
      * - verboseTemplate: string, full path of the template file for rendering exceptions with call stack information.
      * - maxSourceLines: int, maximum number of source code lines to be displayed. Defaults to 19.
      * - maxTraceLines: int, maximum number of trace source code lines to be displayed. Defaults to 13.
-     * - traceHeaderLine: string, trace header line with placeholders to be be substituted. Defaults to null.
+     * - traceHeaderLine: string, trace header line with placeholders to be substituted. Defaults to null.
+     * @param string|null $template The full path of the template file for rendering exceptions without call stack
+     * information.
+     * @param string|null $verboseTemplate The full path of the template file for rendering exceptions with call stack
+     * information.
+     * @param int|null $maxSourceLines The maximum number of source code lines to be displayed. Defaults to 19.
+     * @param int|null $maxTraceLines The maximum number of trace source code lines to be displayed. Defaults to 13.
+     * @param string|null $traceHeaderLine The trace header line with placeholders to be substituted. Defaults to null.
      *
      * @psalm-param array{
      *   template?: string,
@@ -124,37 +134,61 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * } $settings
      * @param \Yiisoft\ErrorHandler\Solution\SolutionProviderInterface[] $solutionProviders
      */
-    public function __construct(array $settings = [], array $solutionProviders = [])
-    {
+    public function __construct(
+        array $settings = [],
+        ?string $template = null,
+        ?string $verboseTemplate = null,
+        ?int $maxSourceLines = null,
+        ?int $maxTraceLines = null,
+        ?string $traceHeaderLine = null,
+        array $solutionProviders = []
+    ) {
         $this->markdownParser = new GithubMarkdown();
         $this->markdownParser->html5 = true;
 
         $this->defaultTemplatePath = dirname(__DIR__, 2) . '/templates';
-        $this->template = $settings['template'] ?? $this->defaultTemplatePath . '/production.php';
-        $this->verboseTemplate = $settings['verboseTemplate'] ?? $this->defaultTemplatePath . '/development.php';
-        $this->maxSourceLines = $settings['maxSourceLines'] ?? 19;
-        $this->maxTraceLines = $settings['maxTraceLines'] ?? 13;
-        $this->traceHeaderLine = $settings['traceHeaderLine'] ?? null;
+
+        $this->template = $template
+            ?? $settings['template']
+            ?? $this->defaultTemplatePath . '/production.php';
+        $this->verboseTemplate = $verboseTemplate
+            ?? $settings['verboseTemplate']
+            ?? $this->defaultTemplatePath . '/development.php';
+        $this->maxSourceLines = $maxSourceLines
+            ?? $settings['maxSourceLines']
+            ?? 19;
+        $this->maxTraceLines = $maxTraceLines
+            ?? $settings['maxTraceLines']
+            ?? 13;
+        $this->traceHeaderLine = $traceHeaderLine
+            ?? $settings['traceHeaderLine']
+            ?? null;
+      
         $this->solutionGenerator = new SolutionGenerator($solutionProviders);
     }
 
-    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
-        return new ErrorData($this->renderTemplate($this->template, [
-            'request' => $request,
-            'throwable' => $t,
-        ]));
+        return new ErrorData(
+            $this->renderTemplate($this->template, [
+                'request' => $request,
+                'throwable' => $t,
+            ]),
+            [Header::CONTENT_TYPE => self::CONTENT_TYPE],
+        );
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         $solutions = $this->solutionGenerator->generate($t);
-
-        return new ErrorData($this->renderTemplate($this->verboseTemplate, [
-            'request' => $request,
-            'throwable' => $t,
-            'solutions' => $solutions,
-        ]));
+        return new ErrorData(
+            $this->renderTemplate($this->verboseTemplate, [
+                'request' => $request,
+                'throwable' => $t,
+                'solutions' => $solutions,
+            ]),
+            [Header::CONTENT_TYPE => self::CONTENT_TYPE],
+        );
     }
 
     /**
@@ -518,7 +552,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         try {
             /** @psalm-suppress PossiblyNullFunctionCall */
             $renderer->bindTo($this)($path, $parameters);
-            return ob_get_clean();
+            return (string) ob_get_clean();
         } catch (Throwable $e) {
             while (ob_get_level() > $obInitialLevel) {
                 if (!@ob_end_clean()) {

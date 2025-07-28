@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
+use Yiisoft\Http\Header;
 
 use function str_replace;
 
@@ -16,16 +17,21 @@ use function str_replace;
  */
 final class XmlRenderer implements ThrowableRendererInterface
 {
-    public function render(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    private const CONTENT_TYPE = 'application/xml';
+
+    public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         $content = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
         $content .= "\n<error>\n";
         $content .= $this->tag('message', self::DEFAULT_ERROR_MESSAGE);
         $content .= '</error>';
-        return new ErrorData($content);
+        return new ErrorData(
+            $content,
+            [Header::CONTENT_TYPE => self::CONTENT_TYPE],
+        );
     }
 
-    public function renderVerbose(Throwable $t, ServerRequestInterface $request = null): ErrorData
+    public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
         $content = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
         $content .= "\n<error>\n";
@@ -36,7 +42,10 @@ final class XmlRenderer implements ThrowableRendererInterface
         $content .= $this->tag('line', (string) $t->getLine());
         $content .= $this->tag('trace', $t->getTraceAsString());
         $content .= '</error>';
-        return new ErrorData($content);
+        return new ErrorData(
+            $content,
+            [Header::CONTENT_TYPE => self::CONTENT_TYPE],
+        );
     }
 
     private function tag(string $name, string $value): string

@@ -54,7 +54,7 @@ final class ErrorCatcherTest extends TestCase
     public function testErrorWithEventDispatcher(): void
     {
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher->method('dispatch')->willThrowException(new \RuntimeException('Event dispatcher error'));
+        $eventDispatcher->method('dispatch')->willThrowException(new RuntimeException('Event dispatcher error'));
         $errorCatcher = new ErrorCatcher(
             $this->createThrowableResponseFactory(),
             $eventDispatcher,

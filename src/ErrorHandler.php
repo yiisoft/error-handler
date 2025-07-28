@@ -47,10 +47,10 @@ final class ErrorHandler
      * @param int $exitShutdownHandlerDepth Depth of the exit() shutdown handler to ensure it's executed last.
      */
     public function __construct(
-        private LoggerInterface $logger,
-        private ThrowableRendererInterface $defaultRenderer,
-        private ?EventDispatcherInterface $eventDispatcher = null,
-        private int $exitShutdownHandlerDepth = 2
+        private readonly LoggerInterface $logger,
+        private readonly ThrowableRendererInterface $defaultRenderer,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
+        private readonly int $exitShutdownHandlerDepth = 2
     ) {
     }
 
@@ -62,8 +62,8 @@ final class ErrorHandler
      */
     public function handle(
         Throwable $t,
-        ThrowableRendererInterface $renderer = null,
-        ServerRequestInterface $request = null
+        ?ThrowableRendererInterface $renderer = null,
+        ?ServerRequestInterface $request = null
     ): ErrorData {
         $renderer ??= $this->defaultRenderer;
 
@@ -192,6 +192,9 @@ final class ErrorHandler
         });
 
         if (!(PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')) {
+            /**
+             * @var string
+             */
             $this->workingDirectory = getcwd();
         }
 

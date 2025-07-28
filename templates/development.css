@@ -875,10 +875,22 @@ main {
 
 @media (prefers-color-scheme: dark) {
     body:not(.light-theme) {
-        --page-bg-color: rgba(46,46,46, 0.9);
+        --page-bg-color: rgba(46, 46, 46, 0.9);
         --page-text-color: #fff;
+        --page-text-muted-color: #aaa;
         --icon-color: #989898;
         --icon-hover-color: #fff;
+
+        --table-line-even-bg: #555;
+        --table-line-even-color: #eee;
+        --table-line-odd-bg: #999;
+        --table-line-odd-color: #eee;
+        --table-line-hover: #141414;
+
+        --button-bg: #6c757d;
+        --button-color: #fff;
+        --button-bg-hover: #5c636a;
+        --button-color-hover: #fff;
     }
 
     body:not(.light-theme) header {
@@ -924,6 +936,10 @@ main {
         --vendor-content-bg-color: rgba(46,46,46, 0.9);
     }
 
+    body:not(.light-theme) .functionArguments {
+        --function-arguments-bg: #303030;
+        --function-arguments-border-color: #272727;
+    }
     body:not(.light-theme) .hljs {
         --hljs-text-color: #fff;
         --hljs-comment-text-color: #999;
@@ -944,6 +960,5 @@ main {
         display: inline;
     }
 }
-
 
 /* end dark-theme */

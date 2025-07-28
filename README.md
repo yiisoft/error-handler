@@ -29,9 +29,8 @@ The package provides advanced error handling. The features are:
 
 ## Requirements
 
-- PHP 8.0 or higher.
+- PHP 8.1 or higher.
 - `DOM` PHP extension.
-- `JSON` PHP extension.
 - `mbstring` PHP extension.
 
 ## Installation
@@ -123,10 +122,11 @@ For more information about creating your own renders and examples of rendering e
 
 ### Using a factory to create a response
 
-`Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` renders `Throwable` object and produces a response according to the content type provided by the client.
+`Yiisoft\ErrorHandler\ThrowableResponseFactory` renders `Throwable` object and produces a response according to the content type provided by the client.
 
 ```php
-use Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory;
+use Yiisoft\ErrorHandler\RendererProvider;
+use Yiisoft\ErrorHandler\ThrowableResponseFactory;
 
 /**
  * @var \Throwable $throwable
@@ -136,27 +136,27 @@ use Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory;
  * @var \Yiisoft\ErrorHandler\ErrorHandler $errorHandler
  */
 
-$throwableResponseFactory = new ThrowableResponseFactory($responseFactory, $errorHandler, $container);
+$throwableResponseFactory = new ThrowableResponseFactory(
+    $responseFactory,
+    $errorHandler,
+    new RendererProvider\CompositeRendererProvider(
+        new RendererProvider\HeadRendererProvider(),
+        new RendererProvider\ContentTypeRendererProvider($container),
+    ),
+);
 
 // Creating an instance of the `Psr\Http\Message\ResponseInterface` with error information.
 $response = $throwableResponseFactory->create($throwable, $request);
 ```
 
-`Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` chooses how to render an exception based on accept HTTP header.
-If it's `text/html` or any unknown content type, it will use the error or exception HTML template to display errors.
-For other mime types, the error handler will choose different renderer that is registered within the error catcher.
-By default, JSON, XML and plain text are supported. You can change this behavior as follows:
+`Yiisoft\ErrorHandler\ThrowableResponseFactory` chooses how to render an exception by renderer provider. Providers
+available out of the box:
 
-```php
-// Returns a new instance without renderers by the specified content types.
-$throwableResponseFactory = $throwableResponseFactory->withoutRenderers('application/xml', 'text/xml');
-
-// Returns a new instance with the specified content type and renderer class.
-$throwableResponseFactory = $throwableResponseFactory->withRenderer('my/format', new MyRenderer());
-
-// Returns a new instance with the specified force content type to respond with regardless of request.
-$throwableResponseFactory = $throwableResponseFactory->forceContentType('application/json');
-```
+- `HeadRendererProvider` - renders error into HTTP headers. It is used for HEAD requests.
+- `ContentTypeRendererProvider` - renders error based on accept HTTP header. By default, JSON, XML and plain text are 
+  supported.
+- `ClosureRendererProvider` - allows you to create your own renderer provider using closures.
+- `CompositeRendererProvider` - allows you to combine several renderer providers.
 
 ### Using a middleware for catching unhandled errors
 
