@@ -108,7 +108,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     private ?array $vendorPaths = null;
 
-    private SolutionGenerator $solutionGenerator;
+    private readonly SolutionGenerator $solutionGenerator;
 
     /**
      * @param array $settings (deprecated) Settings can have the following keys:

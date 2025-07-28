@@ -10,7 +10,7 @@ final class SolutionGenerator
         /**
          * @var SolutionGeneratorInterface[]
          */
-        private array $generators,
+        private readonly array $generators,
     ) {
     }
 
