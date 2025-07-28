@@ -163,7 +163,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $this->traceHeaderLine = $traceHeaderLine
             ?? $settings['traceHeaderLine']
             ?? null;
-      
+
         $this->solutionGenerator = new SolutionGenerator($solutionProviders);
     }
 
