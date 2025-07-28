@@ -4,13 +4,14 @@ use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
+use Yiisoft\ErrorHandler\Solution\SolutionProviderInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
 /**
  * @var $this HtmlRenderer
  * @var $request ServerRequestInterface|null
  * @var $throwable Throwable
- * @var $solutions string[]
+ * @var $solutions SolutionProviderInterface[]
  */
 
 $theme = $_COOKIE['yii-exception-theme'] ?? '';
@@ -96,9 +97,11 @@ $exceptionMessage = $throwable->getMessage();
         if (!empty($solutions)) {
             echo '<div class="solutions">';
             foreach ($solutions as $i => $solution) {
-                echo '<div class="solution solution-' . $i . '">';
-                echo $this->parseMarkdown($solution);
-                echo '</div>';
+                if ($solution->supports($throwable)) {
+                    echo '<div class="solution solution-' . $i . '">';
+                    echo $this->parseMarkdown($solution->generate($throwable));
+                    echo '</div>';
+                }
             }
         }
         ?>

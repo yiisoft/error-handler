@@ -12,7 +12,7 @@ use Throwable;
 use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\ErrorData;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
-use Yiisoft\ErrorHandler\Solution\SolutionGenerator;
+use Yiisoft\ErrorHandler\Solution\SolutionProviderInterface;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 use Yiisoft\Http\Header;
@@ -108,7 +108,10 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     private ?array $vendorPaths = null;
 
-    private readonly SolutionGenerator $solutionGenerator;
+    /**
+     * @var SolutionProviderInterface[]
+     */
+    private array $solutionProviders;
 
     /**
      * @param array $settings (deprecated) Settings can have the following keys:
@@ -164,7 +167,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             ?? $settings['traceHeaderLine']
             ?? null;
 
-        $this->solutionGenerator = new SolutionGenerator($solutionProviders);
+        $this->solutionProviders = $solutionProviders;
     }
 
     public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
@@ -180,12 +183,11 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
     public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
-        $solutions = $this->solutionGenerator->generate($t);
         return new ErrorData(
             $this->renderTemplate($this->verboseTemplate, [
                 'request' => $request,
                 'throwable' => $t,
-                'solutions' => $solutions,
+                'solutions' => $this->solutionProviders,
             ]),
             [Header::CONTENT_TYPE => self::CONTENT_TYPE],
         );
