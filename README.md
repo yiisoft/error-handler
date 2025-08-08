@@ -13,9 +13,11 @@
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Ferror-handler%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/error-handler/master)
 [![static analysis](https://github.com/yiisoft/error-handler/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/error-handler/actions?query=workflow%3A%22static+analysis%22)
 
-<p align="center">
-    <img src="docs/images/view-development-light.png" alt="Light theme" >
-</p>
+<picture>
+ <source media="(prefers-color-scheme: dark)" srcset="docs/images/view-development-dark.png">
+ <source media="(prefers-color-scheme: light)" srcset="docs/images/view-development-light.png">
+ <img alt="Error handler" src="docs/images/view-development-light.png">
+</picture>
 
 The package provides advanced error handling. The features are:
 
