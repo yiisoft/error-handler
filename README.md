@@ -13,12 +13,6 @@
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Ferror-handler%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/error-handler/master)
 [![static analysis](https://github.com/yiisoft/error-handler/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/error-handler/actions?query=workflow%3A%22static+analysis%22)
 
-<picture>
- <source media="(prefers-color-scheme: dark)" srcset="docs/images/view-development-dark.png">
- <source media="(prefers-color-scheme: light)" srcset="docs/images/view-development-light.png">
- <img alt="Error handler" src="docs/images/view-development-light.png">
-</picture>
-
 The package provides advanced error handling. The features are:
 
 - PSR-15 middleware for catching unhandled errors.
@@ -32,6 +26,12 @@ The package provides advanced error handling. The features are:
 - Supports responding with HTML, plain text, JSON, XML and headers out of the box.
 - Has ability to implement your own error rendering for additional types.
 - [Friendly exceptions](https://github.com/yiisoft/friendly-exception/) support.
+
+<picture>
+ <source media="(prefers-color-scheme: dark)" srcset="docs/images/view-development-dark.png">
+ <source media="(prefers-color-scheme: light)" srcset="docs/images/view-development-light.png">
+ <img alt="Error handler" src="docs/images/view-development-light.png">
+</picture>
 
 ## Requirements
 
