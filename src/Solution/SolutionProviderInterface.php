@@ -10,6 +10,9 @@ namespace Yiisoft\ErrorHandler\Solution;
 */
 interface SolutionProviderInterface
 {
+/**
+* Returns true if the implementation may suggest more than regular provider.
+*/
     public function supports(\Throwable $e): bool;
 
 /**
