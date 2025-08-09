@@ -12,5 +12,8 @@ interface SolutionProviderInterface
 {
     public function supports(\Throwable $e): bool;
 
+/**
+* Generates an HTML code with solution which will be clean by {@see \Yiisoft\ErrorHandler\Renderer\HtmlRenderer} and shown to the end user.
+*/
     public function generate(\Throwable $e): string;
 }
