@@ -129,6 +129,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *   maxTraceLines?: int,
      *   traceHeaderLine?: string,
      * } $settings
+     * @param \Yiisoft\ErrorHandler\Solution\SolutionProviderInterface[] $solutionProviders
      */
     public function __construct(
         array $settings = [],
@@ -137,11 +138,13 @@ final class HtmlRenderer implements ThrowableRendererInterface
         ?int $maxSourceLines = null,
         ?int $maxTraceLines = null,
         ?string $traceHeaderLine = null,
+        private readonly array $solutionProviders = []
     ) {
         $this->markdownParser = new GithubMarkdown();
         $this->markdownParser->html5 = true;
 
         $this->defaultTemplatePath = dirname(__DIR__, 2) . '/templates';
+
         $this->template = $template
             ?? $settings['template']
             ?? $this->defaultTemplatePath . '/production.php';
@@ -176,6 +179,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $this->renderTemplate($this->verboseTemplate, [
                 'request' => $request,
                 'throwable' => $t,
+                'solutions' => $this->solutionProviders,
             ]),
             [Header::CONTENT_TYPE => self::CONTENT_TYPE],
         );
@@ -233,6 +237,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
             'ol',
             'li',
             'img',
+            'form',
+            'input',
+            'button',
         ]);
     }
 
