@@ -10,13 +10,13 @@ namespace Yiisoft\ErrorHandler\Solution;
 */
 interface SolutionProviderInterface
 {
-/**
-* Returns true if the implementation may suggest more than regular provider.
-*/
+    /**
+    * Returns true if the implementation may suggest more than regular provider.
+    */
     public function supports(\Throwable $e): bool;
 
-/**
-* Generates an HTML code with solution which will be clean by {@see \Yiisoft\ErrorHandler\Renderer\HtmlRenderer} and shown to the end user.
-*/
+    /**
+    * Generates an HTML code with solution which will be clean by {@see \Yiisoft\ErrorHandler\Renderer\HtmlRenderer} and shown to the end user.
+    */
     public function generate(\Throwable $e): string;
 }
