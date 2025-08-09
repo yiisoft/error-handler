@@ -27,6 +27,12 @@ The package provides advanced error handling. The features are:
 - Has ability to implement your own error rendering for additional types.
 - [Friendly exceptions](https://github.com/yiisoft/friendly-exception/) support.
 
+<picture>
+ <source media="(prefers-color-scheme: dark)" srcset="docs/images/view-development-dark.png">
+ <source media="(prefers-color-scheme: light)" srcset="docs/images/view-development-light.png">
+ <img alt="Error handler" src="docs/images/view-development-light.png">
+</picture>
+
 ## Requirements
 
 - PHP 8.1 or higher.
