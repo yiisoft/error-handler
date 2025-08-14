@@ -354,9 +354,7 @@ final class HtmlRendererTest extends TestCase
     {
         $reflection = new ReflectionObject($object);
         $method = $reflection->getMethod($method);
-        $method->setAccessible(true);
         $result = $method->invokeArgs($object, $args);
-        $method->setAccessible(false);
         return $result;
     }
 
@@ -364,8 +362,6 @@ final class HtmlRendererTest extends TestCase
     {
         $reflection = new ReflectionClass($renderer);
         $property = $reflection->getProperty('vendorPaths');
-        $property->setAccessible(true);
         $property->setValue($renderer, $vendorPaths);
-        $property->setAccessible(false);
     }
 }
