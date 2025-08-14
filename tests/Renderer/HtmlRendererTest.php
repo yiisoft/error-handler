@@ -354,8 +354,7 @@ final class HtmlRendererTest extends TestCase
     {
         $reflection = new ReflectionObject($object);
         $method = $reflection->getMethod($method);
-        $result = $method->invokeArgs($object, $args);
-        return $result;
+        return $method->invokeArgs($object, $args);
     }
 
     private function setVendorPaths(HtmlRenderer $renderer, array $vendorPaths): void
