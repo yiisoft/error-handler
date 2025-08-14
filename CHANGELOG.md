@@ -2,7 +2,7 @@
 
 ## 4.1.1 under development
 
-- no changes in this release.
+- Enh #150: Cleanup templates, remove legacy code (@vjik)
 
 ## 4.1.0 April 18, 2025
 

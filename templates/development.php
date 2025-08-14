@@ -7,9 +7,8 @@ use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
 /**
- * @var $this HtmlRenderer
- * @var $request ServerRequestInterface|null
- * @var $throwable Throwable
+ * @var ServerRequestInterface|null $request
+ * @var Throwable $throwable
  */
 
 $theme = $_COOKIE['yii-exception-theme'] ?? '';
@@ -18,11 +17,13 @@ $originalException = $throwable;
 if ($throwable instanceof CompositeException) {
     $throwable = $throwable->getFirstException();
 }
-$isFriendlyException = $throwable instanceof FriendlyExceptionInterface;
-$solution = $isFriendlyException ? $throwable->getSolution() : null;
+$solution = $throwable instanceof FriendlyExceptionInterface ? $throwable->getSolution() : null;
 $exceptionClass = get_class($throwable);
 $exceptionMessage = $throwable->getMessage();
 
+/**
+ * @var HtmlRenderer $this
+ */
 ?>
 <!doctype html>
 <html lang="en">
@@ -78,7 +79,7 @@ $exceptionMessage = $throwable->getMessage();
     <div class="exception-card">
         <div class="exception-class">
             <?php
-            if ($isFriendlyException): ?>
+            if ($throwable instanceof FriendlyExceptionInterface): ?>
                 <span><?= $this->htmlEncode($throwable->getName())?></span>
                 &mdash;
                 <?= $exceptionClass ?>
@@ -98,12 +99,12 @@ $exceptionMessage = $throwable->getMessage();
 
         <?= $this->renderPreviousExceptions($originalException) ?>
 
-        <textarea id="clipboard"><?= $this->htmlEncode($throwable) ?></textarea>
+        <textarea id="clipboard"><?= $this->htmlEncode((string) $throwable) ?></textarea>
         <span id="copied">Copied!</span>
 
         <a href="#"
            class="copy-clipboard"
-           data-clipboard="<?= $this->htmlEncode($throwable) ?>"
+           data-clipboard="<?= $this->htmlEncode((string) $throwable) ?>"
            title="Copy the stacktrace for use in a bug report or pastebin"
         >
             <svg width="26" height="30" fill="none" xmlns="http://www.w3.org/2000/svg">

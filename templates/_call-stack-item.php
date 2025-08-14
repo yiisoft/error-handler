@@ -14,7 +14,6 @@ use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
  * @var array $args
  * @var bool $isVendorFile
  * @var ReflectionMethod[] $reflectionParameters
- * @var HtmlRenderer $this
  */
 
 $icon = <<<HTML
@@ -24,16 +23,20 @@ $icon = <<<HTML
     <path d="M16,5h1.58l-6.29,6.28a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L19,6.42V8a1,1,0,0,0,1,1h0a1,1,0,0,0,1-1V4a1,1,0,0,0-1-1L16,3h0a1,1,0,0,0,0,2Z" />
 </svg>
 HTML;
+
+/**
+ * @var HtmlRenderer $this
+ */
 ?>
 <li class="<?= (!empty($lines) && ($index === 1 || !$isVendorFile)) ? 'application ' : '' ?>call-stack-item"
-    data-line="<?= (int) ($line - $begin) ?>">
+    data-line="<?= (int) $line - $begin ?>">
     <div class="element-wrap">
         <div class="flex-1 mw-100">
             <?php if ($file !== null): ?>
                 <span class="file-name">
                     <?= "{$index}. in {$this->htmlEncode($file)}" ?>
                     <?php if ($this->traceHeaderLine !== null): ?>
-                        <?= strtr($this->traceHeaderLine, ['{file}' => $file, '{line}' => $line + 1, '{icon}' => $icon]) ?>
+                        <?= strtr($this->traceHeaderLine, ['{file}' => $file, '{line}' => (int) $line + 1, '{icon}' => $icon]) ?>
                     <?php endif ?>
                 </span>
             <?php endif ?>
@@ -75,7 +78,7 @@ HTML;
                             $<?= $this->htmlEncode(
                                 is_int($key) && isset($reflectionParameters[$key])
                                     ? $reflectionParameters[$key]->getName()
-                                    : $key
+                                    : (string) $key
                             ) ?>
                         </td>
                         <td class="functionArguments_type">

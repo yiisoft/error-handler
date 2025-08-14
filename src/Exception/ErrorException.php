@@ -14,7 +14,16 @@ use function function_exists;
 
 /**
  * `ErrorException` represents a PHP error.
- * @psalm-type DebugBacktraceType = list<array{args?:list<mixed>,class?:class-string,file?:string,function:string,line?:int,object?:object,type?:string}>
+ *
+ * @psalm-type DebugBacktraceType = list<array{
+ *     args?: array<mixed>,
+ *     class?: class-string,
+ *     file?: string,
+ *     function?: string,
+ *     line?: int,
+ *     object?: object,
+ *     type?: string
+ * }>
  *
  * @final
  */
@@ -121,7 +130,6 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
             }
 
             $ref = new ReflectionProperty(Exception::class, 'trace');
-            $ref->setAccessible(true);
             $ref->setValue($this, $trace);
         }
     }

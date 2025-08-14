@@ -86,7 +86,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
     private readonly int $maxTraceLines;
 
     /**
-     * @var string|null The trace header line with placeholders to be be substituted. Defaults to null.
+     * @var string|null The trace header line with placeholders to be substituted. Defaults to null.
      *
      * The placeholders are {file}, {line} and {icon}. A typical use case is the creation of IDE-specific links,
      * since when you click on a trace header link, it opens directly in the IDE. You can also insert custom content.
@@ -97,7 +97,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * <a href="ide://open?file={file}&line={line}">{icon}</a>
      * ```
      */
-    private readonly ?string $traceHeaderLine;
+    public readonly ?string $traceHeaderLine;
 
     /**
      * @var string[]|null The list of vendor paths is determined automatically.
@@ -631,8 +631,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $groupIndex = $index;
             $groupedItems[$groupIndex][$index] = $item;
         }
-
-        /** @psalm-var array<int, array<int, string>> $groupedItems It's needed for Psalm <=4.30 only. */
 
         return $groupedItems;
     }

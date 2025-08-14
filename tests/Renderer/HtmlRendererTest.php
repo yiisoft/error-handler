@@ -354,18 +354,13 @@ final class HtmlRendererTest extends TestCase
     {
         $reflection = new ReflectionObject($object);
         $method = $reflection->getMethod($method);
-        $method->setAccessible(true);
-        $result = $method->invokeArgs($object, $args);
-        $method->setAccessible(false);
-        return $result;
+        return $method->invokeArgs($object, $args);
     }
 
     private function setVendorPaths(HtmlRenderer $renderer, array $vendorPaths): void
     {
         $reflection = new ReflectionClass($renderer);
         $property = $reflection->getProperty('vendorPaths');
-        $property->setAccessible(true);
         $property->setValue($renderer, $vendorPaths);
-        $property->setAccessible(false);
     }
 }
