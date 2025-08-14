@@ -1,9 +1,13 @@
 <?php
-/* @var $throwable \Throwable */
-/* @var $this \Yiisoft\ErrorHandler\Renderer\HtmlRenderer */
 
 use Yiisoft\ErrorHandler\Exception\UserException;
+use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
+
+/**
+ * @var Throwable $throwable
+ * @var HtmlRenderer $this
+ */
 
 if ($throwable instanceof UserException) {
     $name = $this->getThrowableName($throwable);
