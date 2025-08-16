@@ -34,17 +34,34 @@ HTML;
         <div class="flex-1 mw-100">
             <?php if ($file !== null): ?>
                 <span class="file-name">
-                    <?= "{$index}. in {$this->htmlEncode($file)}" ?>
-                    <?php if ($this->traceHeaderLine !== null): ?>
-                        <?= strtr($this->traceHeaderLine, ['{file}' => $file, '{line}' => (int) $line + 1, '{icon}' => $icon]) ?>
-                    <?php endif ?>
+                    <?php
+                    if ($this->traceHeaderLine === null) {
+                        echo "$index. ";
+                        $traceLink = ($this->traceLinkGenerator)($file, $line);
+                        echo $traceLink === null
+                            ? $this->htmlEncode($file)
+                            : sprintf(
+                                '<a href="%s" class="trace-link">%s %s</a>',
+                                $this->htmlEncode($traceLink),
+                                $this->htmlEncode($file),
+                                $icon,
+                            );
+                    } else {
+                        echo "$index. " . $this->htmlEncode($file);
+                        echo strtr($this->traceHeaderLine, [
+                            '{file}' => $file,
+                            '{line}' => (int) $line + 1,
+                            '{icon}' => $icon,
+                        ]);
+                    }
+                    ?>
                 </span>
             <?php endif ?>
 
             <?php if ($function !== null): ?>
                 <span class="function-info word-break">
                     <?php
-                    echo $file === null ? "{$index}." : '&mdash;&nbsp;';
+                    echo $file === null ? "$index. " : '&mdash;&nbsp;';
                     $function = $class === null ? $function : "{$this->removeAnonymous($class)}::$function";
 
                     echo '<span class="function">' . $this->htmlEncode($function) . '</span>';
