@@ -129,7 +129,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * @param int|null $maxTraceLines The maximum number of trace source code lines to be displayed. Defaults to 13.
      * @param string|null $traceHeaderLine Deprecated, use {@see traceLink} instead of. The trace header line with
      * placeholders to be substituted. Defaults to null.
-     * @param string|Closure|null $traceLink The trace link. It can be a string with placeholders `file` and `line` to
+     * @param Closure|string|null $traceLink The trace link. It can be a string with placeholders `file` and `line` to
      * be substituted or a closure that accepts `file` and `line` parameters and returns a string or null. Examples:
      *  - string "ide://open?file={file}&line={line}";
      *  - closure:

@@ -308,7 +308,7 @@ final class HtmlRendererTest extends TestCase
         yield [null, static fn() => null];
         yield [
             'phpstorm://open?file=test.php&line=42',
-            static fn(string $file, int|null $line) => "phpstorm://open?file=$file&line=$line"
+            static fn(string $file, int|null $line) => "phpstorm://open?file=$file&line=$line",
         ];
         yield [
             'phpstorm://open?file=test.php&line=42',
