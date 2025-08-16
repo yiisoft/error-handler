@@ -303,6 +303,39 @@ final class HtmlRendererTest extends TestCase
         $this->assertFalse($this->invokeMethod($renderer, 'isVendorFile', ['file' => __FILE__]));
     }
 
+    public static function dataTraceLinkGenerator(): iterable
+    {
+        yield [null, static fn() => null];
+        yield [
+            'phpstorm://open?file=test.php&line=42',
+            static fn(string $file, int|null $line) => "phpstorm://open?file=$file&line=$line"
+        ];
+        yield [
+            'phpstorm://open?file=test.php&line=42',
+            'phpstorm://open?file={file}&line={line}',
+        ];
+        yield [
+            'phpstorm://open?file=test.php&line=',
+            'phpstorm://open?file={file}&line={line}',
+            'test.php',
+            null,
+        ];
+    }
+
+    #[DataProvider('dataTraceLinkGenerator')]
+    public function testTraceLinkGenerator(
+        string|null $expected,
+        mixed $traceLink,
+        string $file = 'test.php',
+        int|null $line = 42,
+    ): void {
+        $renderer = new HtmlRenderer(traceLink: $traceLink);
+
+        $link = ($renderer->traceLinkGenerator)($file, $line);
+
+        $this->assertSame($expected, $link);
+    }
+
     private function createServerRequestMock(): ServerRequestInterface
     {
         $serverRequestMock = $this->createMock(ServerRequestInterface::class);

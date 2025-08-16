@@ -572,7 +572,17 @@ main {
     color: var(--element-wrap-text-color);
 }
 
-.call-stack ul li .element-wrap .file-name:hover,
+.call-stack ul li .element-wrap .file-name .trace-link {
+    color: var(--element-wrap-text-color);
+    text-decoration: none;
+}
+.call-stack ul li .element-wrap .file-name .trace-link:hover {
+    color: var(--element-wrap-hover-text-color);
+}
+.call-stack ul li .element-wrap .file-name .trace-link:hover path {
+    fill: var(--icon-color);
+}
+
 .call-stack ul li .element-code-wrap .code-wrap .lines-item:hover {
     color: var(--element-wrap-hover-text-color);
 }
