@@ -6,6 +6,7 @@ namespace Yiisoft\ErrorHandler\Renderer;
 
 use Alexkart\CurlBuilder\Command;
 use cebe\markdown\GithubMarkdown;
+use Closure;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Throwable;
@@ -48,6 +49,7 @@ use function strlen;
 /**
  * Formats throwable into HTML string.
  *
+ * @psalm-type TraceLinkClosure = Closure(string $file, int|null $line): (string|null)
  * @psalm-import-type DebugBacktraceType from ErrorException
  */
 final class HtmlRenderer implements ThrowableRendererInterface
@@ -100,6 +102,11 @@ final class HtmlRenderer implements ThrowableRendererInterface
     public readonly ?string $traceHeaderLine;
 
     /**
+     * @psalm-var TraceLinkClosure
+     */
+    public readonly Closure $traceLinkGenerator;
+
+    /**
      * @var string[]|null The list of vendor paths is determined automatically.
      *
      * One path if the error handler is installed as a vendor package, or a list of package vendor paths
@@ -120,7 +127,20 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * information.
      * @param int|null $maxSourceLines The maximum number of source code lines to be displayed. Defaults to 19.
      * @param int|null $maxTraceLines The maximum number of trace source code lines to be displayed. Defaults to 13.
-     * @param string|null $traceHeaderLine The trace header line with placeholders to be substituted. Defaults to null.
+     * @param string|null $traceHeaderLine Deprecated, use {@see traceLink} instead. The trace header line with
+     * placeholders to be substituted. Defaults to null.
+     * @param Closure|string|null $traceLink The trace link. It can be a string with placeholders `file` and `line` to
+     * be substituted or a closure that accepts `file` and `line` parameters and returns a string or null. Examples:
+     *  - string "ide://open?file={file}&line={line}";
+     *  - closure:
+     *    ```php
+     *    static function (string $file, ?int $line): string {
+     *        return strtr(
+     *            'phpstorm://open?file={file}&line={line}',
+     *            ['{file}' => $file, '{line}' => (string) $line],
+     *        );
+     *    }
+     *    ```
      *
      * @psalm-param array{
      *   template?: string,
@@ -129,6 +149,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *   maxTraceLines?: int,
      *   traceHeaderLine?: string,
      * } $settings
+     * @psalm-param string|TraceLinkClosure|null $traceLink
      */
     public function __construct(
         array $settings = [],
@@ -137,6 +158,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         ?int $maxSourceLines = null,
         ?int $maxTraceLines = null,
         ?string $traceHeaderLine = null,
+        string|Closure|null $traceLink = null,
     ) {
         $this->markdownParser = new GithubMarkdown();
         $this->markdownParser->html5 = true;
@@ -157,6 +179,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $this->traceHeaderLine = $traceHeaderLine
             ?? $settings['traceHeaderLine']
             ?? null;
+        $this->traceLinkGenerator = $this->createTraceLinkGenerator($traceLink);
     }
 
     public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
@@ -702,5 +725,24 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $anonymousPosition = strpos($value, '@anonymous');
 
         return $anonymousPosition !== false ? substr($value, 0, $anonymousPosition) : $value;
+    }
+
+    /**
+     * @psalm-param string|TraceLinkClosure|null $traceLink
+     * @psalm-return TraceLinkClosure
+     */
+    private function createTraceLinkGenerator(string|Closure|null $traceLink): Closure
+    {
+        if ($traceLink === null) {
+            return static fn(): string|null => null;
+        }
+
+        if (is_string($traceLink)) {
+            return static function (string $file, ?int $line) use ($traceLink): string {
+                return str_replace(['{file}', '{line}'], [$file, (string) $line], $traceLink);
+            };
+        }
+
+        return $traceLink;
     }
 }
