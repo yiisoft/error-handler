@@ -4,6 +4,7 @@
 
 - Enh #150: Cleanup templates, remove legacy code (@vjik)
 - New #151: Add `$traceLink` parameter to `HtmlRenderer` to allow linking to trace files (@vjik)
+- New #152: Add `UserExceptionInterface` to mark user exceptions (@vjik)
 
 ## 4.1.0 April 18, 2025
 

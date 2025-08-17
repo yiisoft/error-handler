@@ -1,6 +1,6 @@
 <?php
 
-use Yiisoft\ErrorHandler\Exception\UserException;
+use Yiisoft\ErrorHandler\Exception\UserExceptionInterface;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
@@ -9,7 +9,7 @@ use Yiisoft\ErrorHandler\ThrowableRendererInterface;
  * @var HtmlRenderer $this
  */
 
-if ($throwable instanceof UserException) {
+if ($throwable instanceof UserExceptionInterface) {
     $name = $this->getThrowableName($throwable);
     $message = $throwable->getMessage();
 } else {

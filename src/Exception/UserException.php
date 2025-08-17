@@ -7,11 +7,10 @@ namespace Yiisoft\ErrorHandler\Exception;
 use Exception;
 
 /**
- * UserException is the base class for exceptions that are meant to be shown to end users.
- * Such exceptions are often caused by mistakes of end users.
+ * `UserException` represents an exception that is meant to be shown to end users.
  *
  * @final
  */
-class UserException extends Exception
+class UserException extends Exception implements UserExceptionInterface
 {
 }
