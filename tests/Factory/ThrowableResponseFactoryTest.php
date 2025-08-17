@@ -32,12 +32,8 @@ final class ThrowableResponseFactoryTest extends TestCase
                 $this->createThrowable(),
                 $this->createServerRequest('HEAD', ['Accept' => ['test/html']])
             );
-        $response
-            ->getBody()
-            ->rewind();
-        $content = $response
-            ->getBody()
-            ->getContents();
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
 
         $this->assertEmpty($content);
         $this->assertSame([HeaderRenderer::DEFAULT_ERROR_MESSAGE], $response->getHeader('X-Error-Message'));
