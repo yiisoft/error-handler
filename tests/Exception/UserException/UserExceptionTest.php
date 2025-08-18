@@ -23,16 +23,16 @@ final class UserExceptionTest extends TestCase
         assertInstanceOf(Exception::class, $exception);
     }
 
-    public static function dataIs(): iterable
+    public static function dataIsUserException(): iterable
     {
         yield [true, new UserException()];
         yield [false, new Exception()];
         yield [true, new NotFoundException()];
     }
 
-    #[DataProvider('dataIs')]
-    public function testIs(bool $expected, Throwable $exception): void
+    #[DataProvider('dataIsUserException')]
+    public function testIsUserException(bool $expected, Throwable $exception): void
     {
-        assertSame($expected, UserException::is($exception));
+        assertSame($expected, UserException::isUserException($exception));
     }
 }

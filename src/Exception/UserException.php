@@ -25,7 +25,7 @@ use function count;
 #[Attribute(Attribute::TARGET_CLASS)]
 class UserException extends Exception
 {
-    public static function is(Throwable $throwable): bool
+    public static function isUserException(Throwable $throwable): bool
     {
         if ($throwable instanceof self) {
             return true;
