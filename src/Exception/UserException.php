@@ -12,7 +12,7 @@ use Throwable;
 use function count;
 
 /**
- * `UserException` is an exception and class attribute that indicates
+ * `UserException` is an exception and a class attribute that indicates
  * the exception message is safe to display to end users.
  *
  * Usage:
