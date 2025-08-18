@@ -9,7 +9,7 @@ use Yiisoft\ErrorHandler\ThrowableRendererInterface;
  * @var HtmlRenderer $this
  */
 
-if ($throwable instanceof UserException) {
+if (UserException::isUserException($throwable)) {
     $name = $this->getThrowableName($throwable);
     $message = $throwable->getMessage();
 } else {
