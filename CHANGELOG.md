@@ -1,5 +1,9 @@
 # Yii Error Handler Change Log
 
+## 4.2.1 under development
+
+- no changes in this release.
+
 ## 4.2.0 August 19, 2025
 
 - New #151: Add `$traceLink` parameter to `HtmlRenderer` to allow linking to trace files (@vjik)
