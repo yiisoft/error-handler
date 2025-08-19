@@ -1,10 +1,10 @@
 # Yii Error Handler Change Log
 
-## 4.1.1 under development
+## 4.2.0 August 19, 2025
 
-- Enh #150: Cleanup templates, remove legacy code (@vjik)
 - New #151: Add `$traceLink` parameter to `HtmlRenderer` to allow linking to trace files (@vjik)
 - New #153: Introduce `UserException` attribute to mark user exceptions (@vjik)
+- Enh #150: Cleanup templates, remove legacy code (@vjik)
 
 ## 4.1.0 April 18, 2025
 
