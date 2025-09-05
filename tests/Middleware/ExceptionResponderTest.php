@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\ErrorHandler\Tests\Middleware;
 
 use DomainException;
-use HttpSoft\Message\Request;
 use HttpSoft\Message\Response;
 use HttpSoft\Message\ResponseFactory;
 use HttpSoft\Message\ResponseTrait;
