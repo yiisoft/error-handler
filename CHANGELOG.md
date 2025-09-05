@@ -2,7 +2,7 @@
 
 ## 4.2.1 under development
 
-- no changes in this release.
+- New #156: Pass request to callable value in `ExceptionResponder` middleware (@vjik)
 
 ## 4.2.0 August 19, 2025
 

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Yiisoft\ErrorHandler\Tests\Middleware;
 
 use DomainException;
+use HttpSoft\Message\Request;
 use HttpSoft\Message\Response;
 use HttpSoft\Message\ResponseFactory;
 use HttpSoft\Message\ResponseTrait;
+use HttpSoft\Message\ServerRequest;
 use HttpSoft\Message\ServerRequestFactory;
 use InvalidArgumentException;
 use LogicException;
@@ -41,18 +43,26 @@ final class ExceptionResponderTest extends TestCase
 
     public function testCallable(): void
     {
+        $request = new ServerRequest(headers: ['X-TEST' => ['HELLO']]);
         $middleware = $this->createMiddleware([
-            DomainException::class => function (ResponseFactoryInterface $responseFactory) {
-                return $responseFactory->createResponse(Status::CREATED);
-            },
+            DomainException::class =>
+                static function (ResponseFactoryInterface $responseFactory, ServerRequestInterface $request) {
+                    return $responseFactory->createResponse(Status::CREATED, $request->getHeaderLine('X-TEST'));
+                },
         ]);
 
-        $this->assertSame(
-            Status::CREATED,
-            $this
-                ->process($middleware)
-                ->getStatusCode(),
+        $response = $middleware->process(
+            $request,
+            new class () implements RequestHandlerInterface {
+                public function handle(ServerRequestInterface $request): ResponseInterface
+                {
+                    throw new DomainException();
+                }
+            },
         );
+
+        $this->assertSame(Status::CREATED, $response->getStatusCode());
+        $this->assertSame('HELLO', $response->getReasonPhrase());
     }
 
     public function testAnotherException(): void
