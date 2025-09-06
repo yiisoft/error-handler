@@ -1,6 +1,6 @@
 # Yii Error Handler Change Log
 
-## 4.2.1 under development
+## 4.3.0 September 06, 2025
 
 - New #156: Pass request to callable value in `ExceptionResponder` middleware (@vjik)
 
