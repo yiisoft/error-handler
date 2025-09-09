@@ -19,8 +19,6 @@ use function count;
  * - throw directly (`throw new UserException(...)`) for explicit user-facing errors;
  * - annotate any exception class with the `#[UserException]` attribute
  *   to mark its messages as user-facing without extending this class.
- *
- * @final
  */
 #[Attribute(Attribute::TARGET_CLASS)]
 final class UserException extends Exception

@@ -15,8 +15,6 @@ use function function_exists;
 /**
  * `ErrorException` represents a PHP error.
  * @psalm-type DebugBacktraceType = list<array{args?: array<mixed>, class?: class-string, file?: string, function?: string, line?: int, object?: object, type?: string}>
- *
- * @final
  */
 final class ErrorException extends \ErrorException implements FriendlyExceptionInterface
 {
