@@ -9,12 +9,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * `ThrowableResponseFactoryInterface` produces a response for `Throwable` object.
+ * `ThrowableResponseActionInterface` produces a response for `Throwable` object.
  */
-interface ThrowableResponseFactoryInterface
+interface ThrowableResponseActionInterface
 {
     /**
      * Handles a `Throwable` object and produces a response.
      */
-    public function create(Throwable $throwable, ServerRequestInterface $request): ResponseInterface;
+    public function handle(ServerRequestInterface $request, Throwable $throwable): ResponseInterface;
 }

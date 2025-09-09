@@ -2,10 +2,16 @@
 
 declare(strict_types=1);
 
-use Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory;
+use Psr\Container\ContainerInterface;
+use Yiisoft\Definitions\DynamicReference;
+use Yiisoft\Definitions\Reference;
+use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
+use Yiisoft\ErrorHandler\RendererProvider\CompositeRendererProvider;
+use Yiisoft\ErrorHandler\RendererProvider\ContentTypeRendererProvider;
+use Yiisoft\ErrorHandler\RendererProvider\HeadRendererProvider;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
-use Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface;
+use Yiisoft\ErrorHandler\ThrowableResponseAction;
 
 /**
  * @var array $params
@@ -13,5 +19,19 @@ use Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface;
 
 return [
     ThrowableRendererInterface::class => HtmlRenderer::class,
-    ThrowableResponseFactoryInterface::class => ThrowableResponseFactory::class,
+    ErrorCatcher::class => [
+        '__construct()' => [
+            'throwableResponseAction' => Reference::to(ThrowableResponseAction::class),
+        ],
+    ],
+    ThrowableResponseAction::class => [
+        '__construct()' => [
+            'rendererProvider' => DynamicReference::to(
+                static fn(ContainerInterface $container) => new CompositeRendererProvider(
+                    new HeadRendererProvider(),
+                    new ContentTypeRendererProvider($container),
+                )
+            ),
+        ],
+    ],
 ];

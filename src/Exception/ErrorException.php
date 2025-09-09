@@ -18,7 +18,7 @@ use function function_exists;
  *
  * @final
  */
-class ErrorException extends \ErrorException implements FriendlyExceptionInterface
+final class ErrorException extends \ErrorException implements FriendlyExceptionInterface
 {
     /** @psalm-suppress MissingClassConstType Private constants never change. */
     private const ERROR_NAMES = [

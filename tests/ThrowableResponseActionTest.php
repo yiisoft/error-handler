@@ -14,20 +14,19 @@ use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\ErrorHandler\RendererProvider\ContentTypeRendererProvider;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
-use Yiisoft\ErrorHandler\ThrowableResponseFactory;
+use Yiisoft\ErrorHandler\ThrowableResponseAction;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
 
-final class ThrowableResponseFactoryTest extends TestCase
+final class ThrowableResponseActionTest extends TestCase
 {
     public function testBase(): void
     {
-        $factory = new ThrowableResponseFactory(
+        $action = new ThrowableResponseAction(
             new ResponseFactory(),
             new ErrorHandler(
-                new NullLogger(),
                 new PlainTextRenderer(),
             ),
             new ContentTypeRendererProvider(
@@ -35,10 +34,10 @@ final class ThrowableResponseFactoryTest extends TestCase
             ),
         );
 
-        $response = $factory->create(
-            new LogicException('test message'),
-            TestHelper::createRequest(),
-        );
+        $response = $action->handle(
+                TestHelper::createRequest(),
+                new LogicException('test message')
+            );
 
         assertSame(500, $response->getStatusCode());
         assertSame(ThrowableRendererInterface::DEFAULT_ERROR_MESSAGE, TestHelper::getResponseContent($response));
@@ -46,10 +45,9 @@ final class ThrowableResponseFactoryTest extends TestCase
 
     public function testHeaders(): void
     {
-        $factory = new ThrowableResponseFactory(
+        $action = new ThrowableResponseAction(
             new ResponseFactory(),
             new ErrorHandler(
-                new NullLogger(),
                 new PlainTextRenderer(),
             ),
             new ContentTypeRendererProvider(
@@ -58,10 +56,10 @@ final class ThrowableResponseFactoryTest extends TestCase
             new HeadersProvider(['X-Test' => ['on'], 'X-Test-Custom' => 'hello'])
         );
 
-        $response = $factory->create(
-            new LogicException('test message'),
-            TestHelper::createRequest(),
-        );
+        $response = $action->handle(
+                TestHelper::createRequest(),
+                new LogicException('test message')
+            );
 
         assertTrue($response->hasHeader('X-Test'));
         assertSame('on', $response->getHeaderLine('X-Test'));

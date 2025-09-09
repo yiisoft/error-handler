@@ -41,14 +41,14 @@ final class ErrorHandler
     private bool $initialized = false;
 
     /**
-     * @param LoggerInterface $logger Logger to write errors to.
      * @param ThrowableRendererInterface $defaultRenderer Default throwable renderer.
+     * @param LoggerInterface|null $logger Logger to write errors to.
      * @param EventDispatcherInterface|null $eventDispatcher Event dispatcher for error events.
      * @param int $exitShutdownHandlerDepth Depth of the exit() shutdown handler to ensure it's executed last.
      */
     public function __construct(
-        private readonly LoggerInterface $logger,
         private readonly ThrowableRendererInterface $defaultRenderer,
+        private readonly ?LoggerInterface $logger = null,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
         private readonly int $exitShutdownHandlerDepth = 2
     ) {
@@ -68,7 +68,7 @@ final class ErrorHandler
         $renderer ??= $this->defaultRenderer;
 
         try {
-            $this->logger->error($t->getMessage(), ['throwable' => $t]);
+            $this->logger?->error($t->getMessage(), ['throwable' => $t]);
             return $this->debug ? $renderer->renderVerbose($t, $request) : $renderer->render($t, $request);
         } catch (Throwable $t) {
             return new ErrorData((string) $t);

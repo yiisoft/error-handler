@@ -23,7 +23,7 @@ use function count;
  * @final
  */
 #[Attribute(Attribute::TARGET_CLASS)]
-class UserException extends Exception
+final class UserException extends Exception
 {
     public static function isUserException(Throwable $throwable): bool
     {
