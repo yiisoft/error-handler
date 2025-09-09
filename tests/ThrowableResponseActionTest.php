@@ -7,7 +7,6 @@ namespace Yiisoft\ErrorHandler\Tests;
 use HttpSoft\Message\ResponseFactory;
 use LogicException;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\HeadersProvider;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
@@ -35,9 +34,9 @@ final class ThrowableResponseActionTest extends TestCase
         );
 
         $response = $action->handle(
-                TestHelper::createRequest(),
-                new LogicException('test message')
-            );
+            TestHelper::createRequest(),
+            new LogicException('test message')
+        );
 
         assertSame(500, $response->getStatusCode());
         assertSame(ThrowableRendererInterface::DEFAULT_ERROR_MESSAGE, TestHelper::getResponseContent($response));
@@ -57,9 +56,9 @@ final class ThrowableResponseActionTest extends TestCase
         );
 
         $response = $action->handle(
-                TestHelper::createRequest(),
-                new LogicException('test message')
-            );
+            TestHelper::createRequest(),
+            new LogicException('test message')
+        );
 
         assertTrue($response->hasHeader('X-Test'));
         assertSame('on', $response->getHeaderLine('X-Test'));
