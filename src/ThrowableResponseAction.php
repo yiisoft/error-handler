@@ -12,22 +12,19 @@ use Yiisoft\ErrorHandler\RendererProvider\RendererProviderInterface;
 use Yiisoft\Http\Status;
 
 /**
- * `ThrowableResponseFactory` produces a response with rendered `Throwable` object.
+ * `ThrowableResponseAction` produces a response with rendered `Throwable` object.
  */
-final class ThrowableResponseFactory implements ThrowableResponseFactoryInterface
+final class ThrowableResponseAction implements ThrowableResponseActionInterface
 {
-    private readonly HeadersProvider $headersProvider;
-
     public function __construct(
         private readonly ResponseFactoryInterface $responseFactory,
         private readonly ErrorHandler $errorHandler,
         private readonly RendererProviderInterface $rendererProvider,
-        ?HeadersProvider $headersProvider = null,
+        private readonly HeadersProvider $headersProvider = new HeadersProvider(),
     ) {
-        $this->headersProvider = $headersProvider ?? new HeadersProvider();
     }
 
-    public function create(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
+    public function handle(ServerRequestInterface $request, Throwable $throwable): ResponseInterface
     {
         $renderer = $this->rendererProvider->get($request);
 

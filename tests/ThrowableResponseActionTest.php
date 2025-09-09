@@ -7,27 +7,25 @@ namespace Yiisoft\ErrorHandler\Tests;
 use HttpSoft\Message\ResponseFactory;
 use LogicException;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\HeadersProvider;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\ErrorHandler\RendererProvider\ContentTypeRendererProvider;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
-use Yiisoft\ErrorHandler\ThrowableResponseFactory;
+use Yiisoft\ErrorHandler\ThrowableResponseAction;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
 
-final class ThrowableResponseFactoryTest extends TestCase
+final class ThrowableResponseActionTest extends TestCase
 {
     public function testBase(): void
     {
-        $factory = new ThrowableResponseFactory(
+        $action = new ThrowableResponseAction(
             new ResponseFactory(),
             new ErrorHandler(
-                new NullLogger(),
                 new PlainTextRenderer(),
             ),
             new ContentTypeRendererProvider(
@@ -35,9 +33,9 @@ final class ThrowableResponseFactoryTest extends TestCase
             ),
         );
 
-        $response = $factory->create(
-            new LogicException('test message'),
+        $response = $action->handle(
             TestHelper::createRequest(),
+            new LogicException('test message')
         );
 
         assertSame(500, $response->getStatusCode());
@@ -46,10 +44,9 @@ final class ThrowableResponseFactoryTest extends TestCase
 
     public function testHeaders(): void
     {
-        $factory = new ThrowableResponseFactory(
+        $action = new ThrowableResponseAction(
             new ResponseFactory(),
             new ErrorHandler(
-                new NullLogger(),
                 new PlainTextRenderer(),
             ),
             new ContentTypeRendererProvider(
@@ -58,9 +55,9 @@ final class ThrowableResponseFactoryTest extends TestCase
             new HeadersProvider(['X-Test' => ['on'], 'X-Test-Custom' => 'hello'])
         );
 
-        $response = $factory->create(
-            new LogicException('test message'),
+        $response = $action->handle(
             TestHelper::createRequest(),
+            new LogicException('test message')
         );
 
         assertTrue($response->hasHeader('X-Test'));

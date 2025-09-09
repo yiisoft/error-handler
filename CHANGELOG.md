@@ -1,5 +1,13 @@
 # Yii Error Handler Change Log
 
+## 5.0 under development
+
+- Chg #121: Make logger in ErrorHandler optional (@olegbaturin)
+- Chg #144: Mark ErrorException and UserException as final (@olegbaturin)
+- Chg #146: Remove deprecated `Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` (@olegbaturin)
+- Chg #157: Rename `Yiisoft\ErrorHandler\ThrowableResponseFactory` to `Yiisoft\ErrorHandler\ThrowableResponseAction` (@olegbaturin)
+- Chg #157: Change parameters order in `ThrowableResponseActionInterface` (@olegbaturin)
+
 ## 4.3.1 under development
 
 - no changes in this release.
