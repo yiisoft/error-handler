@@ -32,7 +32,7 @@ final class ConfigTest extends TestCase
         return new Container(
             ContainerConfig::create()->withDefinitions([
                 ResponseFactoryInterface::class => ResponseFactory::class,
-                ...$this->getDiConfig($postfix)
+                ...$this->getDiConfig($postfix),
             ])
         );
     }
