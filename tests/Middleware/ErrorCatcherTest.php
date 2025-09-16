@@ -14,7 +14,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
 use Throwable;
 use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
-use Yiisoft\ErrorHandler\ThrowableResponseActionInterface;
+use Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface;
 use Yiisoft\Http\Status;
 
 final class ErrorCatcherTest extends TestCase
@@ -22,7 +22,7 @@ final class ErrorCatcherTest extends TestCase
     public function testSuccess(): void
     {
         $errorCatcher = new ErrorCatcher(
-            $this->createThrowableResponseAction(),
+            $this->createThrowableResponseFactory(),
         );
         $handler = new class () implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -41,7 +41,7 @@ final class ErrorCatcherTest extends TestCase
     public function testError(): void
     {
         $errorCatcher = new ErrorCatcher(
-            $this->createThrowableResponseAction(),
+            $this->createThrowableResponseFactory(),
         );
         $response = $errorCatcher->process(
             new ServerRequest(),
@@ -56,7 +56,7 @@ final class ErrorCatcherTest extends TestCase
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcher->method('dispatch')->willThrowException(new RuntimeException('Event dispatcher error'));
         $errorCatcher = new ErrorCatcher(
-            $this->createThrowableResponseAction(),
+            $this->createThrowableResponseFactory(),
             $eventDispatcher,
         );
         $response = $errorCatcher->process(
@@ -66,9 +66,9 @@ final class ErrorCatcherTest extends TestCase
         $this->assertSame(Status::INTERNAL_SERVER_ERROR, $response->getStatusCode());
     }
 
-    private function createThrowableResponseAction(): ThrowableResponseActionInterface
+    private function createThrowableResponseFactory(): ThrowableResponseFactoryInterface
     {
-        return new class () implements ThrowableResponseActionInterface {
+        return new class () implements ThrowableResponseFactoryInterface {
             public function handle(ServerRequestInterface $request, Throwable $throwable): ResponseInterface
             {
                 return new Response(Status::INTERNAL_SERVER_ERROR);

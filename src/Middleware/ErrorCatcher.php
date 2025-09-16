@@ -12,16 +12,16 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\Event\ApplicationError;
-use Yiisoft\ErrorHandler\ThrowableResponseActionInterface;
+use Yiisoft\ErrorHandler\ThrowableResponseFactoryInterface;
 
 /**
  * `ErrorCatcher` catches all throwables from the next middlewares
- * and renders it with a handler that implements the `ThrowableResponseActionInterface`.
+ * and renders it with a handler that implements the `ThrowableResponseFactoryInterface`.
  */
 final class ErrorCatcher implements MiddlewareInterface
 {
     public function __construct(
-        private readonly ThrowableResponseActionInterface $throwableResponseAction,
+        private readonly ThrowableResponseFactoryInterface $throwableResponseFactory,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
@@ -37,7 +37,7 @@ final class ErrorCatcher implements MiddlewareInterface
                 $t = new CompositeException($e, $t);
             }
 
-            return $this->throwableResponseAction->handle($request, $t);
+            return $this->throwableResponseFactory->handle($request, $t);
         }
     }
 }

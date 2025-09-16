@@ -9,9 +9,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * `ThrowableResponseActionInterface` produces a response for `Throwable` object.
+ * `ThrowableResponseFactoryInterface` produces a response for `Throwable` object.
  */
-interface ThrowableResponseActionInterface
+interface ThrowableResponseFactoryInterface
 {
     /**
      * Handles a `Throwable` object and produces a response.

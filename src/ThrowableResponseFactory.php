@@ -12,9 +12,9 @@ use Yiisoft\ErrorHandler\RendererProvider\RendererProviderInterface;
 use Yiisoft\Http\Status;
 
 /**
- * `ThrowableResponseAction` produces a response with rendered `Throwable` object.
+ * `ThrowableResponseFactory` produces a response with rendered `Throwable` object.
  */
-final class ThrowableResponseAction implements ThrowableResponseActionInterface
+final class ThrowableResponseFactory implements ThrowableResponseFactoryInterface
 {
     public function __construct(
         private readonly ResponseFactoryInterface $responseFactory,

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests;
 
-use HttpSoft\Message\ResponseFactory;
 use LogicException;
+use HttpSoft\Message\ResponseFactory;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\HeadersProvider;
@@ -13,17 +13,17 @@ use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 use Yiisoft\ErrorHandler\RendererProvider\ContentTypeRendererProvider;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
-use Yiisoft\ErrorHandler\ThrowableResponseAction;
+use Yiisoft\ErrorHandler\ThrowableResponseFactory;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
 
-final class ThrowableResponseActionTest extends TestCase
+final class ThrowableResponseFactoryTest extends TestCase
 {
     public function testBase(): void
     {
-        $action = new ThrowableResponseAction(
+        $action = new ThrowableResponseFactory(
             new ResponseFactory(),
             new ErrorHandler(
                 new PlainTextRenderer(),
@@ -44,7 +44,7 @@ final class ThrowableResponseActionTest extends TestCase
 
     public function testHeaders(): void
     {
-        $action = new ThrowableResponseAction(
+        $action = new ThrowableResponseFactory(
             new ResponseFactory(),
             new ErrorHandler(
                 new PlainTextRenderer(),

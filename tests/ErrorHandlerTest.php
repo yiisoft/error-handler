@@ -6,6 +6,7 @@ namespace Yiisoft\ErrorHandler\Tests;
 
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Throwable;
 use Yiisoft\ErrorHandler\ErrorHandler;
@@ -15,13 +16,30 @@ use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 final class ErrorHandlerTest extends TestCase
 {
     private ErrorHandler $errorHandler;
+    private LoggerInterface $loggerMock;
     private ThrowableRendererInterface $throwableRendererMock;
 
     protected function setUp(): void
     {
+        $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->throwableRendererMock = $this->createMock(ThrowableRendererInterface::class);
-        $this->errorHandler = new ErrorHandler($this->throwableRendererMock);
+        $this->errorHandler = new ErrorHandler($this->throwableRendererMock, $this->loggerMock);
         $this->errorHandler->memoryReserveSize(0);
+    }
+
+    public function testHandleThrowableCallsDefaultRendererWithoutLogger(): void
+    {
+        $errorHandler = new ErrorHandler($this->throwableRendererMock);
+        $errorHandler->memoryReserveSize(0);
+        $throwable = new RuntimeException();
+
+        $this
+            ->throwableRendererMock
+            ->expects($this->once())
+            ->method('render')
+            ->with($throwable);
+
+        $errorHandler->handle($throwable);
     }
 
     public function testHandleThrowableCallsDefaultRendererWhenNonePassed(): void
@@ -33,7 +51,6 @@ final class ErrorHandlerTest extends TestCase
             ->expects($this->once())
             ->method('render')
             ->with($throwable);
-
 
         $this->errorHandler->handle($throwable);
     }
