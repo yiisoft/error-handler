@@ -69,7 +69,7 @@ final class ErrorCatcherTest extends TestCase
     private function createThrowableResponseFactory(): ThrowableResponseFactoryInterface
     {
         return new class () implements ThrowableResponseFactoryInterface {
-            public function handle(ServerRequestInterface $request, Throwable $throwable): ResponseInterface
+            public function create(ServerRequestInterface $request, Throwable $throwable): ResponseInterface
             {
                 return new Response(Status::INTERNAL_SERVER_ERROR);
             }

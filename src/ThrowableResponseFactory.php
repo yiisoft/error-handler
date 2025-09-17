@@ -24,7 +24,7 @@ final class ThrowableResponseFactory implements ThrowableResponseFactoryInterfac
     ) {
     }
 
-    public function handle(ServerRequestInterface $request, Throwable $throwable): ResponseInterface
+    public function create(ServerRequestInterface $request, Throwable $throwable): ResponseInterface
     {
         $renderer = $this->rendererProvider->get($request);
 

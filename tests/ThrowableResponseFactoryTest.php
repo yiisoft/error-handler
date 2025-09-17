@@ -23,7 +23,7 @@ final class ThrowableResponseFactoryTest extends TestCase
 {
     public function testBase(): void
     {
-        $action = new ThrowableResponseFactory(
+        $factory = new ThrowableResponseFactory(
             new ResponseFactory(),
             new ErrorHandler(
                 new PlainTextRenderer(),
@@ -33,7 +33,7 @@ final class ThrowableResponseFactoryTest extends TestCase
             ),
         );
 
-        $response = $action->handle(
+        $response = $factory->create(
             TestHelper::createRequest(),
             new LogicException('test message')
         );
@@ -44,7 +44,7 @@ final class ThrowableResponseFactoryTest extends TestCase
 
     public function testHeaders(): void
     {
-        $action = new ThrowableResponseFactory(
+        $factory = new ThrowableResponseFactory(
             new ResponseFactory(),
             new ErrorHandler(
                 new PlainTextRenderer(),
@@ -55,7 +55,7 @@ final class ThrowableResponseFactoryTest extends TestCase
             new HeadersProvider(['X-Test' => ['on'], 'X-Test-Custom' => 'hello'])
         );
 
-        $response = $action->handle(
+        $response = $factory->create(
             TestHelper::createRequest(),
             new LogicException('test message')
         );

@@ -16,5 +16,5 @@ interface ThrowableResponseFactoryInterface
     /**
      * Handles a `Throwable` object and produces a response.
      */
-    public function handle(ServerRequestInterface $request, Throwable $throwable): ResponseInterface;
+    public function create(ServerRequestInterface $request, Throwable $throwable): ResponseInterface;
 }
