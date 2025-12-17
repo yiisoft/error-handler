@@ -23,8 +23,23 @@ final class ErrorHandlerTest extends TestCase
     {
         $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->throwableRendererMock = $this->createMock(ThrowableRendererInterface::class);
-        $this->errorHandler = new ErrorHandler($this->loggerMock, $this->throwableRendererMock);
+        $this->errorHandler = new ErrorHandler($this->throwableRendererMock, $this->loggerMock);
         $this->errorHandler->memoryReserveSize(0);
+    }
+
+    public function testHandleThrowableCallsDefaultRendererWithoutLogger(): void
+    {
+        $errorHandler = new ErrorHandler($this->throwableRendererMock);
+        $errorHandler->memoryReserveSize(0);
+        $throwable = new RuntimeException();
+
+        $this
+            ->throwableRendererMock
+            ->expects($this->once())
+            ->method('render')
+            ->with($throwable);
+
+        $errorHandler->handle($throwable);
     }
 
     public function testHandleThrowableCallsDefaultRendererWhenNonePassed(): void
@@ -36,7 +51,6 @@ final class ErrorHandlerTest extends TestCase
             ->expects($this->once())
             ->method('render')
             ->with($throwable);
-
 
         $this->errorHandler->handle($throwable);
     }

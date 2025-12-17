@@ -7,6 +7,7 @@ namespace Yiisoft\ErrorHandler;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Throwable;
 use Yiisoft\ErrorHandler\Event\ApplicationError;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
@@ -41,14 +42,14 @@ final class ErrorHandler
     private bool $initialized = false;
 
     /**
-     * @param LoggerInterface $logger Logger to write errors to.
      * @param ThrowableRendererInterface $defaultRenderer Default throwable renderer.
+     * @param LoggerInterface $logger Logger to write errors to.
      * @param EventDispatcherInterface|null $eventDispatcher Event dispatcher for error events.
      * @param int $exitShutdownHandlerDepth Depth of the exit() shutdown handler to ensure it's executed last.
      */
     public function __construct(
-        private readonly LoggerInterface $logger,
         private readonly ThrowableRendererInterface $defaultRenderer,
+        private readonly LoggerInterface $logger = new NullLogger(),
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
         private readonly int $exitShutdownHandlerDepth = 2
     ) {

@@ -1,5 +1,12 @@
 # Yii Error Handler Change Log
 
+## 5.0 under development
+
+- Chg #121: Use `NullLogger` as the default logger in the `ErrorHandler` (@olegbaturin)
+- Chg #144: Mark `ErrorException` and `UserException` as final (@olegbaturin)
+- Chg #146: Remove deprecated `Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` (@olegbaturin)
+- Chg #157: Change parameters order in the `ThrowableResponseActionInterface` (@olegbaturin)
+
 ## 4.3.1 under development
 
 - no changes in this release.

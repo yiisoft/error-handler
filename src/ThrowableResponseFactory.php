@@ -16,18 +16,15 @@ use Yiisoft\Http\Status;
  */
 final class ThrowableResponseFactory implements ThrowableResponseFactoryInterface
 {
-    private readonly HeadersProvider $headersProvider;
-
     public function __construct(
         private readonly ResponseFactoryInterface $responseFactory,
         private readonly ErrorHandler $errorHandler,
         private readonly RendererProviderInterface $rendererProvider,
-        ?HeadersProvider $headersProvider = null,
+        private readonly HeadersProvider $headersProvider = new HeadersProvider(),
     ) {
-        $this->headersProvider = $headersProvider ?? new HeadersProvider();
     }
 
-    public function create(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
+    public function create(ServerRequestInterface $request, Throwable $throwable): ResponseInterface
     {
         $renderer = $this->rendererProvider->get($request);
 
