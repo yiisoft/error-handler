@@ -111,7 +111,11 @@ final class ErrorHandlerTest extends TestCase
         $this->assertInstanceOf(ErrorException::class, $exception);
         $this->assertFalse($exception::isFatalError($array));
         $this->assertNull($exception->getSolution());
-        $this->assertNotEmpty($exception->getBacktrace());
+
+        $backtrace = $exception->getBacktrace();
+        $this->assertNotEmpty($backtrace);
+        $this->assertSame(__FILE__, $backtrace[0]['file']);
+        $this->assertSame(['file', 'line'], array_keys($backtrace[0]));
 
         $this->errorHandler->unregister();
     }
