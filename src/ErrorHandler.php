@@ -135,7 +135,7 @@ final class ErrorHandler
             }
 
             $backtrace = debug_backtrace(0);
-            array_shift($backtrace);
+            unset($backtrace[0]['function'], $backtrace[0]['class'], $backtrace[0]['type'], $backtrace[0]['args']);
             throw new ErrorException($message, $severity, $severity, $file, $line, null, $backtrace);
         });
 
