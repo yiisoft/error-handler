@@ -119,4 +119,28 @@ final class ErrorHandlerTest extends TestCase
 
         $this->errorHandler->unregister();
     }
+
+    #[WithoutErrorHandler]
+    public function testHandleTriggerErrorWithCatching(): void
+    {
+        $this->errorHandler->register();
+        $array = ['type' => 'undefined'];
+
+        $exception = null;
+        try {
+            trigger_error('test-error');
+        } catch (Throwable $exception) {
+        }
+
+        $this->assertInstanceOf(ErrorException::class, $exception);
+        $this->assertFalse($exception::isFatalError($array));
+        $this->assertNull($exception->getSolution());
+
+        $backtrace = $exception->getBacktrace();
+        $this->assertNotEmpty($backtrace);
+        $this->assertArrayHasKey('file', $backtrace[0]);
+        $this->assertSame(__FILE__, $backtrace[0]['file']);
+
+        $this->errorHandler->unregister();
+    }
 }

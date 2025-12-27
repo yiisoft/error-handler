@@ -2,7 +2,7 @@
 
 ## 4.3.2 under development
 
-- Bug #160: Fix skipping the first trace item when handling a PHP error (@vjik)
+- Bug #160, #161: Fix skipping the first trace item when handling a PHP error (@vjik)
 
 ## 4.3.1 December 18, 2025
 
