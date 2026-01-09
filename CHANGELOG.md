@@ -7,9 +7,13 @@
 - Chg #146: Remove deprecated `Yiisoft\ErrorHandler\Factory\ThrowableResponseFactory` (@olegbaturin)
 - Chg #157: Change parameters order in the `ThrowableResponseActionInterface` (@olegbaturin)
 
-## 4.3.1 under development
+## 4.3.2 under development
 
-- no changes in this release.
+- Bug #160, #161: Fix skipping the first trace item when handling a PHP error (@vjik)
+
+## 4.3.1 December 18, 2025
+
+- Enh #159: Add PHP 8.5 support (@vjik)
 
 ## 4.3.0 September 06, 2025
 
