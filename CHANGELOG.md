@@ -1,5 +1,9 @@
 # Yii Error Handler Change Log
 
+## 4.3.3 under development
+
+- no changes in this release.
+
 ## 4.3.2 January 09, 2026
 
 - Bug #160, #161: Fix skipping the first trace item when handling a PHP error (@vjik)
