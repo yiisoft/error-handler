@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests;
 
-use HttpSoft\Message\ResponseFactory;
 use LogicException;
+use HttpSoft\Message\ResponseFactory;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use Yiisoft\ErrorHandler\ErrorHandler;
 use Yiisoft\ErrorHandler\HeadersProvider;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
@@ -27,7 +26,6 @@ final class ThrowableResponseFactoryTest extends TestCase
         $factory = new ThrowableResponseFactory(
             new ResponseFactory(),
             new ErrorHandler(
-                new NullLogger(),
                 new PlainTextRenderer(),
             ),
             new ContentTypeRendererProvider(
@@ -36,8 +34,8 @@ final class ThrowableResponseFactoryTest extends TestCase
         );
 
         $response = $factory->create(
-            new LogicException('test message'),
             TestHelper::createRequest(),
+            new LogicException('test message')
         );
 
         assertSame(500, $response->getStatusCode());
@@ -49,7 +47,6 @@ final class ThrowableResponseFactoryTest extends TestCase
         $factory = new ThrowableResponseFactory(
             new ResponseFactory(),
             new ErrorHandler(
-                new NullLogger(),
                 new PlainTextRenderer(),
             ),
             new ContentTypeRendererProvider(
@@ -59,8 +56,8 @@ final class ThrowableResponseFactoryTest extends TestCase
         );
 
         $response = $factory->create(
-            new LogicException('test message'),
             TestHelper::createRequest(),
+            new LogicException('test message')
         );
 
         assertTrue($response->hasHeader('X-Test'));

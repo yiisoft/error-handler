@@ -37,7 +37,7 @@ final class ErrorCatcher implements MiddlewareInterface
                 $t = new CompositeException($e, $t);
             }
 
-            return $this->throwableResponseFactory->create($t, $request);
+            return $this->throwableResponseFactory->create($request, $t);
         }
     }
 }

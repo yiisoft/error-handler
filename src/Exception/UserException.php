@@ -19,11 +19,9 @@ use function count;
  * - throw directly (`throw new UserException(...)`) for explicit user-facing errors;
  * - annotate any exception class with the `#[UserException]` attribute
  *   to mark its messages as user-facing without extending this class.
- *
- * @final
  */
 #[Attribute(Attribute::TARGET_CLASS)]
-class UserException extends Exception
+final class UserException extends Exception
 {
     public static function isUserException(Throwable $throwable): bool
     {
