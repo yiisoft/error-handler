@@ -1,8 +1,8 @@
 # Yii Error Handler Change Log
 
-## 4.3.3 under development
+## 5.0.0 under development
 
-- no changes in this release.
+- Chg #162: Replace deprecated `ThrowableResponseFactory` class usage to new one, and remove it (@vjik)
 
 ## 4.3.2 January 09, 2026
 
