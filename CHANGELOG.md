@@ -3,6 +3,7 @@
 ## 5.0.0 under development
 
 - Chg #162: Replace deprecated `ThrowableResponseFactory` class usage to new one, and remove it (@vjik)
+- Enh #163: Explicitly import classes, functions, and constants in "use" section (@mspirkov)
 
 ## 4.3.2 January 09, 2026
 
