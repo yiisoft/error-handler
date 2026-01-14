@@ -24,7 +24,7 @@ final class ErrorCatcherTest extends TestCase
         $errorCatcher = new ErrorCatcher(
             $this->createThrowableResponseFactory(),
         );
-        $handler = new class () implements RequestHandlerInterface {
+        $handler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 return new Response();
@@ -32,7 +32,7 @@ final class ErrorCatcherTest extends TestCase
         };
         $response = $errorCatcher->process(
             new ServerRequest(),
-            $handler
+            $handler,
         );
 
         $this->assertSame(200, $response->getStatusCode());
@@ -68,7 +68,7 @@ final class ErrorCatcherTest extends TestCase
 
     private function createThrowableResponseFactory(): ThrowableResponseFactoryInterface
     {
-        return new class () implements ThrowableResponseFactoryInterface {
+        return new class implements ThrowableResponseFactoryInterface {
             public function create(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
             {
                 return new Response(Status::INTERNAL_SERVER_ERROR);
@@ -78,7 +78,7 @@ final class ErrorCatcherTest extends TestCase
 
     private function createRequestHandlerWithThrowable(): RequestHandlerInterface
     {
-        return new class () implements RequestHandlerInterface {
+        return new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 throw new RuntimeException();

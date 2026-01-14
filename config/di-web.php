@@ -25,7 +25,7 @@ return [
                 static fn(ContainerInterface $container) => new CompositeRendererProvider(
                     new HeadRendererProvider(),
                     new ContentTypeRendererProvider($container),
-                )
+                ),
             ),
         ],
     ],

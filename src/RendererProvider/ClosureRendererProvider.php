@@ -24,8 +24,7 @@ final class ClosureRendererProvider implements RendererProviderInterface
     public function __construct(
         private readonly Closure $closure,
         private readonly ContainerInterface $container,
-    ) {
-    }
+    ) {}
 
     public function get(ServerRequestInterface $request): ?ThrowableRendererInterface
     {

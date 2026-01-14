@@ -16,6 +16,9 @@ use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 use Yiisoft\Http\Header;
+use ReflectionException;
+use ReflectionFunction;
+use ReflectionMethod;
 
 use function array_values;
 use function dirname;
@@ -45,6 +48,12 @@ use function realpath;
 use function str_replace;
 use function stripos;
 use function strlen;
+use function count;
+use function function_exists;
+
+use const DIRECTORY_SEPARATOR;
+use const ENT_QUOTES;
+use const EXTR_OVERWRITE;
 
 /**
  * Formats throwable into HTML string.
@@ -55,6 +64,25 @@ use function strlen;
 final class HtmlRenderer implements ThrowableRendererInterface
 {
     private const CONTENT_TYPE = 'text/html';
+
+    /**
+     * @var string|null The trace header line with placeholders to be substituted. Defaults to null.
+     *
+     * The placeholders are {file}, {line} and {icon}. A typical use case is the creation of IDE-specific links,
+     * since when you click on a trace header link, it opens directly in the IDE. You can also insert custom content.
+     *
+     * Example IDE link:
+     *
+     * ```
+     * <a href="ide://open?file={file}&line={line}">{icon}</a>
+     * ```
+     */
+    public readonly ?string $traceHeaderLine;
+
+    /**
+     * @psalm-var TraceLinkClosure
+     */
+    public readonly Closure $traceLinkGenerator;
 
     private readonly GithubMarkdown $markdownParser;
 
@@ -86,25 +114,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * @var int The maximum number of trace source code lines to be displayed. Defaults to 13.
      */
     private readonly int $maxTraceLines;
-
-    /**
-     * @var string|null The trace header line with placeholders to be substituted. Defaults to null.
-     *
-     * The placeholders are {file}, {line} and {icon}. A typical use case is the creation of IDE-specific links,
-     * since when you click on a trace header link, it opens directly in the IDE. You can also insert custom content.
-     *
-     * Example IDE link:
-     *
-     * ```
-     * <a href="ide://open?file={file}&line={line}">{icon}</a>
-     * ```
-     */
-    public readonly ?string $traceHeaderLine;
-
-    /**
-     * @psalm-var TraceLinkClosure
-     */
-    public readonly Closure $traceLinkGenerator;
 
     /**
      * @var string[]|null The list of vendor paths is determined automatically.
@@ -329,11 +338,11 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 if (!str_contains($function, '{closure}')) {
                     try {
                         if ($class !== null && class_exists($class)) {
-                            $parameters = (new \ReflectionMethod($class, $function))->getParameters();
+                            $parameters = (new ReflectionMethod($class, $function))->getParameters();
                         } elseif (function_exists($function)) {
-                            $parameters = (new \ReflectionFunction($function))->getParameters();
+                            $parameters = (new ReflectionFunction($function))->getParameters();
                         }
-                    } catch (\ReflectionException) {
+                    } catch (ReflectionException) {
                         // pass
                     }
                 }
@@ -453,7 +462,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             }
         }
 
-        $body = (string)$request->getBody();
+        $body = (string) $request->getBody();
         if (!empty($body)) {
             $output .= "\n" . $body . "\n\n";
         }
@@ -527,6 +536,13 @@ final class HtmlRenderer implements ThrowableRendererInterface
         }
 
         return $name;
+    }
+
+    public function removeAnonymous(string $value): string
+    {
+        $anonymousPosition = strpos($value, '@anonymous');
+
+        return $anonymousPosition !== false ? substr($value, 0, $anonymousPosition) : $value;
     }
 
     /**
@@ -720,13 +736,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
         return $this->vendorPaths;
     }
 
-    public function removeAnonymous(string $value): string
-    {
-        $anonymousPosition = strpos($value, '@anonymous');
-
-        return $anonymousPosition !== false ? substr($value, 0, $anonymousPosition) : $value;
-    }
-
     /**
      * @psalm-param string|TraceLinkClosure|null $traceLink
      * @psalm-return TraceLinkClosure
@@ -734,7 +743,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
     private function createTraceLinkGenerator(string|Closure|null $traceLink): Closure
     {
         if ($traceLink === null) {
-            return static fn(): string|null => null;
+            return static fn(): ?string => null;
         }
 
         if (is_string($traceLink)) {

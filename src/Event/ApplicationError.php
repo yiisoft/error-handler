@@ -13,8 +13,7 @@ final class ApplicationError
 {
     public function __construct(
         private readonly Throwable $throwable,
-    ) {
-    }
+    ) {}
 
     public function getThrowable(): Throwable
     {

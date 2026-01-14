@@ -19,8 +19,7 @@ final class ErrorData implements Stringable
     public function __construct(
         private readonly string $content,
         private readonly array $headers = [],
-    ) {
-    }
+    ) {}
 
     /**
      * Returns a content to use as response body.

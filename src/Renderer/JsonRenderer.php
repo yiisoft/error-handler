@@ -12,6 +12,12 @@ use Yiisoft\Http\Header;
 
 use function json_encode;
 
+use const JSON_INVALID_UTF8_SUBSTITUTE;
+use const JSON_PARTIAL_OUTPUT_ON_ERROR;
+use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
+use const JSON_UNESCAPED_SLASHES;
+
 /**
  * Formats throwable into JSON string.
  */
@@ -26,7 +32,7 @@ final class JsonRenderer implements ThrowableRendererInterface
                 [
                     'message' => self::DEFAULT_ERROR_MESSAGE,
                 ],
-                JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
+                JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES,
             ),
             [Header::CONTENT_TYPE => self::CONTENT_TYPE],
         );
@@ -44,7 +50,7 @@ final class JsonRenderer implements ThrowableRendererInterface
                     'line' => $t->getLine(),
                     'trace' => $t->getTrace(),
                 ],
-                JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR
+                JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR,
             ),
             [Header::CONTENT_TYPE => self::CONTENT_TYPE],
         );

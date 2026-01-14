@@ -10,6 +10,7 @@ use RuntimeException;
 use Yiisoft\ErrorHandler\Renderer\PlainTextRenderer;
 
 use function PHPUnit\Framework\assertSame;
+use function sprintf;
 
 final class PlainTextRendererTest extends TestCase
 {
@@ -38,7 +39,7 @@ final class PlainTextRendererTest extends TestCase
             $throwable->getMessage(),
             $throwable->getFile(),
             $throwable->getLine(),
-            $throwable->getTraceAsString()
+            $throwable->getTraceAsString(),
         );
 
         $data = $renderer->renderVerbose($throwable);

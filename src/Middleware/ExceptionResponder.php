@@ -59,8 +59,7 @@ final class ExceptionResponder implements MiddlewareInterface
         private readonly ResponseFactoryInterface $responseFactory,
         private readonly Injector $injector,
         private readonly bool $checkResponseBody = false,
-    ) {
-    }
+    ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
