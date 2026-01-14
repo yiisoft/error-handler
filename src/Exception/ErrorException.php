@@ -11,6 +11,22 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 use function array_slice;
 use function in_array;
 use function function_exists;
+use function ini_get;
+
+use const E_COMPILE_ERROR;
+use const E_COMPILE_WARNING;
+use const E_CORE_ERROR;
+use const E_CORE_WARNING;
+use const E_DEPRECATED;
+use const E_ERROR;
+use const E_NOTICE;
+use const E_PARSE;
+use const E_RECOVERABLE_ERROR;
+use const E_USER_DEPRECATED;
+use const E_USER_ERROR;
+use const E_USER_NOTICE;
+use const E_USER_WARNING;
+use const E_WARNING;
 
 /**
  * `ErrorException` represents a PHP error.
@@ -148,6 +164,6 @@ class ErrorException extends \ErrorException implements FriendlyExceptionInterfa
         }
 
         // Xdebug 3 and later, proper mode is required
-        return str_contains((string) \ini_get('xdebug.mode'), 'develop');
+        return str_contains((string) ini_get('xdebug.mode'), 'develop');
     }
 }

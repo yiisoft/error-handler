@@ -10,6 +10,8 @@ use Yiisoft\Di\ContainerConfig;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 
+use function dirname;
+
 final class ConfigTest extends TestCase
 {
     public function testDiWeb(): void
@@ -25,8 +27,8 @@ final class ConfigTest extends TestCase
     {
         return new Container(
             ContainerConfig::create()->withDefinitions(
-                $this->getDiConfig($postfix)
-            )
+                $this->getDiConfig($postfix),
+            ),
         );
     }
 

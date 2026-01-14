@@ -19,8 +19,7 @@ final class PlainTextRenderer implements ThrowableRendererInterface
 {
     public function __construct(
         private readonly string $contentType = 'text/plain',
-    ) {
-    }
+    ) {}
 
     public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
@@ -53,7 +52,7 @@ final class PlainTextRenderer implements ThrowableRendererInterface
             $t->getMessage(),
             $t->getFile(),
             $t->getLine(),
-            $t->getTraceAsString()
+            $t->getTraceAsString(),
         );
     }
 }

@@ -44,15 +44,15 @@ final class ExceptionResponderTest extends TestCase
     {
         $request = new ServerRequest(headers: ['X-TEST' => ['HELLO']]);
         $middleware = $this->createMiddleware([
-            DomainException::class =>
-                static function (ResponseFactoryInterface $responseFactory, ServerRequestInterface $request) {
+            DomainException::class
+                => static function (ResponseFactoryInterface $responseFactory, ServerRequestInterface $request) {
                     return $responseFactory->createResponse(Status::CREATED, $request->getHeaderLine('X-TEST'));
                 },
         ]);
 
         $response = $middleware->process(
             $request,
-            new class () implements RequestHandlerInterface {
+            new class implements RequestHandlerInterface {
                 public function handle(ServerRequestInterface $request): ResponseInterface
                 {
                     throw new DomainException();
@@ -78,10 +78,10 @@ final class ExceptionResponderTest extends TestCase
     {
         $middleware = $this->createMiddleware(checkResponseBody: true);
         $request = (new ServerRequestFactory())->createServerRequest(Method::GET, 'http://example.com');
-        $handler = new class () implements RequestHandlerInterface {
+        $handler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                return new class () implements ResponseInterface {
+                return new class implements ResponseInterface {
                     use ResponseTrait;
 
                     public function getBody(): StreamInterface
@@ -101,7 +101,7 @@ final class ExceptionResponderTest extends TestCase
     {
         $middleware = $this->createMiddleware(checkResponseBody: true);
         $request = (new ServerRequestFactory())->createServerRequest(Method::GET, 'http://example.com');
-        $handler = new class () implements RequestHandlerInterface {
+        $handler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 return new Response();
@@ -117,12 +117,12 @@ final class ExceptionResponderTest extends TestCase
     {
         return $middleware->process(
             (new ServerRequestFactory())->createServerRequest(Method::GET, 'http://example.com'),
-            new class () implements RequestHandlerInterface {
+            new class implements RequestHandlerInterface {
                 public function handle(ServerRequestInterface $request): ResponseInterface
                 {
                     throw new DomainException();
                 }
-            }
+            },
         );
     }
 

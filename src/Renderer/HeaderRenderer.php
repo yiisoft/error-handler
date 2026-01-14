@@ -20,8 +20,7 @@ final class HeaderRenderer implements ThrowableRendererInterface
      */
     public function __construct(
         private readonly ?string $contentType = null,
-    ) {
-    }
+    ) {}
 
     public function render(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {

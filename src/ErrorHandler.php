@@ -22,6 +22,9 @@ use function set_error_handler;
 use function set_exception_handler;
 use function str_repeat;
 
+use const DEBUG_BACKTRACE_IGNORE_ARGS;
+use const PHP_SAPI;
+
 /**
  * `ErrorHandler` handles out of memory errors, fatals, warnings, notices and exceptions.
  */
@@ -50,9 +53,8 @@ final class ErrorHandler
         private readonly LoggerInterface $logger,
         private readonly ThrowableRendererInterface $defaultRenderer,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
-        private readonly int $exitShutdownHandlerDepth = 2
-    ) {
-    }
+        private readonly int $exitShutdownHandlerDepth = 2,
+    ) {}
 
     /**
      * Handles throwable and returns error data.
@@ -63,7 +65,7 @@ final class ErrorHandler
     public function handle(
         Throwable $t,
         ?ThrowableRendererInterface $renderer = null,
-        ?ServerRequestInterface $request = null
+        ?ServerRequestInterface $request = null,
     ): ErrorData {
         $renderer ??= $this->defaultRenderer;
 
@@ -190,7 +192,7 @@ final class ErrorHandler
                     $e['file'],
                     $e['line'],
                     null,
-                    $backtrace
+                    $backtrace,
                 );
                 $this->renderThrowableAndTerminate($error);
             }
@@ -226,7 +228,7 @@ final class ErrorHandler
             static function (): void {
                 exit(1);
             },
-            $this->exitShutdownHandlerDepth
+            $this->exitShutdownHandlerDepth,
         );
 
         register_shutdown_function($handler);
@@ -244,7 +246,7 @@ final class ErrorHandler
     {
         $currentDepth = 0;
         while ($currentDepth < $depth) {
-            $handler = static function() use ($handler): void {
+            $handler = static function () use ($handler): void {
                 register_shutdown_function($handler);
             };
             $currentDepth++;

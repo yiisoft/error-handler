@@ -21,6 +21,9 @@ use function file_exists;
 use function file_put_contents;
 use function fopen;
 use function unlink;
+use function sprintf;
+
+use const DIRECTORY_SEPARATOR;
 
 final class HtmlRendererTest extends TestCase
 {
@@ -139,7 +142,7 @@ final class HtmlRendererTest extends TestCase
         set_error_handler(
             static function (int $code, string $message) use (&$errorMessage) {
                 $errorMessage = $message;
-            }
+            },
         );
         $result = $this->invokeMethod(new HtmlRenderer(), 'renderCallStackItem', [
             'file' => 'not-exist',
@@ -164,7 +167,7 @@ final class HtmlRendererTest extends TestCase
 
         $this->assertSame(
             "GET https:/example.com\nAccept: text/html\n",
-            $output
+            $output,
         );
     }
 
@@ -308,7 +311,7 @@ final class HtmlRendererTest extends TestCase
         yield [null, static fn() => null];
         yield [
             'phpstorm://open?file=test.php&line=42',
-            static fn(string $file, int|null $line) => "phpstorm://open?file=$file&line=$line",
+            static fn(string $file, ?int $line) => "phpstorm://open?file=$file&line=$line",
         ];
         yield [
             'phpstorm://open?file=test.php&line=42',
@@ -324,10 +327,10 @@ final class HtmlRendererTest extends TestCase
 
     #[DataProvider('dataTraceLinkGenerator')]
     public function testTraceLinkGenerator(
-        string|null $expected,
+        ?string $expected,
         mixed $traceLink,
         string $file = 'test.php',
-        int|null $line = 42,
+        ?int $line = 42,
     ): void {
         $renderer = new HtmlRenderer(traceLink: $traceLink);
 
@@ -358,7 +361,7 @@ final class HtmlRendererTest extends TestCase
                 [
                     'Accept' => $acceptHeader,
                     'Host' => $hostHeader,
-                ]
+                ],
             );
 
         $serverRequestMock

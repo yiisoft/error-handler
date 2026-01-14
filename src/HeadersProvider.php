@@ -17,8 +17,7 @@ final class HeadersProvider
      */
     public function __construct(
         private array $headers = [],
-    ) {
-    }
+    ) {}
 
     /**
      * Adds a header to the list of headers.
@@ -28,7 +27,7 @@ final class HeadersProvider
      */
     public function add(string $name, string|array $values): void
     {
-        $this->headers[$name] = (array)$values;
+        $this->headers[$name] = (array) $values;
     }
 
     /**

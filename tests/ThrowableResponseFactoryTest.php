@@ -55,7 +55,7 @@ final class ThrowableResponseFactoryTest extends TestCase
             new ContentTypeRendererProvider(
                 new SimpleContainer(),
             ),
-            new HeadersProvider(['X-Test' => ['on'], 'X-Test-Custom' => 'hello'])
+            new HeadersProvider(['X-Test' => ['on'], 'X-Test-Custom' => 'hello']),
         );
 
         $response = $factory->create(

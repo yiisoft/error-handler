@@ -8,6 +8,4 @@ use Exception;
 use Yiisoft\ErrorHandler\Exception\UserException;
 
 #[UserException]
-final class NotFoundException extends Exception
-{
-}
+final class NotFoundException extends Exception {}
