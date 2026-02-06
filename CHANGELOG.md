@@ -4,6 +4,7 @@
 
 - Chg #162: Replace deprecated `ThrowableResponseFactory` class usage to new one, and remove it (@vjik)
 - Enh #163: Explicitly import classes, functions, and constants in "use" section (@mspirkov)
+- Bug #164: Fix missing items in stack trace HTML output when handling a PHP error (@vjik) 
 
 ## 4.3.2 January 09, 2026
 

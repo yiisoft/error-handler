@@ -321,10 +321,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
         );
 
         $index = 1;
-        if ($t instanceof ErrorException) {
-            $index = 0;
-        }
-
         foreach ($trace as $traceItem) {
             $file = !empty($traceItem['file']) ? $traceItem['file'] : null;
             $line = !empty($traceItem['line']) ? $traceItem['line'] : null;
