@@ -15,7 +15,6 @@ use ReflectionObject;
 use RuntimeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
-
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 
 use function dirname;
@@ -168,7 +167,7 @@ final class HtmlRendererTest extends TestCase
 
         $result = $renderer->renderCallStack(
             new ErrorException('test-message'),
-            TestHelper::generateTrace([true, true, false, true])
+            TestHelper::generateTrace([true, true, false, true]),
         );
 
         $this->assertStringContainsString('1. ', $result);
