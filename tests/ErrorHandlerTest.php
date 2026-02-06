@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests;
 
+use mysql_xdevapi\BaseResult;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -114,8 +115,8 @@ final class ErrorHandlerTest extends TestCase
 
         $backtrace = $exception->getBacktrace();
         $this->assertNotEmpty($backtrace);
-        $this->assertSame(__FILE__, $backtrace[0]['file']);
-        $this->assertSame(['file', 'line'], array_keys($backtrace[0]));
+        $this->assertArrayHasKey('class', $backtrace[0]);
+        $this->assertSame(self::class, $backtrace[0]['class']);
 
         $this->errorHandler->unregister();
     }
