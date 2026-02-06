@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\ErrorHandler\Tests;
 
-use mysql_xdevapi\BaseResult;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
