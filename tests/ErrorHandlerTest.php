@@ -114,8 +114,8 @@ final class ErrorHandlerTest extends TestCase
 
         $backtrace = $exception->getBacktrace();
         $this->assertNotEmpty($backtrace);
-        $this->assertSame(__FILE__, $backtrace[0]['file']);
-        $this->assertSame(['file', 'line'], array_keys($backtrace[0]));
+        $this->assertArrayHasKey('class', $backtrace[0]);
+        $this->assertSame(self::class, $backtrace[0]['class']);
 
         $this->errorHandler->unregister();
     }
@@ -138,8 +138,8 @@ final class ErrorHandlerTest extends TestCase
 
         $backtrace = $exception->getBacktrace();
         $this->assertNotEmpty($backtrace);
-        $this->assertArrayHasKey('file', $backtrace[0]);
-        $this->assertSame(__FILE__, $backtrace[0]['file']);
+        $this->assertArrayHasKey('class', $backtrace[0]);
+        $this->assertSame(self::class, $backtrace[0]['class']);
 
         $this->errorHandler->unregister();
     }
