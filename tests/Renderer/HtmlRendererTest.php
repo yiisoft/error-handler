@@ -15,6 +15,7 @@ use ReflectionObject;
 use RuntimeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
+use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 
 use function dirname;
 use function file_exists;
@@ -158,6 +159,22 @@ final class HtmlRendererTest extends TestCase
 
         $this->assertSame('', $result);
         $this->assertSame('file(not-exist): Failed to open stream: No such file or directory', $errorMessage);
+    }
+
+    public function testRenderCallStackWithErrorException(): void
+    {
+        $renderer = new HtmlRenderer();
+
+        $result = $renderer->renderCallStack(
+            new ErrorException('test-message'),
+            TestHelper::generateTrace([true, true, false, true]),
+        );
+
+        $this->assertStringContainsString('1. ', $result);
+        $this->assertStringContainsString('2. ', $result);
+        $this->assertStringContainsString('3. ', $result);
+        $this->assertStringContainsString('4. ', $result);
+        $this->assertStringContainsString('5. ', $result);
     }
 
     public function testRenderRequest(): void
