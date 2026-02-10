@@ -164,7 +164,7 @@ $exceptionMessage = $throwable->getMessage();
             <p>
                 <a href="https://www.yiiframework.com/" target="_blank" rel="noopener noreferrer">Yii Framework</a>
                 /
-                <a href="https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md" target="_blank" rel="noopener noreferrer">Error Handling Guide</a>
+                <a href="https://yiisoft.github.io/docs/guide/runtime/handling-errors.html" target="_blank" rel="noopener noreferrer">Error Handling Guide</a>
             </p>
         </div>
 

@@ -124,7 +124,7 @@ $errorHandler = new ErrorHandler($logger, $renderer);
 ```
 
 For more information about creating your own renders and examples of rendering error data,
-[see here](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md#rendering-error-data).
+[see here](https://yiisoft.github.io/docs/guide/runtime/handling-errors.html#rendering-error-data).
 
 ### Using a factory to create a response
 
@@ -260,7 +260,7 @@ For example:
 
 ## Documentation
 
-- [Yii guide to handling errors](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/handling-errors.md)
+- [Yii guide to handling errors](https://yiisoft.github.io/docs/guide/runtime/handling-errors.html)
 - [Internals](docs/internals.md)
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
