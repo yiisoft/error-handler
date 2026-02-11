@@ -3,6 +3,7 @@
 ## 4.3.3 under development
 
 - Bug #164: Fix missing items in stack trace HTML output when handling a PHP error (@vjik)
+- Bug #166: Fix broken link to error handling guide (@vjik)
 
 ## 4.3.2 January 09, 2026
 
