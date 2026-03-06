@@ -9,6 +9,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 /**
  * @var ServerRequestInterface|null $request
  * @var Throwable $throwable
+ * @var string|null $exceptionDescription
  */
 
 $theme = $_COOKIE['yii-exception-theme'] ?? '';
@@ -92,6 +93,10 @@ $exceptionMessage = $throwable->getMessage();
         <div class="exception-message">
             <?= nl2br($this->htmlEncode($exceptionMessage)) ?>
         </div>
+
+        <?php if ($exceptionDescription !== null): ?>
+            <div class="exception-description solution"><?= $this->parseMarkdown($exceptionDescription) ?></div>
+        <?php endif ?>
 
         <?php if ($solution !== null): ?>
             <div class="solution"><?= $this->parseMarkdown($solution) ?></div>

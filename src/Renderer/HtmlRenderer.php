@@ -16,6 +16,7 @@ use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 use Yiisoft\Http\Header;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
@@ -45,11 +46,17 @@ use function ob_get_level;
 use function ob_implicit_flush;
 use function ob_start;
 use function realpath;
+use function preg_match;
+use function preg_replace;
+use function preg_replace_callback;
+use function preg_split;
 use function str_replace;
+use function str_starts_with;
 use function stripos;
 use function strlen;
 use function count;
 use function function_exists;
+use function trim;
 
 use const DIRECTORY_SEPARATOR;
 use const ENT_QUOTES;
@@ -204,10 +211,16 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
     public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
+        $displayThrowable = $t instanceof CompositeException ? $t->getFirstException() : $t;
+        $exceptionDescription = $displayThrowable instanceof FriendlyExceptionInterface
+            ? null
+            : $this->getThrowableDescription($displayThrowable);
+
         return new ErrorData(
             $this->renderTemplate($this->verboseTemplate, [
                 'request' => $request,
                 'throwable' => $t,
+                'exceptionDescription' => $exceptionDescription,
             ]),
             [Header::CONTENT_TYPE => self::CONTENT_TYPE],
         );
@@ -539,6 +552,60 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $anonymousPosition = strpos($value, '@anonymous');
 
         return $anonymousPosition !== false ? substr($value, 0, $anonymousPosition) : $value;
+    }
+
+    /**
+     * Extracts a user-facing description from throwable class PHPDoc.
+     *
+     * Takes only descriptive text before block tags and normalizes inline
+     * {@see ...}/{@link ...} annotations into markdown-friendly form.
+     */
+    private function getThrowableDescription(Throwable $throwable): ?string
+    {
+        $docComment = (new ReflectionClass($throwable))->getDocComment();
+        if ($docComment === false) {
+            return null;
+        }
+
+        $descriptionLines = [];
+        foreach (preg_split('/\R/', $docComment) ?: [] as $line) {
+            $line = trim($line);
+            $line = preg_replace('/^\/\*\*?/', '', $line) ?? $line;
+            $line = preg_replace('/\*\/$/', '', $line) ?? $line;
+            $line = preg_replace('/^\*/', '', $line) ?? $line;
+            $line = trim($line);
+
+            if ($line !== '' && str_starts_with($line, '@')) {
+                break;
+            }
+
+            $descriptionLines[] = $line;
+        }
+
+        $description = trim(implode("\n", $descriptionLines));
+        if ($description === '') {
+            return null;
+        }
+
+        return preg_replace_callback(
+            '/\{@(see|link)\s+([^\s}]+)(?:\s+([^}]+))?\}/i',
+            static function (array $matches): string {
+                $target = $matches[2];
+                $label = trim($matches[3] ?? '');
+
+                if (preg_match('/^https?:\/\//i', $target) === 1) {
+                    $text = $label !== '' ? $label : $target;
+                    return '[' . $text . '](' . $target . ')';
+                }
+
+                if ($label !== '') {
+                    return $label . ' (`' . $target . '`)';
+                }
+
+                return '`' . $target . '`';
+            },
+            $description,
+        ) ?? $description;
     }
 
     /**

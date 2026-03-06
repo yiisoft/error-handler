@@ -15,6 +15,9 @@ use ReflectionObject;
 use RuntimeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
+use Yiisoft\ErrorHandler\Tests\Support\TestDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestExceptionWithoutDocBlock;
+use Yiisoft\ErrorHandler\Tests\Support\TestFriendlyException;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 
 use function dirname;
@@ -64,6 +67,44 @@ final class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('<html', (string) $errorData);
         $this->assertStringContainsString(RuntimeException::class, (string) $errorData);
         $this->assertStringContainsString($exceptionMessage, (string) $errorData);
+    }
+
+    public function testVerboseOutputRendersThrowableDescriptionFromDocComment(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+
+        $this->assertStringContainsString('<div class="exception-description solution">', $result);
+        $this->assertStringContainsString('Test summary with <code>RuntimeException</code>.', $result);
+        $this->assertStringContainsString(
+            '<a href="https://www.yiiframework.com">Yii Framework</a>',
+            $result,
+        );
+    }
+
+    public function testVerboseOutputDoesNotRenderThrowableDescriptionWhenNoDocComment(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestExceptionWithoutDocBlock('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+
+        $this->assertStringNotContainsString('<div class="exception-description solution">', (string) $errorData);
+    }
+
+    public function testVerboseOutputKeepsFriendlyExceptionBehaviorWithoutDescriptionDuplication(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestFriendlyException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+
+        $this->assertStringContainsString('<div class="solution">', $result);
+        $this->assertStringNotContainsString('<div class="exception-description solution">', $result);
     }
 
     public function testNonVerboseOutputWithCustomTemplate(): void
