@@ -16,9 +16,11 @@ use RuntimeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\Tests\Support\TestDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestEmptyDescriptionDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestExceptionWithoutDocBlock;
 use Yiisoft\ErrorHandler\Tests\Support\TestFriendlyException;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
+use Yiisoft\ErrorHandler\Tests\Support\TestInlineCodeDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeDocBlockException;
 
 use function dirname;
@@ -96,6 +98,16 @@ final class HtmlRendererTest extends TestCase
         $this->assertStringNotContainsString('<div class="exception-description solution">', (string) $errorData);
     }
 
+    public function testVerboseOutputDoesNotRenderThrowableDescriptionWhenDocCommentHasNoDescription(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestEmptyDescriptionDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+
+        $this->assertStringNotContainsString('<div class="exception-description solution">', (string) $errorData);
+    }
+
     public function testVerboseOutputKeepsFriendlyExceptionBehaviorWithoutDescriptionDuplication(): void
     {
         $renderer = new HtmlRenderer();
@@ -122,6 +134,18 @@ final class HtmlRendererTest extends TestCase
             '<a href="https://www.yiiframework.com">Safe link</a>',
             $result,
         );
+    }
+
+    public function testVerboseOutputRendersInlineCodeAndSeeTagWithoutLabel(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestInlineCodeDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+
+        $this->assertStringContainsString('<code>inline-code</code>', $result);
+        $this->assertStringContainsString('<code>RuntimeException</code>', $result);
     }
 
     public function testNonVerboseOutputWithCustomTemplate(): void
