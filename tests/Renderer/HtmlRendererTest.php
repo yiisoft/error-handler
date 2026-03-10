@@ -19,6 +19,7 @@ use Yiisoft\ErrorHandler\Tests\Support\TestDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestExceptionWithoutDocBlock;
 use Yiisoft\ErrorHandler\Tests\Support\TestFriendlyException;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
+use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeDocBlockException;
 
 use function dirname;
 use function file_exists;
@@ -105,6 +106,22 @@ final class HtmlRendererTest extends TestCase
 
         $this->assertStringContainsString('<div class="solution">', $result);
         $this->assertStringNotContainsString('<div class="exception-description solution">', $result);
+    }
+
+    public function testVerboseOutputEscapesUnsafeThrowableDescriptionLinks(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestUnsafeDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+
+        $this->assertStringNotContainsString('href="javascript:alert(1)"', $result);
+        $this->assertStringContainsString('Click me (<code>javascript:alert(1)</code>)', $result);
+        $this->assertStringContainsString(
+            '<a href="https://www.yiiframework.com">Safe link</a>',
+            $result,
+        );
     }
 
     public function testNonVerboseOutputWithCustomTemplate(): void

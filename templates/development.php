@@ -95,7 +95,7 @@ $exceptionMessage = $throwable->getMessage();
         </div>
 
         <?php if ($exceptionDescription !== null): ?>
-            <div class="exception-description solution"><?= $this->parseMarkdown($exceptionDescription) ?></div>
+            <div class="exception-description solution"><?= $exceptionDescription ?></div>
         <?php endif ?>
 
         <?php if ($solution !== null): ?>

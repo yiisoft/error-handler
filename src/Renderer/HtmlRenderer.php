@@ -587,8 +587,8 @@ final class HtmlRenderer implements ThrowableRendererInterface
             return null;
         }
 
-        return preg_replace_callback(
-            '/\{@(see|link)\s+([^\s}]+)(?:\s+([^}]+))?\}/i',
+        $description = preg_replace_callback(
+            '/\{@(see|link)\s+([^\s}]+)(?:\s+([^}]+))?}/i',
             static function (array $matches): string {
                 $target = $matches[2];
                 $label = trim($matches[3] ?? '');
@@ -606,6 +606,54 @@ final class HtmlRenderer implements ThrowableRendererInterface
             },
             $description,
         ) ?? $description;
+
+        $paragraphs = preg_split('/\R\s*\R/', $description) ?: [];
+        $result = [];
+
+        foreach ($paragraphs as $paragraph) {
+            $paragraph = trim($paragraph);
+            if ($paragraph === '') {
+                continue;
+            }
+
+            $parts = preg_split(
+                '/(\[[^]]+]\([^)]+\)|`[^`]+`)/',
+                $paragraph,
+                -1,
+                PREG_SPLIT_DELIM_CAPTURE,
+            ) ?: [];
+
+            $html = '';
+            foreach ($parts as $part) {
+                if ($part === '') {
+                    continue;
+                }
+
+                if (preg_match('/^\[([^]]+)]\(([^)]+)\)$/', $part, $matches) === 1) {
+                    if (preg_match('/^https?:\/\//i', $matches[2]) === 1) {
+                        $html .= '<a href="' . $this->htmlEncode($matches[2]) . '">'
+                            . $this->htmlEncode($matches[1])
+                            . '</a>';
+                    } else {
+                        $html .= $this->htmlEncode($matches[1])
+                            . ' (<code>' . $this->htmlEncode($matches[2]) . '</code>)';
+                    }
+
+                    continue;
+                }
+
+                if (preg_match('/^`([^`]+)`$/', $part, $matches) === 1) {
+                    $html .= '<code>' . $this->htmlEncode($matches[1]) . '</code>';
+                    continue;
+                }
+
+                $html .= $this->htmlEncode($part);
+            }
+
+            $result[] = '<p>' . $html . '</p>';
+        }
+
+        return $result === [] ? null : implode("\n", $result);
     }
 
     /**
