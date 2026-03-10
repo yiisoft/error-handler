@@ -61,6 +61,7 @@ use function trim;
 use const DIRECTORY_SEPARATOR;
 use const ENT_QUOTES;
 use const EXTR_OVERWRITE;
+use const PREG_SPLIT_DELIM_CAPTURE;
 
 /**
  * Formats throwable into HTML string.
