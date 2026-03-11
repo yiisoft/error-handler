@@ -558,8 +558,15 @@ final class HtmlRenderer implements ThrowableRendererInterface
     /**
      * Extracts a user-facing description from throwable class PHPDoc.
      *
-     * Takes only descriptive text before block tags and normalizes inline
-     * {@see ...}/{@link ...} annotations into markdown-friendly form.
+     * Takes only descriptive text before block tags and converts it into an
+     * HTML fragment suitable for direct inclusion in the error template.
+     * Inline {@see ...}/{@link ...} annotations are rendered as HTML links.
+     *
+     * The returned value is an HTML snippet (for example, containing <p>, <a>,
+     * <code> elements) and is intended to be inserted into the template as-is,
+     * without additional HTML-escaping.
+     *
+     * @return string|null HTML fragment describing the throwable, or null if no description is available.
      */
     private function getThrowableDescription(Throwable $throwable): ?string
     {
