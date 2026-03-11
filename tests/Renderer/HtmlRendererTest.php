@@ -21,7 +21,9 @@ use Yiisoft\ErrorHandler\Tests\Support\TestExceptionWithoutDocBlock;
 use Yiisoft\ErrorHandler\Tests\Support\TestFriendlyException;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 use Yiisoft\ErrorHandler\Tests\Support\TestInlineCodeDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestOwaspFilterEvasionDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeMarkdownDocBlockException;
 
 use function dirname;
 use function file_exists;
@@ -127,12 +129,108 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
 
         $this->assertStringNotContainsString('href="javascript:alert(1)"', $result);
+        $this->assertNotSame('', $description);
+        $this->assertStringNotContainsString('<img', $description);
+        $this->assertStringContainsString(
+            '&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;&gt;',
+            $description,
+        );
         $this->assertStringContainsString('Click me (<code>javascript:alert(1)</code>)', $result);
         $this->assertStringContainsString(
             '<a href="https://www.yiiframework.com">Safe link</a>',
             $result,
+        );
+    }
+
+    public function testVerboseOutputEscapesUnsafeThrowableDescriptionMarkdownPayloads(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestUnsafeMarkdownDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertNotSame('', $description);
+        $this->assertStringNotContainsString('href="javascript:alert(document.domain)"', $description);
+        $this->assertStringNotContainsString('href="javascript:alert(\'html-link\')"', $description);
+        $this->assertStringNotContainsString('<img', $description);
+        $this->assertStringNotContainsString('<svg', $description);
+        $this->assertStringContainsString('Click me (<code>javascript:alert(document.domain</code>))', $description);
+        $this->assertStringContainsString('!Image payload (<code>javascript:alert(&#039;img&#039;</code>))', $description);
+        $this->assertStringContainsString(
+            '&lt;a href=&quot;javascript:alert(&#039;html-link&#039;)&quot;&gt;Raw HTML link&lt;/a&gt;',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;svg onload=&quot;alert(&#039;svg&#039;)&quot;&gt;&lt;/svg&gt;',
+            $description,
+        );
+    }
+
+    public function testVerboseOutputEscapesNonHttpSchemesInThrowableDescriptionMarkdownLinks(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestUnsafeMarkdownDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertNotSame('', $description);
+        $this->assertStringContainsString('Encoded payload (<code>JaVaScRiPt:alert(1</code>))', $description);
+        $this->assertStringContainsString(
+            'Data URL (<code>data:text/html,&lt;script&gt;alert(1</code>)&lt;/script&gt;)',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '<a href="https://www.yiiframework.com">Safe link</a>',
+            $description,
+        );
+    }
+
+    public function testVerboseOutputEscapesOwaspFilterEvasionThrowableDescriptionPayloads(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestOwaspFilterEvasionDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertNotSame('', $description);
+        $this->assertStringNotContainsString('<a href=', $description);
+        $this->assertStringNotContainsString('<img', $description);
+        $this->assertStringContainsString(
+            '&lt;a href=&quot;&amp;#0000106&amp;#0000097&amp;#0000118',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;a href=&quot;jav&amp;#x09;ascript:alert(&#039;XSS&#039;);&quot;&gt;Encoded tab payload&lt;/a&gt;',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;img src= onmouseover=&quot;alert(&#039;xss&#039;)&quot;&gt;',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;img onmouseover=&quot;alert(&#039;xss&#039;)&quot;&gt;',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;img dynsrc=&quot;javascript:alert(&#039;XSS&#039;)&quot;&gt;',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;img lowsrc=&quot;javascript:alert(&#039;XSS&#039;)&quot;&gt;',
+            $description,
         );
     }
 
