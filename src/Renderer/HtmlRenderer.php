@@ -212,15 +212,28 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
     public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
-        $displayThrowable = $t instanceof CompositeException ? $t->getFirstException() : $t;
-        $exceptionDescription = $displayThrowable instanceof FriendlyExceptionInterface
-            ? null
-            : $this->getThrowableDescription($displayThrowable);
+        $solution = null;
+        $exceptionDescription = null;
+        $originalException = $t;
+
+        if ($t instanceof CompositeException) {
+            $t = $t->getFirstException();
+        }
+
+        if ($t instanceof FriendlyExceptionInterface) {
+            $solution = $t->getSolution();
+        } else {
+            $exceptionDescription = $this->getThrowableDescription($t);
+        }
 
         return new ErrorData(
             $this->renderTemplate($this->verboseTemplate, [
                 'request' => $request,
                 'throwable' => $t,
+                'solution' => $solution,
+                'originalException' => $originalException,
+                'exceptionClass' => get_class($t),
+                'exceptionMessage' => $t->getMessage(),
                 'exceptionDescription' => $exceptionDescription,
             ]),
             [Header::CONTENT_TYPE => self::CONTENT_TYPE],

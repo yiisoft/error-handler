@@ -1,7 +1,6 @@
 <?php
 
 use Psr\Http\Message\ServerRequestInterface;
-use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
@@ -9,18 +8,14 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 /**
  * @var ServerRequestInterface|null $request
  * @var Throwable $throwable
+ * @var string|null $solution
+ * @var Throwable $originalException
+ * @var string $exceptionClass
+ * @var string $exceptionMessage
  * @var string|null $exceptionDescription
  */
 
 $theme = $_COOKIE['yii-exception-theme'] ?? '';
-
-$originalException = $throwable;
-if ($throwable instanceof CompositeException) {
-    $throwable = $throwable->getFirstException();
-}
-$solution = $throwable instanceof FriendlyExceptionInterface ? $throwable->getSolution() : null;
-$exceptionClass = get_class($throwable);
-$exceptionMessage = $throwable->getMessage();
 
 /**
  * @var HtmlRenderer $this
