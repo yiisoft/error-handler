@@ -214,26 +214,26 @@ final class HtmlRenderer implements ThrowableRendererInterface
     {
         $solution = null;
         $exceptionDescription = null;
-        $originalException = $t;
+        $displayThrowable = $t;
 
         if ($t instanceof CompositeException) {
-            $t = $t->getFirstException();
+            $displayThrowable = $t->getFirstException();
         }
 
-        if ($t instanceof FriendlyExceptionInterface) {
-            $solution = $t->getSolution();
+        if ($displayThrowable instanceof FriendlyExceptionInterface) {
+            $solution = $displayThrowable->getSolution();
         } else {
-            $exceptionDescription = $this->getThrowableDescription($t);
+            $exceptionDescription = $this->getThrowableDescription($displayThrowable);
         }
 
         return new ErrorData(
             $this->renderTemplate($this->verboseTemplate, [
                 'request' => $request,
                 'throwable' => $t,
+                'displayThrowable' => $displayThrowable,
                 'solution' => $solution,
-                'originalException' => $originalException,
-                'exceptionClass' => get_class($t),
-                'exceptionMessage' => $t->getMessage(),
+                'exceptionClass' => get_class($displayThrowable),
+                'exceptionMessage' => $displayThrowable->getMessage(),
                 'exceptionDescription' => $exceptionDescription,
             ]),
             [Header::CONTENT_TYPE => self::CONTENT_TYPE],

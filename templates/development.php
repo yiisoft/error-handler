@@ -8,8 +8,8 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 /**
  * @var ServerRequestInterface|null $request
  * @var Throwable $throwable
+ * @var Throwable $displayThrowable
  * @var string|null $solution
- * @var Throwable $originalException
  * @var string $exceptionClass
  * @var string $exceptionMessage
  * @var string|null $exceptionDescription
@@ -28,7 +28,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-        <?= $this->htmlEncode($this->getThrowableName($throwable)) ?>
+        <?= $this->htmlEncode($this->getThrowableName($displayThrowable)) ?>
     </title>
     <style>
         <?= file_get_contents(__DIR__ . '/development.css') ?>
@@ -75,14 +75,14 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
     <div class="exception-card">
         <div class="exception-class">
             <?php
-            if ($throwable instanceof FriendlyExceptionInterface): ?>
-                <span><?= $this->htmlEncode($throwable->getName())?></span>
+            if ($displayThrowable instanceof FriendlyExceptionInterface): ?>
+                <span><?= $this->htmlEncode($displayThrowable->getName())?></span>
                 &mdash;
                 <?= $exceptionClass ?>
             <?php else: ?>
                 <span><?= $exceptionClass ?></span>
             <?php endif ?>
-            (Code #<?= $throwable->getCode() ?>)
+            (Code #<?= $displayThrowable->getCode() ?>)
         </div>
 
         <div class="exception-message">
@@ -97,7 +97,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
             <div class="solution"><?= $this->parseMarkdown($solution) ?></div>
         <?php endif ?>
 
-        <?= $this->renderPreviousExceptions($originalException) ?>
+        <?= $this->renderPreviousExceptions($throwable) ?>
 
         <textarea id="clipboard"><?= $this->htmlEncode((string) $throwable) ?></textarea>
         <span id="copied">Copied!</span>
@@ -117,10 +117,10 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
 <main>
     <div class="call-stack">
         <?= $this->renderCallStack(
-            $throwable,
-            $originalException === $throwable && $originalException instanceof ErrorException
-                ? $originalException->getBacktrace()
-                : $throwable->getTrace()
+            $displayThrowable,
+            $displayThrowable === $throwable && $throwable instanceof ErrorException
+                ? $throwable->getBacktrace()
+                : $displayThrowable->getTrace(),
         ) ?>
     </div>
     <?php if ($request && ($requestInfo = $this->renderRequest($request)) !== ''): ?>
