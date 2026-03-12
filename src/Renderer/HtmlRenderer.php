@@ -57,6 +57,7 @@ use function strlen;
 use function count;
 use function function_exists;
 use function trim;
+use function get_class;
 
 use const DIRECTORY_SEPARATOR;
 use const ENT_QUOTES;
@@ -232,7 +233,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 'throwable' => $t,
                 'displayThrowable' => $displayThrowable,
                 'solution' => $solution,
-                'exceptionClass' => get_class($displayThrowable),
+                'exceptionClass' => $displayThrowable::class,
                 'exceptionMessage' => $displayThrowable->getMessage(),
                 'exceptionDescription' => $exceptionDescription,
             ]),
