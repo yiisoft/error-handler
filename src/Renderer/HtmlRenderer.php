@@ -57,7 +57,6 @@ use function strlen;
 use function count;
 use function function_exists;
 use function trim;
-use function get_class;
 
 use const DIRECTORY_SEPARATOR;
 use const ENT_QUOTES;
