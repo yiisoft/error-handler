@@ -571,9 +571,10 @@ final class HtmlRenderer implements ThrowableRendererInterface
     /**
      * Extracts a user-facing description from throwable class PHPDoc.
      *
-     * Takes only descriptive text before block tags and converts it into an
-     * HTML fragment suitable for direct inclusion in the error template.
-     * Inline {@see ...}/{@link ...} annotations are rendered as HTML links.
+     * Takes only descriptive text before block tags, normalizes unsafe markup
+     * into safe markdown/plain text and converts it into an HTML fragment
+     * suitable for direct inclusion in the error template.
+     * Inline {@see ...}/{@link ...} annotations are rendered as markdown links.
      *
      * The returned value is an HTML snippet (for example, containing <p>, <a>,
      * <code> elements) and is intended to be inserted into the template as-is,
@@ -628,53 +629,49 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $description,
         ) ?? $description;
 
-        $paragraphs = preg_split('/\R\s*\R/', $description) ?: [];
-        $result = [];
+        $parts = preg_split(
+            '/(!?\[[^]]+]\([^)]+\)|`[^`]+`)/',
+            $description,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE,
+        ) ?: [];
 
-        foreach ($paragraphs as $paragraph) {
-            $paragraph = trim($paragraph);
-            if ($paragraph === '') {
+        $normalized = '';
+
+        foreach ($parts as $part) {
+            if ($part === '') {
                 continue;
             }
 
-            $parts = preg_split(
-                '/(\[[^]]+]\([^\s)]+(?:\)[^\s)]*)*\)|`[^`]+`)/',
-                $paragraph,
-                -1,
-                PREG_SPLIT_DELIM_CAPTURE,
-            ) ?: [];
-
-            $html = '';
-            foreach ($parts as $part) {
-                if ($part === '') {
-                    continue;
-                }
-
-                if (preg_match('/^\[([^]]+)]\(([^\\s)]+(?:\)[^\\s)]*)*)\)$/', $part, $matches) === 1) {
-                    if (preg_match('/^https?:\/\//i', $matches[2]) === 1) {
-                        $html .= '<a href="' . $this->htmlEncode($matches[2]) . '">'
-                            . $this->htmlEncode($matches[1])
-                            . '</a>';
-                    } else {
-                        $html .= $this->htmlEncode($matches[1])
-                            . ' (<code>' . $this->htmlEncode($matches[2]) . '</code>)';
-                    }
-
-                    continue;
-                }
-
-                if (preg_match('/^`([^`]+)`$/', $part, $matches) === 1) {
-                    $html .= '<code>' . $this->htmlEncode($matches[1]) . '</code>';
-                    continue;
-                }
-
-                $html .= $this->htmlEncode($part);
+            if (preg_match('/^`([^`]+)`$/', $part, $matches) === 1) {
+                $normalized .= '<code>' . $this->htmlEncode($matches[1]) . '</code>';
+                continue;
             }
 
-            $result[] = '<p>' . $html . '</p>';
+            if (preg_match('/^(!)?\[([^]]+)]\(([^)]+)\)$/', $part, $matches) === 1) {
+                $prefix = $matches[1] ?? '';
+                $label = $this->htmlEncode($matches[2]);
+                $target = $matches[3];
+
+                if ($prefix === '' && preg_match('/^https?:\/\//i', $target) === 1) {
+                    $normalized .= '[' . $label . '](' . $target . ')';
+                } elseif ($label !== '') {
+                    $normalized .= $prefix . $label . ' (<code>' . $this->htmlEncode($target) . '</code>)';
+                } else {
+                    $normalized .= $prefix . '<code>' . $this->htmlEncode($target) . '</code>';
+                }
+
+                continue;
+            }
+
+            $normalized .= $this->htmlEncode($part);
         }
 
-        return $result === [] ? null : implode("\n", $result);
+        $normalized = trim($normalized);
+
+        return $normalized === ''
+            ? null
+            : $this->parseMarkdown($normalized);
     }
 
     /**
