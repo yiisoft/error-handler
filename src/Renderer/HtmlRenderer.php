@@ -638,7 +638,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             }
 
             $parts = preg_split(
-                '/(\[[^]]+]\([^)]+\)|`[^`]+`)/',
+                '/(\[[^]]+]\([^\s)]+(?:\)[^\s)]*)*\)|`[^`]+`)/',
                 $paragraph,
                 -1,
                 PREG_SPLIT_DELIM_CAPTURE,
@@ -650,7 +650,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
                     continue;
                 }
 
-                if (preg_match('/^\[([^]]+)]\(([^)]+)\)$/', $part, $matches) === 1) {
+                if (preg_match('/^\[([^]]+)]\(([^\\s)]+(?:\)[^\\s)]*)*)\)$/', $part, $matches) === 1) {
                     if (preg_match('/^https?:\/\//i', $matches[2]) === 1) {
                         $html .= '<a href="' . $this->htmlEncode($matches[2]) . '">'
                             . $this->htmlEncode($matches[1])
