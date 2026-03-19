@@ -22,6 +22,7 @@ use Yiisoft\ErrorHandler\Tests\Support\TestFriendlyException;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 use Yiisoft\ErrorHandler\Tests\Support\TestInlineCodeDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestOwaspFilterEvasionDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestParenthesizedMarkdownDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestQueryStringDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeMarkdownDocBlockException;
@@ -263,6 +264,27 @@ final class HtmlRendererTest extends TestCase
         );
         $this->assertStringNotContainsString(
             'https://www.yiiframework.com/search?q=error&amp;amp;lang=en',
+            $description,
+        );
+    }
+
+    public function testVerboseOutputRendersThrowableDescriptionLinksWithParentheses(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestParenthesizedMarkdownDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertNotSame('', $description);
+        $this->assertStringContainsString(
+            '<a href="https://en.wikipedia.org/wiki/Function_(mathematics)">Wiki</a>',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '<a href="https://en.wikipedia.org/wiki/Function_(mathematics)">Inline wiki</a>',
             $description,
         );
     }
