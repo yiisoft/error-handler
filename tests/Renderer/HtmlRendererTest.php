@@ -22,6 +22,7 @@ use Yiisoft\ErrorHandler\Tests\Support\TestFriendlyException;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 use Yiisoft\ErrorHandler\Tests\Support\TestInlineCodeDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestOwaspFilterEvasionDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestQueryStringDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeMarkdownDocBlockException;
 
@@ -244,6 +245,26 @@ final class HtmlRendererTest extends TestCase
 
         $this->assertStringContainsString('<code>inline-code</code>', $result);
         $this->assertStringContainsString('<code>RuntimeException</code>', $result);
+    }
+
+    public function testVerboseOutputDoesNotDoubleEncodeSafeThrowableDescriptionLinks(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestQueryStringDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertStringContainsString(
+            '<a href="https://www.yiiframework.com/search?q=error&amp;lang=en">Yii Search</a>',
+            $description,
+        );
+        $this->assertStringNotContainsString(
+            'https://www.yiiframework.com/search?q=error&amp;amp;lang=en',
+            $description,
+        );
     }
 
     public function testNonVerboseOutputWithCustomTemplate(): void

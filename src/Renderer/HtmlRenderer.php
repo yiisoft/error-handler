@@ -592,9 +592,11 @@ final class HtmlRenderer implements ThrowableRendererInterface
         $descriptionLines = [];
         foreach (preg_split('/\R/', $docComment) ?: [] as $line) {
             $line = trim($line);
-            $line = preg_replace('/^\/\*\*?/', '', $line) ?? $line;
-            $line = preg_replace('/\*\/$/', '', $line) ?? $line;
-            $line = preg_replace('/^\*/', '', $line) ?? $line;
+            $line = preg_replace(
+                ['/^\/\*\*?/', '/\*\/$/', '/^\*\s?/'],
+                '',
+                $line,
+            ) ?? $line;
             $line = trim($line);
 
             if ($line !== '' && str_starts_with($line, '@')) {
@@ -610,10 +612,10 @@ final class HtmlRenderer implements ThrowableRendererInterface
         }
 
         $description = preg_replace_callback(
-            '/\{@(see|link)\s+([^\s}]+)(?:\s+([^}]+))?}/i',
+            '/\{@(?:see|link)\s+(?<target>[^\s}]+)(?:\s+(?<label>[^}]+))?}/i',
             static function (array $matches): string {
-                $target = $matches[2];
-                $label = trim($matches[3] ?? '');
+                $target = $matches['target'];
+                $label = trim($matches['label'] ?? '');
 
                 if (preg_match('/^https?:\/\//i', $target) === 1) {
                     $text = $label !== '' ? $label : $target;
@@ -629,6 +631,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $description,
         ) ?? $description;
 
+        $tokenPattern = '/^(?:`(?<code>[^`]+)`|(?<image>!)?\[(?<label>[^\]]+)]\((?<target>[^)]+)\))$/';
         $parts = preg_split(
             '/(!?\[[^]]+]\([^)]+\)|`[^`]+`)/',
             $description,
@@ -636,38 +639,36 @@ final class HtmlRenderer implements ThrowableRendererInterface
             PREG_SPLIT_DELIM_CAPTURE,
         ) ?: [];
 
-        $normalized = '';
+        $normalized = [];
 
         foreach ($parts as $part) {
             if ($part === '') {
                 continue;
             }
 
-            if (preg_match('/^`([^`]+)`$/', $part, $matches) === 1) {
-                $normalized .= '<code>' . $this->htmlEncode($matches[1]) . '</code>';
+            if (preg_match($tokenPattern, $part, $matches) !== 1) {
+                $normalized[] = $this->htmlEncode($part);
                 continue;
             }
 
-            if (preg_match('/^(!)?\[([^]]+)]\(([^)]+)\)$/', $part, $matches) === 1) {
-                $prefix = $matches[1] ?? '';
-                $label = $this->htmlEncode($matches[2]);
-                $target = $matches[3];
-
-                if ($prefix === '' && preg_match('/^https?:\/\//i', $target) === 1) {
-                    $normalized .= '[' . $label . '](' . $target . ')';
-                } elseif ($label !== '') {
-                    $normalized .= $prefix . $label . ' (<code>' . $this->htmlEncode($target) . '</code>)';
-                } else {
-                    $normalized .= $prefix . '<code>' . $this->htmlEncode($target) . '</code>';
-                }
-
+            if (($matches['code'] ?? '') !== '') {
+                $normalized[] = '<code>' . $this->htmlEncode($matches['code']) . '</code>';
                 continue;
             }
 
-            $normalized .= $this->htmlEncode($part);
+            $label = $this->htmlEncode($matches['label']);
+            $target = $matches['target'];
+            $imageMarker = $matches['image'] ?? '';
+
+            if ($imageMarker === '' && preg_match('/^https?:\/\//i', $target) === 1) {
+                $normalized[] = '[' . $label . '](' . $target . ')';
+                continue;
+            }
+
+            $normalized[] = $imageMarker . $label . ' (<code>' . $this->htmlEncode($target) . '</code>)';
         }
 
-        $normalized = trim($normalized);
+        $normalized = trim(implode('', $normalized));
 
         return $normalized === ''
             ? null
