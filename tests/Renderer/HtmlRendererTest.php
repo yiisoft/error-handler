@@ -13,6 +13,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
 use ReflectionObject;
 use RuntimeException;
+use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\Tests\Support\TestDocBlockException;
@@ -21,6 +22,7 @@ use Yiisoft\ErrorHandler\Tests\Support\TestExceptionWithoutDocBlock;
 use Yiisoft\ErrorHandler\Tests\Support\TestFriendlyException;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 use Yiisoft\ErrorHandler\Tests\Support\TestInlineCodeDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestLeadingMarkdownLinkDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestOwaspFilterEvasionDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestParenthesizedMarkdownDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestQueryStringDocBlockException;
@@ -122,6 +124,21 @@ final class HtmlRendererTest extends TestCase
 
         $this->assertStringContainsString('<div class="solution">', $result);
         $this->assertStringNotContainsString('<div class="exception-description solution">', $result);
+    }
+
+    public function testVerboseOutputUsesFirstExceptionFromCompositeException(): void
+    {
+        $renderer = new HtmlRenderer();
+        $first = new TestDocBlockException('first-message');
+        $second = new RuntimeException('second-message');
+        $exception = new CompositeException($first, $second);
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+
+        $this->assertStringContainsString(TestDocBlockException::class, $result);
+        $this->assertStringContainsString('first-message', $result);
+        $this->assertStringContainsString('Test summary with <code>RuntimeException</code>.', $result);
     }
 
     public function testVerboseOutputEscapesUnsafeThrowableDescriptionLinks(): void
@@ -264,6 +281,23 @@ final class HtmlRendererTest extends TestCase
         );
         $this->assertStringNotContainsString(
             'https://www.yiiframework.com/search?q=error&amp;amp;lang=en',
+            $description,
+        );
+    }
+
+    public function testVerboseOutputRendersThrowableDescriptionStartingWithMarkdownLink(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestLeadingMarkdownLinkDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertNotSame('', $description);
+        $this->assertStringContainsString(
+            '<a href="https://www.yiiframework.com">Yii Framework</a> starts this description.',
             $description,
         );
     }

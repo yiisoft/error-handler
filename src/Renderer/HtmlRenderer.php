@@ -670,9 +670,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
         $normalized = trim(implode('', $normalized));
 
-        return $normalized === ''
-            ? null
-            : $this->parseMarkdown($normalized);
+        return $this->parseMarkdown($normalized);
     }
 
     /**
