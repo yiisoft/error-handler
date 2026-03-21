@@ -19,7 +19,6 @@ use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\Tests\Support\TestDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestEmptyDescriptionDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestExceptionWithoutDocBlock;
-use Yiisoft\ErrorHandler\Tests\Support\TestFriendlyException;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 use Yiisoft\ErrorHandler\Tests\Support\TestInlineCodeDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestLeadingMarkdownLinkDocBlockException;
