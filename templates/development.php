@@ -9,7 +9,6 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
  * @var ServerRequestInterface|null $request
  * @var Throwable $throwable
  * @var Throwable $displayThrowable
- * @var string|null $solution
  * @var string $exceptionClass
  * @var string $exceptionMessage
  * @var string|null $exceptionDescription
@@ -90,11 +89,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
         </div>
 
         <?php if ($exceptionDescription !== null): ?>
-            <div class="exception-description solution"><?= $exceptionDescription ?></div>
-        <?php endif ?>
-
-        <?php if ($solution !== null): ?>
-            <div class="solution"><?= $this->parseMarkdown($solution) ?></div>
+            <div class="exception-description"><?= $exceptionDescription ?></div>
         <?php endif ?>
 
         <?= $this->renderPreviousExceptions($throwable) ?>
@@ -206,7 +201,7 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
     const DARK_THEME = 'dark-theme';
 
     window.onload = function() {
-        const codeBlocks = document.querySelectorAll('.solution pre code,.codeBlock');
+        const codeBlocks = document.querySelectorAll('.exception-description pre code,.codeBlock');
         const callStackItems = document.getElementsByClassName('call-stack-item');
 
         // If there are grouped vendor package files
