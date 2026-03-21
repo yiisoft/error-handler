@@ -423,7 +423,15 @@ final class HtmlRendererTest extends TestCase
         $renderer = new HtmlRenderer();
 
         $result = $renderer->renderCallStack(
-            new ErrorException('test-message'),
+            new ErrorException(
+                'test-message',
+                0,
+                0,
+                __FILE__,
+                __LINE__,
+                null,
+                [],
+            ),
             TestHelper::generateTrace([true, true, false, true]),
         );
 
@@ -455,8 +463,18 @@ final class HtmlRendererTest extends TestCase
 
     public function testGetThrowableName(): void
     {
+        $exception = new ErrorException(
+            'test-message',
+            0,
+            0,
+            __FILE__,
+            __LINE__,
+            null,
+            [],
+        );
+
         $renderer = new HtmlRenderer();
-        $name = $renderer->getThrowableName(new ErrorException());
+        $name = $renderer->getThrowableName($exception);
 
         $this->assertSame('Error (' . ErrorException::class . ')', $name);
     }
