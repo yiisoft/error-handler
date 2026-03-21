@@ -13,9 +13,21 @@ use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
 use ReflectionObject;
 use RuntimeException;
+use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
+use Yiisoft\ErrorHandler\Tests\Support\TestDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestEmptyDescriptionDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestExceptionWithoutDocBlock;
+use Yiisoft\ErrorHandler\Tests\Support\TestFriendlyException;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
+use Yiisoft\ErrorHandler\Tests\Support\TestInlineCodeDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestLeadingMarkdownLinkDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestOwaspFilterEvasionDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestParenthesizedMarkdownDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestQueryStringDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeMarkdownDocBlockException;
 
 use function dirname;
 use function file_exists;
@@ -64,6 +76,251 @@ final class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('<html', (string) $errorData);
         $this->assertStringContainsString(RuntimeException::class, (string) $errorData);
         $this->assertStringContainsString($exceptionMessage, (string) $errorData);
+    }
+
+    public function testVerboseOutputRendersThrowableDescriptionFromDocComment(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+
+        $this->assertStringContainsString('<div class="exception-description solution">', $result);
+        $this->assertStringContainsString('Test summary with <code>RuntimeException</code>.', $result);
+        $this->assertStringContainsString(
+            '<a href="https://www.yiiframework.com">Yii Framework</a>',
+            $result,
+        );
+    }
+
+    public function testVerboseOutputDoesNotRenderThrowableDescriptionWhenNoDocComment(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestExceptionWithoutDocBlock('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+
+        $this->assertStringNotContainsString('<div class="exception-description solution">', (string) $errorData);
+    }
+
+    public function testVerboseOutputDoesNotRenderThrowableDescriptionWhenDocCommentHasNoDescription(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestEmptyDescriptionDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+
+        $this->assertStringNotContainsString('<div class="exception-description solution">', (string) $errorData);
+    }
+
+    public function testVerboseOutputKeepsFriendlyExceptionBehaviorWithoutDescriptionDuplication(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestFriendlyException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+
+        $this->assertStringContainsString('<div class="solution">', $result);
+        $this->assertStringNotContainsString('<div class="exception-description solution">', $result);
+    }
+
+    public function testVerboseOutputUsesFirstExceptionFromCompositeException(): void
+    {
+        $renderer = new HtmlRenderer();
+        $first = new TestDocBlockException('first-message');
+        $second = new RuntimeException('second-message');
+        $exception = new CompositeException($first, $second);
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+
+        $this->assertStringContainsString(TestDocBlockException::class, $result);
+        $this->assertStringContainsString('first-message', $result);
+        $this->assertStringContainsString('Test summary with <code>RuntimeException</code>.', $result);
+    }
+
+    public function testVerboseOutputEscapesUnsafeThrowableDescriptionLinks(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestUnsafeDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertStringNotContainsString('href="javascript:alert(1)"', $result);
+        $this->assertNotSame('', $description);
+        $this->assertStringNotContainsString('<img', $description);
+        $this->assertStringContainsString(
+            '&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;&gt;',
+            $description,
+        );
+        $this->assertStringContainsString('Click me (<code>javascript:alert(1)</code>)', $result);
+        $this->assertStringContainsString(
+            '<a href="https://www.yiiframework.com">Safe link</a>',
+            $result,
+        );
+    }
+
+    public function testVerboseOutputEscapesUnsafeThrowableDescriptionMarkdownPayloads(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestUnsafeMarkdownDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertNotSame('', $description);
+        $this->assertStringNotContainsString('href="javascript:alert(document.domain)"', $description);
+        $this->assertStringNotContainsString('href="javascript:alert(\'html-link\')"', $description);
+        $this->assertStringNotContainsString('<img', $description);
+        $this->assertStringNotContainsString('<svg', $description);
+        $this->assertStringContainsString('Click me (<code>javascript:alert(document.domain</code>))', $description);
+        $this->assertStringContainsString('!Image payload (<code>javascript:alert(&#039;img&#039;</code>))', $description);
+        $this->assertStringContainsString(
+            '&lt;a href=&quot;javascript:alert(&#039;html-link&#039;)&quot;&gt;Raw HTML link&lt;/a&gt;',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;svg onload=&quot;alert(&#039;svg&#039;)&quot;&gt;&lt;/svg&gt;',
+            $description,
+        );
+    }
+
+    public function testVerboseOutputEscapesNonHttpSchemesInThrowableDescriptionMarkdownLinks(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestUnsafeMarkdownDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertNotSame('', $description);
+        $this->assertStringContainsString('Encoded payload (<code>JaVaScRiPt:alert(1</code>))', $description);
+        $this->assertStringContainsString(
+            'Data URL (<code>data:text/html,&lt;script&gt;alert(1</code>)&lt;/script&gt;)',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '<a href="https://www.yiiframework.com">Safe link</a>',
+            $description,
+        );
+    }
+
+    public function testVerboseOutputEscapesOwaspFilterEvasionThrowableDescriptionPayloads(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestOwaspFilterEvasionDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertNotSame('', $description);
+        $this->assertStringNotContainsString('<a href=', $description);
+        $this->assertStringNotContainsString('<img', $description);
+        $this->assertStringContainsString(
+            '&lt;a href=&quot;&amp;#0000106&amp;#0000097&amp;#0000118',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;a href=&quot;jav&amp;#x09;ascript:alert(&#039;XSS&#039;);&quot;&gt;Encoded tab payload&lt;/a&gt;',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;img src= onmouseover=&quot;alert(&#039;xss&#039;)&quot;&gt;',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;img onmouseover=&quot;alert(&#039;xss&#039;)&quot;&gt;',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;img dynsrc=&quot;javascript:alert(&#039;XSS&#039;)&quot;&gt;',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '&lt;img lowsrc=&quot;javascript:alert(&#039;XSS&#039;)&quot;&gt;',
+            $description,
+        );
+    }
+
+    public function testVerboseOutputRendersInlineCodeAndSeeTagWithoutLabel(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestInlineCodeDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+
+        $this->assertStringContainsString('<code>inline-code</code>', $result);
+        $this->assertStringContainsString('<code>RuntimeException</code>', $result);
+    }
+
+    public function testVerboseOutputDoesNotDoubleEncodeSafeThrowableDescriptionLinks(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestQueryStringDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertStringContainsString(
+            '<a href="https://www.yiiframework.com/search?q=error&amp;lang=en">Yii Search</a>',
+            $description,
+        );
+        $this->assertStringNotContainsString(
+            'https://www.yiiframework.com/search?q=error&amp;amp;lang=en',
+            $description,
+        );
+    }
+
+    public function testVerboseOutputRendersThrowableDescriptionStartingWithMarkdownLink(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestLeadingMarkdownLinkDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertNotSame('', $description);
+        $this->assertStringContainsString(
+            '<a href="https://www.yiiframework.com">Yii Framework</a> starts this description.',
+            $description,
+        );
+    }
+
+    public function testVerboseOutputRendersThrowableDescriptionLinksWithParentheses(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = new TestParenthesizedMarkdownDocBlockException('exception-test-message');
+
+        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
+        $result = (string) $errorData;
+        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        $description = $matches[1] ?? '';
+
+        $this->assertNotSame('', $description);
+        $this->assertStringContainsString(
+            '<a href="https://en.wikipedia.org/wiki/Function_(mathematics)">Wiki</a>',
+            $description,
+        );
+        $this->assertStringContainsString(
+            '<a href="https://en.wikipedia.org/wiki/Function_(mathematics)">Inline wiki</a>',
+            $description,
+        );
     }
 
     public function testNonVerboseOutputWithCustomTemplate(): void

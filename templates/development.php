@@ -1,7 +1,6 @@
 <?php
 
 use Psr\Http\Message\ServerRequestInterface;
-use Yiisoft\ErrorHandler\CompositeException;
 use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
@@ -9,17 +8,14 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 /**
  * @var ServerRequestInterface|null $request
  * @var Throwable $throwable
+ * @var Throwable $displayThrowable
+ * @var string|null $solution
+ * @var string $exceptionClass
+ * @var string $exceptionMessage
+ * @var string|null $exceptionDescription
  */
 
 $theme = $_COOKIE['yii-exception-theme'] ?? '';
-
-$originalException = $throwable;
-if ($throwable instanceof CompositeException) {
-    $throwable = $throwable->getFirstException();
-}
-$solution = $throwable instanceof FriendlyExceptionInterface ? $throwable->getSolution() : null;
-$exceptionClass = get_class($throwable);
-$exceptionMessage = $throwable->getMessage();
 
 /**
  * @var HtmlRenderer $this
@@ -32,7 +28,7 @@ $exceptionMessage = $throwable->getMessage();
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-        <?= $this->htmlEncode($this->getThrowableName($throwable)) ?>
+        <?= $this->htmlEncode($this->getThrowableName($displayThrowable)) ?>
     </title>
     <style>
         <?= file_get_contents(__DIR__ . '/development.css') ?>
@@ -79,25 +75,29 @@ $exceptionMessage = $throwable->getMessage();
     <div class="exception-card">
         <div class="exception-class">
             <?php
-            if ($throwable instanceof FriendlyExceptionInterface): ?>
-                <span><?= $this->htmlEncode($throwable->getName())?></span>
+            if ($displayThrowable instanceof FriendlyExceptionInterface): ?>
+                <span><?= $this->htmlEncode($displayThrowable->getName())?></span>
                 &mdash;
                 <?= $exceptionClass ?>
             <?php else: ?>
                 <span><?= $exceptionClass ?></span>
             <?php endif ?>
-            (Code #<?= $throwable->getCode() ?>)
+            (Code #<?= $displayThrowable->getCode() ?>)
         </div>
 
         <div class="exception-message">
             <?= nl2br($this->htmlEncode($exceptionMessage)) ?>
         </div>
 
+        <?php if ($exceptionDescription !== null): ?>
+            <div class="exception-description solution"><?= $exceptionDescription ?></div>
+        <?php endif ?>
+
         <?php if ($solution !== null): ?>
             <div class="solution"><?= $this->parseMarkdown($solution) ?></div>
         <?php endif ?>
 
-        <?= $this->renderPreviousExceptions($originalException) ?>
+        <?= $this->renderPreviousExceptions($throwable) ?>
 
         <textarea id="clipboard"><?= $this->htmlEncode((string) $throwable) ?></textarea>
         <span id="copied">Copied!</span>
@@ -117,10 +117,10 @@ $exceptionMessage = $throwable->getMessage();
 <main>
     <div class="call-stack">
         <?= $this->renderCallStack(
-            $throwable,
-            $originalException === $throwable && $originalException instanceof ErrorException
-                ? $originalException->getBacktrace()
-                : $throwable->getTrace()
+            $displayThrowable,
+            $displayThrowable === $throwable && $throwable instanceof ErrorException
+                ? $throwable->getBacktrace()
+                : $displayThrowable->getTrace(),
         ) ?>
     </div>
     <?php if ($request && ($requestInfo = $this->renderRequest($request)) !== ''): ?>
