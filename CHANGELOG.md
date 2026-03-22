@@ -2,7 +2,7 @@
 
 ## 5.0.0 under development
 
-- Enh #104: Render exception class PHPDoc description with safe markdown links in HTML debug output (@dbuhonov)
+- Enh #104, #168: Render exception class PHPDoc description with safe markdown links in HTML debug output (@dbuhonov, @vjik)
 - Chg #162: Replace deprecated `ThrowableResponseFactory` class usage to new one, and remove it (@vjik)
 - Enh #163: Explicitly import classes, functions, and constants in "use" section (@mspirkov)
 - Bug #164: Fix missing items in stack trace HTML output when handling a PHP error (@vjik)

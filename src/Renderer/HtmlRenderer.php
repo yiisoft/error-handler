@@ -212,18 +212,16 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
     public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
-        $solution = null;
-        $exceptionDescription = null;
         $displayThrowable = $t;
-
         if ($t instanceof CompositeException) {
             $displayThrowable = $t->getFirstException();
         }
 
-        if ($displayThrowable instanceof FriendlyExceptionInterface) {
-            $solution = $displayThrowable->getSolution();
-        } else {
-            $exceptionDescription = $this->getThrowableDescription($displayThrowable);
+        $exceptionDescription = $displayThrowable instanceof FriendlyExceptionInterface
+            ? $displayThrowable->getSolution()
+            : $this->getThrowableDescription($displayThrowable);
+        if ($exceptionDescription !== null) {
+            $exceptionDescription = $this->parseMarkdown($exceptionDescription);
         }
 
         return new ErrorData(
@@ -231,7 +229,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 'request' => $request,
                 'throwable' => $t,
                 'displayThrowable' => $displayThrowable,
-                'solution' => $solution,
                 'exceptionClass' => $displayThrowable::class,
                 'exceptionMessage' => $displayThrowable->getMessage(),
                 'exceptionDescription' => $exceptionDescription,
@@ -576,11 +573,8 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * suitable for direct inclusion in the error template.
      * Inline {@see ...}/{@link ...} annotations are rendered as markdown links.
      *
-     * The returned value is an HTML snippet (for example, containing <p>, <a>,
-     * <code> elements) and is intended to be inserted into the template as-is,
-     * without additional HTML-escaping.
-     *
-     * @return string|null HTML fragment describing the throwable, or null if no description is available.
+     * @return string|null Markdown string with inline HTML (`<code>` elements) describing the throwable, or `null` if
+     * no description is available.
      */
     private function getThrowableDescription(Throwable $throwable): ?string
     {
@@ -668,9 +662,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $normalized[] = $imageMarker . $label . ' (<code>' . $this->htmlEncode($target) . '</code>)';
         }
 
-        $normalized = trim(implode('', $normalized));
-
-        return $this->parseMarkdown($normalized);
+        return trim(implode('', $normalized));
     }
 
     /**

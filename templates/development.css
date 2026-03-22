@@ -144,7 +144,7 @@ header {
     --previous-arrow-color: #e51717;
 }
 
-header .solution {
+header .exception-description {
     --text-color: var(--page-text-color);
     --link-color: #00617b;
     --link-hover-color: #1191b3;
@@ -257,115 +257,115 @@ header .exception-message {
     color: var(--exception-message-text-color);
 }
 
-header .solution {
+header .exception-description {
     margin-top: 24px;
     font-size: 16px;
     line-height: 22px;
     color: var(--text-color);
 }
 
-header .solution h1 {
+header .exception-description h1 {
     margin-top: 24px;
     font-size: 26px;
     line-height: 32px;
     font-weight: bold;
 }
 
-header .solution h2 {
+header .exception-description h2 {
     margin-top: 24px;
     font-size: 22px;
     line-height: 28px;
     font-weight: bold;
 }
 
-header .solution h3 {
+header .exception-description h3 {
     margin-top: 24px;
     font-size: 20px;
     line-height: 26px;
     font-weight: bold;
 }
 
-header .solution h4 {
+header .exception-description h4 {
     margin-top: 24px;
     font-size: 18px;
     line-height: 24px;
     font-weight: bold;
 }
 
-header .solution h5 {
+header .exception-description h5 {
     margin-top: 24px;
     font-size: 16px;
     line-height: 22px;
     font-weight: bold;
 }
 
-header .solution h6 {
+header .exception-description h6 {
     margin-top: 24px;
     font-size: 14px;
     line-height: 20px;
     font-weight: bold;
 }
 
-header .solution p {
+header .exception-description p {
     margin-top: 16px;
 }
 
-header .solution a {
+header .exception-description a {
     color: var(--link-color);
     text-decoration: underline;
 }
-header .solution a:hover {
+header .exception-description a:hover {
     color: var(--link-hover-color);
 }
 
-header .solution h1:first-child,
-header .solution h2:first-child,
-header .solution h3:first-child,
-header .solution h4:first-child,
-header .solution h5:first-child,
-header .solution h6:first-child,
-header .solution p:first-child {
+header .exception-description h1:first-child,
+header .exception-description h2:first-child,
+header .exception-description h3:first-child,
+header .exception-description h4:first-child,
+header .exception-description h5:first-child,
+header .exception-description h6:first-child,
+header .exception-description p:first-child {
     margin-top: 0;
 }
 
-header .solution blockquote {
+header .exception-description blockquote {
     margin: 18px 0 18px 4px;
     padding: 3px 0 2px 16px;
     border-left: 4px solid var(--blockquote-border-color);
     color: var(--blockquote-text-color);
 }
 
-header .solution ul,
-header .solution ol {
+header .exception-description ul,
+header .exception-description ol {
     padding: 0;
     margin: 16px 0 0 32px;
 }
-header .solution li ul,
-header .solution li ol {
+header .exception-description li ul,
+header .exception-description li ol {
     margin: 0 0 0 24px;
 }
 
-header .solution li {
+header .exception-description li {
     margin: 8px 0 0 0;
 }
 
-header .solution ul {
+header .exception-description ul {
     list-style: outside;
 }
 
-header .solution pre,
-header .solution code {
+header .exception-description pre,
+header .exception-description code {
     font-family: monospace;
 }
 
-header .solution code {
+header .exception-description code {
     padding: 2px 6px;
     font-size: 90%;
     background-color: var(--code-bg-color);
     border-radius: 6px;
 }
 
-header .solution pre {
+header .exception-description pre {
     margin: 24px 0;
     width: 100%;
     box-sizing: border-box;
@@ -374,23 +374,23 @@ header .solution pre {
     border-radius: 8px;
     background: var(--pre-bg-color);
 }
-header .solution pre code {
+header .exception-description pre code {
     font-size: 100%;
     padding: 0;
     width: max-content;
 }
 
-header .solution table {
+header .exception-description table {
     margin: 16px 0 0 0;
     border-collapse: collapse;
 }
-header .solution td,
-header .solution th {
+header .exception-description td,
+header .exception-description th {
     padding: 6px 12px;
     border: 1px solid var(--table-border-color);
 }
 
-header .solution HR {
+header .exception-description HR {
     margin: 24px 0;
     border: 1px solid var(--separator-color);
     border-width: 1px 0 0 0;
@@ -836,7 +836,7 @@ main {
     --exception-message-text-color: rgba(255, 255, 255, 0.8);
 }
 
-.dark-theme header .solution {
+.dark-theme header .exception-description {
     --text-color: rgba(255, 255, 255, 0.8);
     --link-color: #03a9f4;
     --link-hover-color: #39b9f3;
@@ -918,7 +918,7 @@ main {
         --exception-message-text-color: rgba(255, 255, 255, 0.8);
     }
 
-    body:not(.light-theme) header .solution {
+    body:not(.light-theme) header .exception-description {
         --text-color: rgba(255, 255, 255, 0.8);
         --link-color: #03a9f4;
         --link-hover-color: #39b9f3;

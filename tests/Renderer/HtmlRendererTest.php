@@ -19,7 +19,6 @@ use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\Tests\Support\TestDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestEmptyDescriptionDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestExceptionWithoutDocBlock;
-use Yiisoft\ErrorHandler\Tests\Support\TestFriendlyException;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 use Yiisoft\ErrorHandler\Tests\Support\TestInlineCodeDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestLeadingMarkdownLinkDocBlockException;
@@ -86,7 +85,7 @@ final class HtmlRendererTest extends TestCase
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
 
-        $this->assertStringContainsString('<div class="exception-description solution">', $result);
+        $this->assertStringContainsString('<div class="exception-description">', $result);
         $this->assertStringContainsString('Test summary with <code>RuntimeException</code>.', $result);
         $this->assertStringContainsString(
             '<a href="https://www.yiiframework.com">Yii Framework</a>',
@@ -101,7 +100,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
 
-        $this->assertStringNotContainsString('<div class="exception-description solution">', (string) $errorData);
+        $this->assertStringNotContainsString('<div class="exception-description">', (string) $errorData);
     }
 
     public function testVerboseOutputDoesNotRenderThrowableDescriptionWhenDocCommentHasNoDescription(): void
@@ -111,19 +110,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
 
-        $this->assertStringNotContainsString('<div class="exception-description solution">', (string) $errorData);
-    }
-
-    public function testVerboseOutputKeepsFriendlyExceptionBehaviorWithoutDescriptionDuplication(): void
-    {
-        $renderer = new HtmlRenderer();
-        $exception = new TestFriendlyException('exception-test-message');
-
-        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
-        $result = (string) $errorData;
-
-        $this->assertStringContainsString('<div class="solution">', $result);
-        $this->assertStringNotContainsString('<div class="exception-description solution">', $result);
+        $this->assertStringNotContainsString('<div class="exception-description">', (string) $errorData);
     }
 
     public function testVerboseOutputUsesFirstExceptionFromCompositeException(): void
@@ -148,7 +135,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertStringNotContainsString('href="javascript:alert(1)"', $result);
@@ -172,7 +159,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertNotSame('', $description);
@@ -199,7 +186,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertNotSame('', $description);
@@ -221,7 +208,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertNotSame('', $description);
@@ -272,7 +259,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertStringContainsString(
@@ -292,7 +279,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertNotSame('', $description);
@@ -309,7 +296,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertNotSame('', $description);
