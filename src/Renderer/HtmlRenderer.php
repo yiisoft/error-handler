@@ -50,6 +50,7 @@ use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
 use function preg_split;
+use function rtrim;
 use function str_replace;
 use function str_starts_with;
 use function stripos;
@@ -158,6 +159,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *        );
      *    }
      *    ```
+     * @param array<string, string> $traceFileMap Map of file path prefixes for trace display and links. Keys are
+     * original path prefixes (e.g. container paths), values are replacement prefixes (e.g. host machine paths).
+     * Example: `['/app' => '/home/user/project']` maps `/app/src/index.php` to `/home/user/project/src/index.php`.
      *
      * @psalm-param array{
      *   template?: string,
@@ -176,6 +180,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         ?int $maxTraceLines = null,
         ?string $traceHeaderLine = null,
         string|Closure|null $traceLink = null,
+        public readonly array $traceFileMap = [],
     ) {
         $this->markdownParser = new GithubMarkdown();
         $this->markdownParser->html5 = true;
@@ -749,7 +754,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         }
 
         return $this->renderTemplate($this->defaultTemplatePath . '/_call-stack-item.php', [
-            'file' => $file,
+            'file' => $file !== null ? $this->mapFilePath($file) : null,
             'line' => $line,
             'class' => $class,
             'function' => $function,
@@ -854,6 +859,36 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
         $this->vendorPaths = [];
         return $this->vendorPaths;
+    }
+
+    private function mapFilePath(string $file): string
+    {
+        foreach ($this->traceFileMap as $from => $to) {
+            $normalizedFrom = rtrim($from, '/\\');
+            $normalizedTo = rtrim($to, '/\\');
+
+            if ($normalizedFrom === '') {
+                if ($from === '') {
+                    continue;
+                }
+
+                if (str_starts_with($file, $from)) {
+                    return $normalizedTo . $file;
+                }
+
+                continue;
+            }
+
+            $fromLength = strlen($normalizedFrom);
+            if (
+                $file === $normalizedFrom
+                || str_starts_with($file, $normalizedFrom . '/')
+                || str_starts_with($file, $normalizedFrom . '\\')
+            ) {
+                return $normalizedTo . substr($file, $fromLength);
+            }
+        }
+        return $file;
     }
 
     /**
