@@ -868,11 +868,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $normalizedTo = rtrim($to, '/\\');
 
             if ($normalizedFrom === '') {
-                if ($from === '') {
-                    continue;
-                }
-
-                if (str_starts_with($file, $from)) {
+                if ($from !== '' && str_starts_with($file, $from)) {
                     return $normalizedTo . $file;
                 }
 
