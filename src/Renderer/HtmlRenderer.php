@@ -355,7 +355,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $function = null;
             if (!empty($traceItem['function']) && $traceItem['function'] !== 'unknown') {
                 $function = $traceItem['function'];
-                if (!str_contains($function, '{closure}')) {
+                if (!str_contains($function, '{closure')) {
                     try {
                         if ($class !== null && class_exists($class)) {
                             $parameters = (new ReflectionMethod($class, $function))->getParameters();
@@ -566,6 +566,34 @@ final class HtmlRenderer implements ThrowableRendererInterface
     }
 
     /**
+     * Formats a trace function name for display.
+     *
+     * Handles PHP 8.4+ closure format `{closure:Context:line}` by extracting the definition context.
+     * For regular functions, prepends the class name when available.
+     */
+    public function formatTraceFunctionName(?string $class, string $function): string
+    {
+        // PHP 8.4+: {closure:Context:line} - already contains full definition context.
+        if (preg_match('/^\{closure:(.+):(\d+)\}$/', $function, $matches)) {
+            return '{closure} ' . $matches[1] . ':' . $matches[2];
+        }
+
+        // PHP < 8.4 namespaced closure: Namespace\{closure} - strip redundant namespace.
+        if (str_contains($function, '\\{closure')) {
+            if ($class !== null && $class !== 'Closure') {
+                return $this->removeAnonymous($class) . '::{closure}';
+            }
+            return $function;
+        }
+
+        if ($class === null || $class === 'Closure') {
+            return $function;
+        }
+
+        return $this->removeAnonymous($class) . '::' . $function;
+    }
+
+    /**
      * Extracts a user-facing description from throwable class PHPDoc.
      *
      * Takes only descriptive text before block tags, normalizes unsafe markup
@@ -740,12 +768,13 @@ final class HtmlRenderer implements ThrowableRendererInterface
         if ($file !== null && $line !== null) {
             $line--; // adjust line number from one-based to zero-based
             $lines = @file($file);
-            if ($line < 0 || $lines === false || ($lineCount = count($lines)) < $line) {
-                return '';
+            if ($line >= 0 && $lines !== false && ($lineCount = count($lines)) > $line) {
+                $half = (int) (($index === 1 ? $this->maxSourceLines : $this->maxTraceLines) / 2);
+                $begin = $line - $half > 0 ? $line - $half : 0;
+                $end = $line + $half < $lineCount ? $line + $half : $lineCount - 1;
+            } else {
+                $lines = [];
             }
-            $half = (int) (($index === 1 ? $this->maxSourceLines : $this->maxTraceLines) / 2);
-            $begin = $line - $half > 0 ? $line - $half : 0;
-            $end = $line + $half < $lineCount ? $line + $half : $lineCount - 1;
         }
 
         return $this->renderTemplate($this->defaultTemplatePath . '/_call-stack-item.php', [
