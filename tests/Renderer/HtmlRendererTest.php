@@ -631,6 +631,47 @@ final class HtmlRendererTest extends TestCase
         $this->assertSame($expected, $link);
     }
 
+    public static function dataFormatTraceFunctionName(): iterable
+    {
+        yield 'regular function without class' => [
+            null, 'array_map', 'array_map',
+        ];
+        yield 'regular method' => [
+            'Foo', 'bar', 'Foo::bar',
+        ];
+        yield 'old closure without class' => [
+            null, '{closure}', '{closure}',
+        ];
+        yield 'old closure with class' => [
+            'Foo', '{closure}', 'Foo::{closure}',
+        ];
+        yield 'bound closure' => [
+            'Closure', '{closure}', '{closure}',
+        ];
+        yield 'namespaced closure with class' => [
+            'Yiisoft\\Yii\\Gii\\Gii', 'Yiisoft\\Yii\\Gii\\{closure}', 'Yiisoft\\Yii\\Gii\\Gii::{closure}',
+        ];
+        yield 'namespaced closure without class' => [
+            null, 'Yiisoft\\Yii\\Gii\\{closure}', 'Yiisoft\\Yii\\Gii\\{closure}',
+        ];
+        yield 'php84 closure in method' => [
+            'Foo', '{closure:Foo::bar():4}', '{closure} Foo::bar():4',
+        ];
+        yield 'php84 closure in file' => [
+            null, '{closure:/app/src/index.php:12}', '{closure} /app/src/index.php:12',
+        ];
+        yield 'php84 nested closure' => [
+            null, '{closure:{closure:/app/index.php:5}:8}', '{closure} {closure:/app/index.php:5}:8',
+        ];
+    }
+
+    #[DataProvider('dataFormatTraceFunctionName')]
+    public function testFormatTraceFunctionName(?string $class, string $function, string $expected): void
+    {
+        $renderer = new HtmlRenderer();
+        $this->assertSame($expected, $renderer->formatTraceFunctionName($class, $function));
+    }
+
     public function testRenderCallStackWithMethodClosure(): void
     {
         $renderer = new HtmlRenderer();
