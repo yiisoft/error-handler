@@ -809,7 +809,7 @@ final class HtmlRendererTest extends TestCase
         $result = $renderer->renderCallStack($exception, $exception->getTrace());
 
         $this->assertMatchesRegularExpression(
-            '#\{closure\}\s+.+/tests/Support/file_level_closure_exception\.php:\d+#',
+            '#\{closure\}\s+.+[/\\\\]tests[/\\\\]Support[/\\\\]file_level_closure_exception\.php:\d+#',
             $result,
         );
     }
