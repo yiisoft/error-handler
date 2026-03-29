@@ -669,7 +669,7 @@ final class HtmlRendererTest extends TestCase
             traceFileMap: [__DIR__ => '/mapped/path'],
         );
 
-        $result = $renderer->renderCallStack(new RuntimeException('test'));
+        $result = str_replace('\\', '/', $renderer->renderCallStack(new RuntimeException('test')));
 
         $this->assertStringContainsString('/mapped/path/', $result);
         $this->assertStringContainsString('phpstorm://open?file=/mapped/path/', $result);

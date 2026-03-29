@@ -875,12 +875,13 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 continue;
             }
 
-            $fromLength = strlen($normalizedFrom);
             if (
                 $file === $normalizedFrom
                 || str_starts_with($file, $normalizedFrom . '/')
                 || str_starts_with($file, $normalizedFrom . '\\')
             ) {
+                $fromLength = strlen($normalizedFrom);
+
                 return $normalizedTo . substr($file, $fromLength);
             }
         }
