@@ -20,6 +20,6 @@ final class NamespacedClosureTraceFixture
             return $e;
         }
 
-        throw new RuntimeException('Unreachable.');
+        throw new RuntimeException('Namespaced closure did not throw RuntimeException.');
     }
 }

@@ -768,12 +768,17 @@ final class HtmlRenderer implements ThrowableRendererInterface
         if ($file !== null && $line !== null) {
             $line--; // adjust line number from one-based to zero-based
             $lines = @file($file);
-            if ($line >= 0 && $lines !== false && ($lineCount = count($lines)) > $line) {
-                $half = (int) (($index === 1 ? $this->maxSourceLines : $this->maxTraceLines) / 2);
-                $begin = $line - $half > 0 ? $line - $half : 0;
-                $end = $line + $half < $lineCount ? $line + $half : $lineCount - 1;
-            } else {
+            if ($line < 0 || $lines === false) {
                 $lines = [];
+            } else {
+                $lineCount = count($lines);
+                if ($line < $lineCount) {
+                    $half = (int) (($index === 1 ? $this->maxSourceLines : $this->maxTraceLines) / 2);
+                    $begin = $line - $half > 0 ? $line - $half : 0;
+                    $end = $line + $half < $lineCount ? $line + $half : $lineCount - 1;
+                } else {
+                    $lines = [];
+                }
             }
         }
 

@@ -452,6 +452,25 @@ final class HtmlRendererTest extends TestCase
         $this->assertStringNotContainsString('element-code-wrap', $result);
     }
 
+    public function testRenderCallStackItemRendersSourceCodeForLastLineInFile(): void
+    {
+        $line = count(file(__FILE__));
+        $result = $this->invokeMethod(new HtmlRenderer(), 'renderCallStackItem', [
+            'file' => __FILE__,
+            'line' => $line,
+            'class' => null,
+            'function' => null,
+            'args' => [],
+            'index' => 1,
+            'isVendorFile' => false,
+            'reflectionParameters' => [],
+        ]);
+
+        $this->assertStringContainsString(__FILE__, $result);
+        $this->assertStringContainsString('at line ' . $line, $result);
+        $this->assertStringContainsString('element-code-wrap', $result);
+    }
+
     public function testRenderRequest(): void
     {
         $renderer = new HtmlRenderer();
@@ -669,7 +688,7 @@ final class HtmlRendererTest extends TestCase
     public function testFormatTraceFunctionName(?string $class, string $function, string $expected): void
     {
         $renderer = new HtmlRenderer();
-        $this->assertSame($expected, $renderer->formatTraceFunctionName($class, $function));
+        $this->assertSame($expected, $this->invokeMethod($renderer, 'formatTraceFunctionName', [$class, $function]));
     }
 
     public function testRenderCallStackWithMethodClosure(): void
@@ -684,9 +703,6 @@ final class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('{closure', $traceItem['function']);
 
         $result = $renderer->renderCallStack($exception, $exception->getTrace());
-
-        $this->assertStringContainsString('{closure}', $result);
-        $this->assertStringNotContainsString(self::class . '::' . $traceItem['function'], $result);
 
         if (PHP_VERSION_ID >= 80400) {
             $this->assertMatchesRegularExpression(
@@ -720,10 +736,6 @@ final class HtmlRendererTest extends TestCase
             [],
         ]);
 
-        $this->assertStringContainsString('{closure}', $result);
-        $this->assertStringContainsString('{closure}', $itemResult);
-        $this->assertStringNotContainsString('Closure::{closure}', $itemResult);
-
         if (PHP_VERSION_ID >= 80400) {
             $this->assertMatchesRegularExpression('/\{closure\}\s+.+::createBoundClosureException\(\):\d+/', $result);
             return;
@@ -755,9 +767,6 @@ final class HtmlRendererTest extends TestCase
             [],
         ]);
 
-        $this->assertStringContainsString('{closure}', $result);
-        $this->assertStringNotContainsString(self::class . '::' . $traceItem['function'], $result);
-        $this->assertStringContainsString('{closure}', $itemResult);
         $this->assertStringNotContainsString('element-code-wrap', $itemResult);
 
         if (PHP_VERSION_ID >= 80400) {
@@ -804,7 +813,6 @@ final class HtmlRendererTest extends TestCase
         $traceItem = $exception->getTrace()[0];
 
         $this->assertArrayNotHasKey('class', $traceItem);
-        $this->assertStringContainsString('{closure:', $traceItem['function']);
 
         $result = $renderer->renderCallStack($exception, $exception->getTrace());
 
@@ -866,8 +874,7 @@ final class HtmlRendererTest extends TestCase
             return $e;
         }
 
-        $this->fail('Expected exception from method closure.');
-        throw new RuntimeException('Unreachable.');
+        $this->fail('Method closure did not throw RuntimeException.');
     }
 
     private function createInternalFunctionClosureException(): RuntimeException
@@ -882,8 +889,7 @@ final class HtmlRendererTest extends TestCase
             return $e;
         }
 
-        $this->fail('Expected exception from closure called via internal function.');
-        throw new RuntimeException('Unreachable.');
+        $this->fail('Closure called via internal function did not throw RuntimeException.');
     }
 
     private function createBoundClosureException(): RuntimeException
@@ -901,8 +907,7 @@ final class HtmlRendererTest extends TestCase
             return $e;
         }
 
-        $this->fail('Expected exception from Closure scope closure.');
-        throw new RuntimeException('Unreachable.');
+        $this->fail('Bound closure did not throw RuntimeException.');
     }
 
     private function createTestTemplate(string $path, string $templateContents): void

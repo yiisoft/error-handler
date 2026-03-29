@@ -7,7 +7,8 @@
 - Enh #163: Explicitly import classes, functions, and constants in "use" section (@mspirkov)
 - Bug #164: Fix missing items in stack trace HTML output when handling a PHP error (@vjik)
 - Bug #166: Fix broken link to error handling guide (@vjik)
-- Bug #172: Fix closure rendering in stack traces and keep items when source is unavailable (@WarLikeLaux)
+- Enh #172: Improve closure rendering in stack traces (@WarLikeLaux)
+- Bug #172: Keep items in stack traces when source is unavailable (@WarLikeLaux)
 
 ## 4.3.2 January 09, 2026
 

@@ -12,4 +12,4 @@ try {
     return $e;
 }
 
-throw new RuntimeException('Unreachable.');
+throw new RuntimeException('File-level closure did not throw RuntimeException.');
