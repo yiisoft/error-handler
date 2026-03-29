@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
+use Closure;
 use ReflectionClass;
 use ReflectionObject;
 use RuntimeException;
@@ -22,35 +23,41 @@ use Yiisoft\ErrorHandler\Tests\Support\TestExceptionWithoutDocBlock;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 use Yiisoft\ErrorHandler\Tests\Support\TestInlineCodeDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestLeadingMarkdownLinkDocBlockException;
+use Yiisoft\ErrorHandler\Tests\Support\NamespacedClosureTraceFixture;
 use Yiisoft\ErrorHandler\Tests\Support\TestOwaspFilterEvasionDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestParenthesizedMarkdownDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestQueryStringDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeMarkdownDocBlockException;
+use stdClass;
 
 use function dirname;
 use function file_exists;
 use function file_put_contents;
 use function fopen;
+use function Yiisoft\ErrorHandler\Tests\Support\loadFileLevelClosureException;
 use function unlink;
 use function sprintf;
+use function count;
 
 use const DIRECTORY_SEPARATOR;
+use const PHP_VERSION_ID;
+
+require_once dirname(__DIR__) . '/Support/FileLevelClosureLoader.php';
 
 final class HtmlRendererTest extends TestCase
 {
-    private const CUSTOM_SETTING = [
-        'verboseTemplate' => __DIR__ . '/test-template-verbose.php',
-        'template' => __DIR__ . '/test-template-non-verbose.php',
-    ];
+    private array $temporaryFiles = [];
 
     protected function tearDown(): void
     {
-        foreach (self::CUSTOM_SETTING as $template) {
+        foreach ($this->temporaryFiles as $template) {
             if (file_exists($template)) {
                 unlink($template);
             }
         }
+
+        $this->temporaryFiles = [];
     }
 
     public function testNonVerboseOutput(): void
@@ -312,10 +319,11 @@ final class HtmlRendererTest extends TestCase
 
     public function testNonVerboseOutputWithCustomTemplate(): void
     {
+        $settings = $this->createCustomSetting();
         $templateFileContents = '<html><?php echo $throwable->getMessage();?></html>';
-        $this->createTestTemplate(self::CUSTOM_SETTING['template'], $templateFileContents);
+        $this->createTestTemplate($settings['template'], $templateFileContents);
 
-        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
+        $renderer = new HtmlRenderer($settings);
         $exceptionMessage = 'exception-test-message';
         $exception = new RuntimeException($exceptionMessage);
 
@@ -325,10 +333,11 @@ final class HtmlRendererTest extends TestCase
 
     public function testVerboseOutputWithCustomTemplate(): void
     {
+        $settings = $this->createCustomSetting();
         $templateFileContents = '<html><?php echo $throwable->getMessage();?></html>';
-        $this->createTestTemplate(self::CUSTOM_SETTING['verboseTemplate'], $templateFileContents);
+        $this->createTestTemplate($settings['verboseTemplate'], $templateFileContents);
 
-        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
+        $renderer = new HtmlRenderer($settings);
         $exceptionMessage = 'exception-test-message';
         $exception = new RuntimeException($exceptionMessage);
 
@@ -347,8 +356,9 @@ final class HtmlRendererTest extends TestCase
 
     public function testRenderTemplateThrowsExceptionWhenFailureInTemplate(): void
     {
-        $this->createTestTemplate(self::CUSTOM_SETTING['verboseTemplate'], '<html><?php throw $throwable;?></html>');
-        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
+        $settings = $this->createCustomSetting();
+        $this->createTestTemplate($settings['verboseTemplate'], '<html><?php throw $throwable;?></html>');
+        $renderer = new HtmlRenderer($settings);
         $exceptionMessage = 'Template error.';
         $exception = new RuntimeException($exceptionMessage);
 
@@ -359,11 +369,12 @@ final class HtmlRendererTest extends TestCase
 
     public function testRenderPreviousExceptions(): void
     {
+        $settings = $this->createCustomSetting();
         $previousExceptionMessage = 'Test Previous Exception.';
         $exception = new RuntimeException('Some error.', 0, new Exception($previousExceptionMessage));
         $templateFileContents = '<?php echo $this->renderPreviousExceptions($throwable); ?>';
-        $this->createTestTemplate(self::CUSTOM_SETTING['verboseTemplate'], $templateFileContents);
-        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
+        $this->createTestTemplate($settings['verboseTemplate'], $templateFileContents);
+        $renderer = new HtmlRenderer($settings);
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $this->assertStringContainsString($previousExceptionMessage, (string) $errorData);
@@ -371,7 +382,7 @@ final class HtmlRendererTest extends TestCase
 
     public function testRenderCallStack(): void
     {
-        $renderer = new HtmlRenderer(self::CUSTOM_SETTING);
+        $renderer = new HtmlRenderer();
         $this->setVendorPaths($renderer, [dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'vendor']);
 
         $this->assertStringContainsString(
@@ -401,7 +412,8 @@ final class HtmlRendererTest extends TestCase
         ]);
         restore_error_handler();
 
-        $this->assertSame('', $result);
+        $this->assertStringContainsString('not-exist', $result);
+        $this->assertStringContainsString('call-stack-item', $result);
         $this->assertSame('file(not-exist): Failed to open stream: No such file or directory', $errorMessage);
     }
 
@@ -419,6 +431,44 @@ final class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('3. ', $result);
         $this->assertStringContainsString('4. ', $result);
         $this->assertStringContainsString('5. ', $result);
+    }
+
+    public function testRenderCallStackItemDoesNotRenderSourceCodeWhenLineIsOutsideFileRange(): void
+    {
+        $line = count(file(__FILE__)) + 1;
+        $result = $this->invokeMethod(new HtmlRenderer(), 'renderCallStackItem', [
+            'file' => __FILE__,
+            'line' => $line,
+            'class' => null,
+            'function' => null,
+            'args' => [],
+            'index' => 1,
+            'isVendorFile' => false,
+            'reflectionParameters' => [],
+        ]);
+
+        $this->assertStringContainsString(__FILE__, $result);
+        $this->assertStringContainsString('at line ' . $line, $result);
+        $this->assertStringNotContainsString('element-code-wrap', $result);
+    }
+
+    public function testRenderCallStackItemRendersSourceCodeForLastLineInFile(): void
+    {
+        $line = count(file(__FILE__));
+        $result = $this->invokeMethod(new HtmlRenderer(), 'renderCallStackItem', [
+            'file' => __FILE__,
+            'line' => $line,
+            'class' => null,
+            'function' => null,
+            'args' => [],
+            'index' => 1,
+            'isVendorFile' => false,
+            'reflectionParameters' => [],
+        ]);
+
+        $this->assertStringContainsString(__FILE__, $result);
+        $this->assertStringContainsString('at line ' . $line, $result);
+        $this->assertStringContainsString('element-code-wrap', $result);
     }
 
     public function testRenderRequest(): void
@@ -600,6 +650,178 @@ final class HtmlRendererTest extends TestCase
         $this->assertSame($expected, $link);
     }
 
+    public static function dataFormatTraceFunctionName(): iterable
+    {
+        yield 'regular function without class' => [
+            null, 'array_map', 'array_map',
+        ];
+        yield 'regular method' => [
+            'Foo', 'bar', 'Foo::bar',
+        ];
+        yield 'old closure without class' => [
+            null, '{closure}', '{closure}',
+        ];
+        yield 'old closure with class' => [
+            'Foo', '{closure}', 'Foo::{closure}',
+        ];
+        yield 'bound closure' => [
+            'Closure', '{closure}', '{closure}',
+        ];
+        yield 'namespaced closure with class' => [
+            'Yiisoft\\Yii\\Gii\\Gii', 'Yiisoft\\Yii\\Gii\\{closure}', 'Yiisoft\\Yii\\Gii\\Gii::{closure}',
+        ];
+        yield 'namespaced closure without class' => [
+            null, 'Yiisoft\\Yii\\Gii\\{closure}', 'Yiisoft\\Yii\\Gii\\{closure}',
+        ];
+        yield 'php84 closure in method' => [
+            'Foo', '{closure:Foo::bar():4}', '{closure} Foo::bar():4',
+        ];
+        yield 'php84 closure in file' => [
+            null, '{closure:/app/src/index.php:12}', '{closure} /app/src/index.php:12',
+        ];
+        yield 'php84 nested closure' => [
+            null, '{closure:{closure:/app/index.php:5}:8}', '{closure} {closure:/app/index.php:5}:8',
+        ];
+    }
+
+    #[DataProvider('dataFormatTraceFunctionName')]
+    public function testFormatTraceFunctionName(?string $class, string $function, string $expected): void
+    {
+        $renderer = new HtmlRenderer();
+        $this->assertSame($expected, $this->invokeMethod($renderer, 'formatTraceFunctionName', [$class, $function]));
+    }
+
+    public function testRenderCallStackWithMethodClosure(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = $this->createMethodClosureException();
+        $traceItem = $exception->getTrace()[0];
+
+        $this->assertArrayHasKey('file', $traceItem);
+        $this->assertArrayHasKey('line', $traceItem);
+        $this->assertSame(self::class, $traceItem['class']);
+        $this->assertStringContainsString('{closure', $traceItem['function']);
+
+        $result = $renderer->renderCallStack($exception, $exception->getTrace());
+
+        if (PHP_VERSION_ID >= 80400) {
+            $this->assertMatchesRegularExpression(
+                '/\{closure\}\s+' . preg_quote(self::class, '/') . '::createMethodClosureException\(\):\d+/',
+                $result,
+            );
+            return;
+        }
+
+        $this->assertStringContainsString(self::class . '::{closure}', $result);
+    }
+
+    public function testRenderCallStackWithBoundClosure(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = $this->createBoundClosureException();
+        $traceItem = $exception->getTrace()[0];
+
+        $this->assertSame('Closure', $traceItem['class']);
+        $this->assertStringContainsString('{closure', $traceItem['function']);
+
+        $result = $renderer->renderCallStack($exception, $exception->getTrace());
+        $itemResult = $this->invokeMethod($renderer, 'renderCallStackItem', [
+            $traceItem['file'] ?? null,
+            $traceItem['line'] ?? null,
+            $traceItem['class'] ?? null,
+            $traceItem['function'] ?? null,
+            $traceItem['args'] ?? [],
+            2,
+            false,
+            [],
+        ]);
+
+        if (PHP_VERSION_ID >= 80400) {
+            $this->assertMatchesRegularExpression('/\{closure\}\s+.+::createBoundClosureException\(\):\d+/', $result);
+            return;
+        }
+
+        $this->assertStringContainsString('Yiisoft\\ErrorHandler\\Tests\\Renderer\\{closure}', $itemResult);
+    }
+
+    public function testRenderCallStackWithInternalFunctionClosure(): void
+    {
+        $renderer = new HtmlRenderer();
+        $exception = $this->createInternalFunctionClosureException();
+        $traceItem = $exception->getTrace()[0];
+
+        $this->assertArrayNotHasKey('file', $traceItem);
+        $this->assertArrayNotHasKey('line', $traceItem);
+        $this->assertSame(self::class, $traceItem['class']);
+        $this->assertStringContainsString('{closure', $traceItem['function']);
+
+        $result = $renderer->renderCallStack($exception, $exception->getTrace());
+        $itemResult = $this->invokeMethod($renderer, 'renderCallStackItem', [
+            $traceItem['file'] ?? null,
+            $traceItem['line'] ?? null,
+            $traceItem['class'] ?? null,
+            $traceItem['function'] ?? null,
+            $traceItem['args'] ?? [],
+            2,
+            false,
+            [],
+        ]);
+
+        $this->assertStringNotContainsString('element-code-wrap', $itemResult);
+
+        if (PHP_VERSION_ID >= 80400) {
+            $this->assertMatchesRegularExpression(
+                '/\{closure\}\s+' . preg_quote(self::class, '/') . '::createInternalFunctionClosureException\(\):\d+/',
+                $result,
+            );
+            return;
+        }
+
+        $this->assertStringContainsString(self::class . '::{closure}', $result);
+    }
+
+    public function testRenderCallStackWithNamespacedClosureOnPhpBelow84(): void
+    {
+        if (PHP_VERSION_ID >= 80400) {
+            $this->markTestSkipped('PHP < 8.4 specific behavior.');
+        }
+
+        $renderer = new HtmlRenderer();
+        $exception = NamespacedClosureTraceFixture::createException();
+        $traceItem = $exception->getTrace()[0];
+
+        $this->assertSame(NamespacedClosureTraceFixture::class, $traceItem['class']);
+        $this->assertSame('Yiisoft\\ErrorHandler\\Tests\\Support\\{closure}', $traceItem['function']);
+
+        $result = $renderer->renderCallStack($exception, $exception->getTrace());
+
+        $this->assertStringContainsString(NamespacedClosureTraceFixture::class . '::{closure}', $result);
+        $this->assertStringNotContainsString(
+            NamespacedClosureTraceFixture::class . '::' . $traceItem['function'],
+            $result,
+        );
+    }
+
+    public function testRenderCallStackWithFileLevelClosureOnPhp84Plus(): void
+    {
+        if (PHP_VERSION_ID < 80400) {
+            $this->markTestSkipped('PHP 8.4+ specific behavior.');
+        }
+
+        $renderer = new HtmlRenderer();
+        $exception = loadFileLevelClosureException();
+        $traceItem = $exception->getTrace()[0];
+
+        $this->assertArrayNotHasKey('class', $traceItem);
+
+        $result = $renderer->renderCallStack($exception, $exception->getTrace());
+
+        $this->assertMatchesRegularExpression(
+            '#\{closure\}\s+.+[/\\\\]tests[/\\\\]Support[/\\\\]file_level_closure_exception\.php:\d+#',
+            $result,
+        );
+    }
+
     private function createServerRequestMock(): ServerRequestInterface
     {
         $serverRequestMock = $this->createMock(ServerRequestInterface::class);
@@ -640,11 +862,77 @@ final class HtmlRendererTest extends TestCase
         return $serverRequestMock;
     }
 
+    private function createMethodClosureException(): RuntimeException
+    {
+        $closure = function (): void {
+            throw new RuntimeException('test');
+        };
+
+        try {
+            $closure();
+        } catch (RuntimeException $e) {
+            return $e;
+        }
+
+        $this->fail('Method closure did not throw RuntimeException.');
+    }
+
+    private function createInternalFunctionClosureException(): RuntimeException
+    {
+        $closure = function (int $value): void {
+            throw new RuntimeException((string) $value);
+        };
+
+        try {
+            array_map($closure, [1]);
+        } catch (RuntimeException $e) {
+            return $e;
+        }
+
+        $this->fail('Closure called via internal function did not throw RuntimeException.');
+    }
+
+    private function createBoundClosureException(): RuntimeException
+    {
+        $closure = function (): void {
+            throw new RuntimeException('test');
+        };
+
+        $boundClosure = Closure::bind($closure, new stdClass(), null);
+        $this->assertInstanceOf(Closure::class, $boundClosure);
+
+        try {
+            $boundClosure();
+        } catch (RuntimeException $e) {
+            return $e;
+        }
+
+        $this->fail('Bound closure did not throw RuntimeException.');
+    }
+
     private function createTestTemplate(string $path, string $templateContents): void
     {
         if (!file_put_contents($path, $templateContents)) {
             throw new RuntimeException(sprintf('Unable to create file at path %s', $path));
         }
+    }
+
+    private function createCustomSetting(): array
+    {
+        $verboseTemplate = tempnam(sys_get_temp_dir(), 'verbose-template-');
+        $template = tempnam(sys_get_temp_dir(), 'template-');
+
+        if ($verboseTemplate === false || $template === false) {
+            throw new RuntimeException('Unable to create temporary template paths.');
+        }
+
+        $this->temporaryFiles[] = $verboseTemplate;
+        $this->temporaryFiles[] = $template;
+
+        return [
+            'verboseTemplate' => $verboseTemplate,
+            'template' => $template,
+        ];
     }
 
     private function invokeMethod(object $object, string $method, array $args = [])
