@@ -669,10 +669,10 @@ final class HtmlRendererTest extends TestCase
             traceFileMap: [__DIR__ => '/mapped/path'],
         );
 
-        $result = str_replace('\\', '/', $renderer->renderCallStack(new RuntimeException('test')));
+        $result = $renderer->renderCallStack(new RuntimeException('test'));
 
-        $this->assertStringContainsString('/mapped/path/', $result);
-        $this->assertStringContainsString('phpstorm://open?file=/mapped/path/', $result);
+        $this->assertStringContainsString(' class="trace-link">/mapped/path', $result);
+        $this->assertStringContainsString('href="phpstorm://open?file=/mapped/path', $result);
     }
 
     private function createServerRequestMock(): ServerRequestInterface
