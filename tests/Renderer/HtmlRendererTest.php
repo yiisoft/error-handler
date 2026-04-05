@@ -19,7 +19,6 @@ use Yiisoft\ErrorHandler\Renderer\HtmlRenderer;
 use Yiisoft\ErrorHandler\Tests\Support\TestDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestEmptyDescriptionDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestExceptionWithoutDocBlock;
-use Yiisoft\ErrorHandler\Tests\Support\TestFriendlyException;
 use Yiisoft\ErrorHandler\Tests\Support\TestHelper;
 use Yiisoft\ErrorHandler\Tests\Support\TestInlineCodeDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestLeadingMarkdownLinkDocBlockException;
@@ -86,7 +85,7 @@ final class HtmlRendererTest extends TestCase
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
 
-        $this->assertStringContainsString('<div class="exception-description solution">', $result);
+        $this->assertStringContainsString('<div class="exception-description">', $result);
         $this->assertStringContainsString('Test summary with <code>RuntimeException</code>.', $result);
         $this->assertStringContainsString(
             '<a href="https://www.yiiframework.com">Yii Framework</a>',
@@ -101,7 +100,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
 
-        $this->assertStringNotContainsString('<div class="exception-description solution">', (string) $errorData);
+        $this->assertStringNotContainsString('<div class="exception-description">', (string) $errorData);
     }
 
     public function testVerboseOutputDoesNotRenderThrowableDescriptionWhenDocCommentHasNoDescription(): void
@@ -111,19 +110,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
 
-        $this->assertStringNotContainsString('<div class="exception-description solution">', (string) $errorData);
-    }
-
-    public function testVerboseOutputKeepsFriendlyExceptionBehaviorWithoutDescriptionDuplication(): void
-    {
-        $renderer = new HtmlRenderer();
-        $exception = new TestFriendlyException('exception-test-message');
-
-        $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
-        $result = (string) $errorData;
-
-        $this->assertStringContainsString('<div class="solution">', $result);
-        $this->assertStringNotContainsString('<div class="exception-description solution">', $result);
+        $this->assertStringNotContainsString('<div class="exception-description">', (string) $errorData);
     }
 
     public function testVerboseOutputUsesFirstExceptionFromCompositeException(): void
@@ -148,7 +135,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertStringNotContainsString('href="javascript:alert(1)"', $result);
@@ -172,7 +159,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertNotSame('', $description);
@@ -199,7 +186,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertNotSame('', $description);
@@ -221,7 +208,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertNotSame('', $description);
@@ -272,7 +259,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertStringContainsString(
@@ -292,7 +279,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertNotSame('', $description);
@@ -309,7 +296,7 @@ final class HtmlRendererTest extends TestCase
 
         $errorData = $renderer->renderVerbose($exception, $this->createServerRequestMock());
         $result = (string) $errorData;
-        preg_match('/<div class="exception-description solution">(.*?)<\/div>/s', $result, $matches);
+        preg_match('/<div class="exception-description">(.*?)<\/div>/s', $result, $matches);
         $description = $matches[1] ?? '';
 
         $this->assertNotSame('', $description);
@@ -629,6 +616,81 @@ final class HtmlRendererTest extends TestCase
         $link = ($renderer->traceLinkGenerator)($file, $line);
 
         $this->assertSame($expected, $link);
+    }
+
+    public static function dataMapFilePath(): iterable
+    {
+        yield 'prefix match' => [
+            ['/app' => '/local'],
+            '/app/src/index.php',
+            '/local/src/index.php',
+        ];
+        yield 'no match' => [
+            ['/other' => '/local'],
+            '/app/src/index.php',
+            '/app/src/index.php',
+        ];
+        yield 'first match wins' => [
+            ['/app' => '/first', '/app/src' => '/second'],
+            '/app/src/index.php',
+            '/first/src/index.php',
+        ];
+        yield 'partial prefix should not match' => [
+            ['/app' => '/local'],
+            '/application/src/index.php',
+            '/application/src/index.php',
+        ];
+        yield 'prefix with trailing slash' => [
+            ['/app/' => '/local/'],
+            '/app/src/index.php',
+            '/local/src/index.php',
+        ];
+        yield 'exact match' => [
+            ['/app' => '/local'],
+            '/app',
+            '/local',
+        ];
+        yield 'windows separator' => [
+            ['C:\\project' => 'D:\\project'],
+            'C:\\project\\src\\index.php',
+            'D:\\project\\src\\index.php',
+        ];
+        yield 'empty source prefix is ignored' => [
+            ['' => '/mapped', '/app' => '/local'],
+            '/app/src/index.php',
+            '/local/src/index.php',
+        ];
+        yield 'root prefix' => [
+            ['/' => '/mapped'],
+            '/app/src/index.php',
+            '/mapped/app/src/index.php',
+        ];
+        yield 'empty map' => [
+            [],
+            '/app/src/index.php',
+            '/app/src/index.php',
+        ];
+    }
+
+    #[DataProvider('dataMapFilePath')]
+    public function testMapFilePath(array $traceFileMap, string $file, string $expected): void
+    {
+        $renderer = new HtmlRenderer(traceFileMap: $traceFileMap);
+        $result = $this->invokeMethod($renderer, 'mapFilePath', ['file' => $file]);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testTraceFileMapAppliedInCallStack(): void
+    {
+        $renderer = new HtmlRenderer(
+            traceLink: 'phpstorm://open?file={file}&line={line}',
+            traceFileMap: [__DIR__ => '/mapped/path'],
+        );
+
+        $result = $renderer->renderCallStack(new RuntimeException('test'));
+
+        $this->assertStringContainsString(' class="trace-link">/mapped/path', $result);
+        $this->assertStringContainsString('href="phpstorm://open?file=/mapped/path', $result);
     }
 
     private function createServerRequestMock(): ServerRequestInterface

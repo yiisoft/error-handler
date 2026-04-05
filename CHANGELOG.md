@@ -2,12 +2,13 @@
 
 ## 5.0.0 under development
 
-- Enh #104: Render exception class PHPDoc description with safe markdown links in HTML debug output (@dbuhonov)
+- Enh #104, #168: Render exception class PHPDoc description with safe markdown links in HTML debug output (@dbuhonov, @vjik)
 - Chg #162: Replace deprecated `ThrowableResponseFactory` class usage to new one, and remove it (@vjik)
 - Enh #163: Explicitly import classes, functions, and constants in "use" section (@mspirkov)
 - Bug #164: Fix missing items in stack trace HTML output when handling a PHP error (@vjik)
 - Bug #166: Fix broken link to error handling guide (@vjik)
 - Chg #170: Make all parameters of `ErrorException` constructor required (@vjik)
+- New #171: Add `$traceFileMap` parameter to `HtmlRenderer` for mapping file paths in trace links (@WarLikeLaux)
 
 ## 4.3.2 January 09, 2026
 

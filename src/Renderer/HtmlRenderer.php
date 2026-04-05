@@ -50,6 +50,7 @@ use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
 use function preg_split;
+use function rtrim;
 use function str_replace;
 use function str_starts_with;
 use function stripos;
@@ -158,6 +159,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *        );
      *    }
      *    ```
+     * @param array<string, string> $traceFileMap Map of file path prefixes for trace display and links. Keys are
+     * original path prefixes (e.g. container paths), values are replacement prefixes (e.g. host machine paths).
+     * Example: `['/app' => '/home/user/project']` maps `/app/src/index.php` to `/home/user/project/src/index.php`.
      *
      * @psalm-param array{
      *   template?: string,
@@ -176,6 +180,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         ?int $maxTraceLines = null,
         ?string $traceHeaderLine = null,
         string|Closure|null $traceLink = null,
+        public readonly array $traceFileMap = [],
     ) {
         $this->markdownParser = new GithubMarkdown();
         $this->markdownParser->html5 = true;
@@ -212,18 +217,16 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
     public function renderVerbose(Throwable $t, ?ServerRequestInterface $request = null): ErrorData
     {
-        $solution = null;
-        $exceptionDescription = null;
         $displayThrowable = $t;
-
         if ($t instanceof CompositeException) {
             $displayThrowable = $t->getFirstException();
         }
 
-        if ($displayThrowable instanceof FriendlyExceptionInterface) {
-            $solution = $displayThrowable->getSolution();
-        } else {
-            $exceptionDescription = $this->getThrowableDescription($displayThrowable);
+        $exceptionDescription = $displayThrowable instanceof FriendlyExceptionInterface
+            ? $displayThrowable->getSolution()
+            : $this->getThrowableDescription($displayThrowable);
+        if ($exceptionDescription !== null) {
+            $exceptionDescription = $this->parseMarkdown($exceptionDescription);
         }
 
         return new ErrorData(
@@ -231,7 +234,6 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 'request' => $request,
                 'throwable' => $t,
                 'displayThrowable' => $displayThrowable,
-                'solution' => $solution,
                 'exceptionClass' => $displayThrowable::class,
                 'exceptionMessage' => $displayThrowable->getMessage(),
                 'exceptionDescription' => $exceptionDescription,
@@ -576,11 +578,8 @@ final class HtmlRenderer implements ThrowableRendererInterface
      * suitable for direct inclusion in the error template.
      * Inline {@see ...}/{@link ...} annotations are rendered as markdown links.
      *
-     * The returned value is an HTML snippet (for example, containing <p>, <a>,
-     * <code> elements) and is intended to be inserted into the template as-is,
-     * without additional HTML-escaping.
-     *
-     * @return string|null HTML fragment describing the throwable, or null if no description is available.
+     * @return string|null Markdown string with inline HTML (`<code>` elements) describing the throwable, or `null` if
+     * no description is available.
      */
     private function getThrowableDescription(Throwable $throwable): ?string
     {
@@ -668,9 +667,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $normalized[] = $imageMarker . $label . ' (<code>' . $this->htmlEncode($target) . '</code>)';
         }
 
-        $normalized = trim(implode('', $normalized));
-
-        return $this->parseMarkdown($normalized);
+        return trim(implode('', $normalized));
     }
 
     /**
@@ -757,7 +754,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         }
 
         return $this->renderTemplate($this->defaultTemplatePath . '/_call-stack-item.php', [
-            'file' => $file,
+            'file' => $file !== null ? $this->mapFilePath($file) : null,
             'line' => $line,
             'class' => $class,
             'function' => $function,
@@ -862,6 +859,33 @@ final class HtmlRenderer implements ThrowableRendererInterface
 
         $this->vendorPaths = [];
         return $this->vendorPaths;
+    }
+
+    private function mapFilePath(string $file): string
+    {
+        foreach ($this->traceFileMap as $from => $to) {
+            $normalizedFrom = rtrim($from, '/\\');
+            $normalizedTo = rtrim($to, '/\\');
+
+            if ($normalizedFrom === '') {
+                if ($from !== '' && str_starts_with($file, $from)) {
+                    return $normalizedTo . $file;
+                }
+
+                continue;
+            }
+
+            if (
+                $file === $normalizedFrom
+                || str_starts_with($file, $normalizedFrom . '/')
+                || str_starts_with($file, $normalizedFrom . '\\')
+            ) {
+                $fromLength = strlen($normalizedFrom);
+
+                return $normalizedTo . substr($file, $fromLength);
+            }
+        }
+        return $file;
     }
 
     /**
