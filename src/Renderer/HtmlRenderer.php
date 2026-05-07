@@ -154,7 +154,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      *    ```php
      *    static function (string $file, ?int $line): string {
      *        return strtr(
-     *            'phpstorm://open?file={file}&line={line}',
+     *            'jetbrains://phpstorm/navigate/reference?path={file}&line={line}',
      *            ['{file}' => $file, '{line}' => (string) $line],
      *        );
      *    }
