@@ -589,16 +589,16 @@ final class HtmlRendererTest extends TestCase
     {
         yield [null, static fn() => null];
         yield [
-            'phpstorm://open?file=test.php&line=42',
-            static fn(string $file, ?int $line) => "phpstorm://open?file=$file&line=$line",
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path=test.php:42',
+            static fn(string $file, ?int $line) => "jetbrains://phpstorm/navigate/reference?project=my-app&path=$file:$line",
         ];
         yield [
-            'phpstorm://open?file=test.php&line=42',
-            'phpstorm://open?file={file}&line={line}',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path=test.php:42',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path={file}:{line}',
         ];
         yield [
-            'phpstorm://open?file=test.php&line=',
-            'phpstorm://open?file={file}&line={line}',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path=test.php:',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path={file}:{line}',
             'test.php',
             null,
         ];
@@ -683,14 +683,17 @@ final class HtmlRendererTest extends TestCase
     public function testTraceFileMapAppliedInCallStack(): void
     {
         $renderer = new HtmlRenderer(
-            traceLink: 'phpstorm://open?file={file}&line={line}',
+            traceLink: 'jetbrains://phpstorm/navigate/reference?project=my-app&path={file}:{line}',
             traceFileMap: [__DIR__ => '/mapped/path'],
         );
 
         $result = $renderer->renderCallStack(new RuntimeException('test'));
 
         $this->assertStringContainsString(' class="trace-link">/mapped/path', $result);
-        $this->assertStringContainsString('href="phpstorm://open?file=/mapped/path', $result);
+        $this->assertStringContainsString(
+            'href="jetbrains://phpstorm/navigate/reference?project=my-app&amp;path=/mapped/path',
+            $result,
+        );
     }
 
     private function createServerRequestMock(): ServerRequestInterface
