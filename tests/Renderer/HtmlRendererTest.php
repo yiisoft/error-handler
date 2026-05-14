@@ -589,16 +589,16 @@ final class HtmlRendererTest extends TestCase
     {
         yield [null, static fn() => null];
         yield [
-            'jetbrains://phpstorm/navigate/reference?path=test.php&line=42',
-            static fn(string $file, ?int $line) => "jetbrains://phpstorm/navigate/reference?path=$file&line=$line",
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path=test.php:42',
+            static fn(string $file, ?int $line) => "jetbrains://phpstorm/navigate/reference?project=my-app&path=$file:$line",
         ];
         yield [
-            'jetbrains://phpstorm/navigate/reference?path=test.php&line=42',
-            'jetbrains://phpstorm/navigate/reference?path={file}&line={line}',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path=test.php:42',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path={file}:{line}',
         ];
         yield [
-            'jetbrains://phpstorm/navigate/reference?path=test.php&line=',
-            'jetbrains://phpstorm/navigate/reference?path={file}&line={line}',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path=test.php:',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path={file}:{line}',
             'test.php',
             null,
         ];
@@ -683,14 +683,17 @@ final class HtmlRendererTest extends TestCase
     public function testTraceFileMapAppliedInCallStack(): void
     {
         $renderer = new HtmlRenderer(
-            traceLink: 'jetbrains://phpstorm/navigate/reference?path={file}&line={line}',
+            traceLink: 'jetbrains://phpstorm/navigate/reference?project=my-app&path={file}:{line}',
             traceFileMap: [__DIR__ => '/mapped/path'],
         );
 
         $result = $renderer->renderCallStack(new RuntimeException('test'));
 
         $this->assertStringContainsString(' class="trace-link">/mapped/path', $result);
-        $this->assertStringContainsString('href="jetbrains://phpstorm/navigate/reference?path=/mapped/path', $result);
+        $this->assertStringContainsString(
+            'href="jetbrains://phpstorm/navigate/reference?project=my-app&amp;path=/mapped/path',
+            $result,
+        );
     }
 
     private function createServerRequestMock(): ServerRequestInterface
