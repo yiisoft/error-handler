@@ -11,6 +11,7 @@
 - New #171: Add `$traceFileMap` parameter to `HtmlRenderer` for mapping file paths in trace links (@WarLikeLaux)
 - Enh #172: Improve closure rendering in stack traces (@WarLikeLaux)
 - Bug #172: Keep items in stack traces when source is unavailable (@WarLikeLaux)
+- Bug #172: Don't render non-positive line number in stack trace frame (@WarLikeLaux)
 
 ## 4.3.2 January 09, 2026
 

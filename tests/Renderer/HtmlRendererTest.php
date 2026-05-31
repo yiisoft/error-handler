@@ -510,6 +510,23 @@ final class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('element-code-wrap', $result);
     }
 
+    public function testRenderCallStackItemRendersNoLineWhenLineIsNotPositive(): void
+    {
+        $result = $this->invokeMethod(new HtmlRenderer(), 'renderCallStackItem', [
+            'file' => __FILE__,
+            'line' => 0,
+            'class' => null,
+            'function' => null,
+            'args' => [],
+            'index' => 1,
+            'isVendorFile' => false,
+            'reflectionParameters' => [],
+        ]);
+
+        $this->assertStringContainsString(__FILE__, $result);
+        $this->assertStringNotContainsString('at line', $result);
+    }
+
     public function testRenderRequest(): void
     {
         $renderer = new HtmlRenderer();

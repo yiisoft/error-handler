@@ -774,6 +774,9 @@ final class HtmlRenderer implements ThrowableRendererInterface
             $line--; // adjust line number from one-based to zero-based
             $lines = @file($file);
             if ($line < 0 || $lines === false) {
+                if ($line < 0) {
+                    $line = null; // non-positive line has no valid source location to show
+                }
                 $lines = [];
             } else {
                 $lineCount = count($lines);
