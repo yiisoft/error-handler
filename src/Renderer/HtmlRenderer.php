@@ -777,7 +777,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
                 $lines = [];
             } else {
                 $lineCount = count($lines);
-                if ($line < $lineCount) {
+                if ($line <= $lineCount) {
                     $half = (int) (($index === 1 ? $this->maxSourceLines : $this->maxTraceLines) / 2);
                     $begin = $line - $half > 0 ? $line - $half : 0;
                     $end = $line + $half < $lineCount ? $line + $half : $lineCount - 1;
