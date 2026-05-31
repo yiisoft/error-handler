@@ -422,7 +422,15 @@ final class HtmlRendererTest extends TestCase
         $renderer = new HtmlRenderer();
 
         $result = $renderer->renderCallStack(
-            new ErrorException('test-message'),
+            new ErrorException(
+                'test-message',
+                0,
+                0,
+                __FILE__,
+                __LINE__,
+                null,
+                [],
+            ),
             TestHelper::generateTrace([true, true, false, true]),
         );
 
@@ -492,8 +500,18 @@ final class HtmlRendererTest extends TestCase
 
     public function testGetThrowableName(): void
     {
+        $exception = new ErrorException(
+            'test-message',
+            0,
+            0,
+            __FILE__,
+            __LINE__,
+            null,
+            [],
+        );
+
         $renderer = new HtmlRenderer();
-        $name = $renderer->getThrowableName(new ErrorException());
+        $name = $renderer->getThrowableName($exception);
 
         $this->assertSame('Error (' . ErrorException::class . ')', $name);
     }
@@ -621,16 +639,16 @@ final class HtmlRendererTest extends TestCase
     {
         yield [null, static fn() => null];
         yield [
-            'phpstorm://open?file=test.php&line=42',
-            static fn(string $file, ?int $line) => "phpstorm://open?file=$file&line=$line",
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path=test.php:42',
+            static fn(string $file, ?int $line) => "jetbrains://phpstorm/navigate/reference?project=my-app&path=$file:$line",
         ];
         yield [
-            'phpstorm://open?file=test.php&line=42',
-            'phpstorm://open?file={file}&line={line}',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path=test.php:42',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path={file}:{line}',
         ];
         yield [
-            'phpstorm://open?file=test.php&line=',
-            'phpstorm://open?file={file}&line={line}',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path=test.php:',
+            'jetbrains://phpstorm/navigate/reference?project=my-app&path={file}:{line}',
             'test.php',
             null,
         ];
@@ -818,6 +836,84 @@ final class HtmlRendererTest extends TestCase
 
         $this->assertMatchesRegularExpression(
             '#\{closure\}\s+.+[/\\\\]tests[/\\\\]Support[/\\\\]file_level_closure_exception\.php:\d+#',
+            $result,
+        );
+    }
+
+    public static function dataMapFilePath(): iterable
+    {
+        yield 'prefix match' => [
+            ['/app' => '/local'],
+            '/app/src/index.php',
+            '/local/src/index.php',
+        ];
+        yield 'no match' => [
+            ['/other' => '/local'],
+            '/app/src/index.php',
+            '/app/src/index.php',
+        ];
+        yield 'first match wins' => [
+            ['/app' => '/first', '/app/src' => '/second'],
+            '/app/src/index.php',
+            '/first/src/index.php',
+        ];
+        yield 'partial prefix should not match' => [
+            ['/app' => '/local'],
+            '/application/src/index.php',
+            '/application/src/index.php',
+        ];
+        yield 'prefix with trailing slash' => [
+            ['/app/' => '/local/'],
+            '/app/src/index.php',
+            '/local/src/index.php',
+        ];
+        yield 'exact match' => [
+            ['/app' => '/local'],
+            '/app',
+            '/local',
+        ];
+        yield 'windows separator' => [
+            ['C:\\project' => 'D:\\project'],
+            'C:\\project\\src\\index.php',
+            'D:\\project\\src\\index.php',
+        ];
+        yield 'empty source prefix is ignored' => [
+            ['' => '/mapped', '/app' => '/local'],
+            '/app/src/index.php',
+            '/local/src/index.php',
+        ];
+        yield 'root prefix' => [
+            ['/' => '/mapped'],
+            '/app/src/index.php',
+            '/mapped/app/src/index.php',
+        ];
+        yield 'empty map' => [
+            [],
+            '/app/src/index.php',
+            '/app/src/index.php',
+        ];
+    }
+
+    #[DataProvider('dataMapFilePath')]
+    public function testMapFilePath(array $traceFileMap, string $file, string $expected): void
+    {
+        $renderer = new HtmlRenderer(traceFileMap: $traceFileMap);
+        $result = $this->invokeMethod($renderer, 'mapFilePath', ['file' => $file]);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testTraceFileMapAppliedInCallStack(): void
+    {
+        $renderer = new HtmlRenderer(
+            traceLink: 'jetbrains://phpstorm/navigate/reference?project=my-app&path={file}:{line}',
+            traceFileMap: [__DIR__ => '/mapped/path'],
+        );
+
+        $result = $renderer->renderCallStack(new RuntimeException('test'));
+
+        $this->assertStringContainsString(' class="trace-link">/mapped/path', $result);
+        $this->assertStringContainsString(
+            'href="jetbrains://phpstorm/navigate/reference?project=my-app&amp;path=/mapped/path',
             $result,
         );
     }
