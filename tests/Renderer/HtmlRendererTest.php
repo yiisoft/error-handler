@@ -37,6 +37,7 @@ use function file;
 use function file_exists;
 use function file_put_contents;
 use function fopen;
+use function preg_match;
 use function preg_quote;
 use function restore_error_handler;
 use function set_error_handler;
