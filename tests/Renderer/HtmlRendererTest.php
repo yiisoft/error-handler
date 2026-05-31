@@ -443,7 +443,8 @@ final class HtmlRendererTest extends TestCase
 
     public function testRenderCallStackItemDoesNotRenderSourceCodeWhenLineIsOutsideFileRange(): void
     {
-        $line = count(file(__FILE__)) + 1;
+        // +2 because the renderer tolerates one line past EOF, so the line must be clearly out of range.
+        $line = count(file(__FILE__)) + 2;
         $result = $this->invokeMethod(new HtmlRenderer(), 'renderCallStackItem', [
             'file' => __FILE__,
             'line' => $line,
