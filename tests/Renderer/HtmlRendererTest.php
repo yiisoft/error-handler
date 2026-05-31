@@ -489,6 +489,27 @@ final class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('element-code-wrap', $result);
     }
 
+    public function testRenderCallStackItemRendersSourceCodeWhenLineEqualsLineCount(): void
+    {
+        // `$lineCount === $line` boundary: after the zero-based adjustment the line lands one past
+        // the last valid index, and the renderer still shows the trailing source lines.
+        $line = count(file(__FILE__)) + 1;
+        $result = $this->invokeMethod(new HtmlRenderer(), 'renderCallStackItem', [
+            'file' => __FILE__,
+            'line' => $line,
+            'class' => null,
+            'function' => null,
+            'args' => [],
+            'index' => 1,
+            'isVendorFile' => false,
+            'reflectionParameters' => [],
+        ]);
+
+        $this->assertStringContainsString(__FILE__, $result);
+        $this->assertStringContainsString('at line ' . $line, $result);
+        $this->assertStringContainsString('element-code-wrap', $result);
+    }
+
     public function testRenderRequest(): void
     {
         $renderer = new HtmlRenderer();
