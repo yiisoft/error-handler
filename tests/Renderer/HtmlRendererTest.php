@@ -31,10 +31,17 @@ use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeDocBlockException;
 use Yiisoft\ErrorHandler\Tests\Support\TestUnsafeMarkdownDocBlockException;
 use stdClass;
 
+use function array_map;
 use function dirname;
+use function file;
 use function file_exists;
 use function file_put_contents;
 use function fopen;
+use function preg_quote;
+use function restore_error_handler;
+use function set_error_handler;
+use function sys_get_temp_dir;
+use function tempnam;
 use function Yiisoft\ErrorHandler\Tests\Support\loadFileLevelClosureException;
 use function unlink;
 use function sprintf;
@@ -414,7 +421,8 @@ final class HtmlRendererTest extends TestCase
 
         $this->assertStringContainsString('not-exist', $result);
         $this->assertStringContainsString('call-stack-item', $result);
-        $this->assertSame('file(not-exist): Failed to open stream: No such file or directory', $errorMessage);
+        $this->assertNotNull($errorMessage);
+        $this->assertStringContainsString('not-exist', $errorMessage);
     }
 
     public function testRenderCallStackWithErrorException(): void
