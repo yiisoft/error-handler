@@ -7,6 +7,7 @@
 - Enh #163: Explicitly import classes, functions, and constants in "use" section (@mspirkov)
 - Bug #164: Fix missing items in stack trace HTML output when handling a PHP error (@vjik)
 - Bug #166: Fix broken link to error handling guide (@vjik)
+- Bug #176: Remove unused `ext-dom` dependency (@samdark)
 - Chg #170: Make all parameters of `ErrorException` constructor required (@vjik)
 - New #171: Add `$traceFileMap` parameter to `HtmlRenderer` for mapping file paths in trace links (@WarLikeLaux)
 
