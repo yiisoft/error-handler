@@ -36,7 +36,6 @@ The package provides advanced error handling. The features are:
 ## Requirements
 
 - PHP 8.1 - 8.5.
-- `DOM` PHP extension.
 - `mbstring` PHP extension.
 
 ## Installation
