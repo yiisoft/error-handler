@@ -14,4 +14,7 @@ return (new Configuration())
     ->addPathToScan(__DIR__ . '/tests', isDev: true)
     // `psr/event-dispatcher` is an intentionally optional integration: `ErrorHandler` only accepts it
     // via a nullable constructor type-hint, consumers are not required to install it.
-    ->ignoreErrorsOnPackages(['psr/event-dispatcher'], [ErrorType::DEV_DEPENDENCY_IN_PROD]);
+    ->ignoreErrorsOnPackages(['psr/event-dispatcher'], [ErrorType::DEV_DEPENDENCY_IN_PROD])
+    // `yiisoft/definitions` is used only in `config/di-web.php`, which is loaded by consumers using
+    // `yiisoft/di`, that already requires `yiisoft/definitions` itself.
+    ->ignoreErrorsOnPackages(['yiisoft/definitions'], [ErrorType::SHADOW_DEPENDENCY]);
