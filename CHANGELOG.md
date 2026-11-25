@@ -1,5 +1,9 @@
 # Yii Error Handler Change Log
 
+## 4.3.4 under development
+
+- no changes in this release.
+
 ## 4.3.3 November 25, 2026
 
 - Enh #192: Add PHP 8.6 support (@roxblnfk)
