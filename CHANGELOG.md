@@ -11,6 +11,7 @@
 - Chg #170: Make all parameters of `ErrorException` constructor required (@vjik)
 - New #171: Add `$traceFileMap` parameter to `HtmlRenderer` for mapping file paths in trace links (@WarLikeLaux)
 - Enh #192: Add PHP 8.6 support (@roxblnfk)
+- Bug #192: Escape cURL command in HTML debug output (@roxblnfk)
 
 ## 4.3.2 January 09, 2026
 

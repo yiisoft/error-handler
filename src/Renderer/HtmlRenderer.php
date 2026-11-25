@@ -16,10 +16,10 @@ use Yiisoft\ErrorHandler\Exception\ErrorException;
 use Yiisoft\ErrorHandler\ThrowableRendererInterface;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 use Yiisoft\Http\Header;
-use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
+use ReflectionObject;
 
 use function array_values;
 use function dirname;
@@ -583,7 +583,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
      */
     private function getThrowableDescription(Throwable $throwable): ?string
     {
-        $docComment = (new ReflectionClass($throwable))->getDocComment();
+        $docComment = (new ReflectionObject($throwable))->getDocComment();
         if ($docComment === false) {
             return null;
         }
@@ -701,7 +701,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         ob_implicit_flush(false);
 
         try {
-            /** @psalm-suppress PossiblyNullFunctionCall */
+            /** @psalm-suppress PossiblyNullFunctionCall, TooManyArguments */
             $renderer->bindTo($this)($path, $parameters);
             return (string) ob_get_clean();
         } catch (Throwable $e) {

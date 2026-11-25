@@ -220,6 +220,7 @@ final class ErrorHandler
         // Set preventive HTTP status code to 500 in case error handling somehow fails and headers are sent.
         http_response_code(Status::INTERNAL_SERVER_ERROR);
 
+        /** @psalm-suppress TaintedInput Escaping the output is the renderer's responsibility. */
         echo $this->handle($t);
         $this->eventDispatcher?->dispatch(new ApplicationError($t));
 
