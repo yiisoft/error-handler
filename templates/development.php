@@ -128,12 +128,12 @@ $theme = $_COOKIE['yii-exception-theme'] ?? '';
     <?php endif ?>
     <?php if ($request && ($curlInfo = $this->renderCurl($request)) !== 'curl'): ?>
         <div class="request">
-            <textarea id="clipboard"><?= $curlInfo ?></textarea>
+            <textarea id="clipboard"><?= $this->htmlEncode($curlInfo) ?></textarea>
             <span id="copied" style="top: 10px">Copied!</span>
             <h2>cURL</h2>
             <a href="#"
                class="copy-clipboard"
-               data-clipboard="<?= $curlInfo ?>"
+               data-clipboard="<?= $this->htmlEncode($curlInfo) ?>"
                title="Copy the cURL"
                style="right: 10px; top: 5px"
             >
