@@ -10,6 +10,7 @@
 - Bug #176: Remove unused `ext-dom` dependency (@samdark)
 - Chg #170: Make all parameters of `ErrorException` constructor required (@vjik)
 - New #171: Add `$traceFileMap` parameter to `HtmlRenderer` for mapping file paths in trace links (@WarLikeLaux)
+- Enh #192: Add PHP 8.6 support (@roxblnfk)
 
 ## 4.3.2 January 09, 2026
 
