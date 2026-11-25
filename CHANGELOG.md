@@ -1,12 +1,12 @@
 # Yii Error Handler Change Log
 
-## 4.3.3 under development
+## 4.3.3 November 25, 2026
 
+- Enh #192: Add PHP 8.6 support (@roxblnfk)
 - Bug #164: Fix missing items in stack trace HTML output when handling a PHP error (@vjik)
 - Bug #166: Fix broken link to error handling guide (@vjik)
 - Bug #176: Remove unused `ext-dom` dependency (@samdark)
 - Bug #192: Escape cURL command in HTML debug output (@roxblnfk)
-- Enh #192: Add PHP 8.6 support (@roxblnfk)
 
 ## 4.3.2 January 09, 2026
 
