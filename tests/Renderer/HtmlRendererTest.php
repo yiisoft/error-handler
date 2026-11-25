@@ -155,7 +155,12 @@ final class HtmlRendererTest extends TestCase
         restore_error_handler();
 
         $this->assertSame('', $result);
-        $this->assertSame('file(not-exist): Failed to open stream: No such file or directory', $errorMessage);
+        $this->assertSame(
+            PHP_VERSION_ID >= 80600
+                ? 'file(): Failed to open stream: No such file or directory'
+                : 'file(not-exist): Failed to open stream: No such file or directory',
+            $errorMessage,
+        );
     }
 
     public function testRenderCallStackWithErrorException(): void

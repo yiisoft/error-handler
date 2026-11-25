@@ -35,7 +35,7 @@ The package provides advanced error handling. The features are:
 
 ## Requirements
 
-- PHP 8.1 - 8.5.
+- PHP 8.1 - 8.6.
 - `mbstring` PHP extension.
 
 ## Installation

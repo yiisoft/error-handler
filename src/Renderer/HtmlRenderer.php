@@ -556,7 +556,7 @@ final class HtmlRenderer implements ThrowableRendererInterface
         ob_implicit_flush(false);
 
         try {
-            /** @psalm-suppress PossiblyNullFunctionCall */
+            /** @psalm-suppress PossiblyNullFunctionCall, TooManyArguments */
             $renderer->bindTo($this)($path, $parameters);
             return (string) ob_get_clean();
         } catch (Throwable $e) {
