@@ -5,6 +5,7 @@
 - Enh #104, #168: Render exception class PHPDoc description with safe markdown links in HTML debug output (@dbuhonov, @vjik)
 - Chg #162: Replace deprecated `ThrowableResponseFactory` class usage to new one, and remove it (@vjik)
 - Enh #163: Explicitly import classes, functions, and constants in "use" section (@mspirkov)
+- Bug #194: Fix closure detection in call stack HTML output on PHP 8.4+ (@roxblnfk)
 
 ## 4.3.3 November 25, 2026
 
