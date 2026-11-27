@@ -5,6 +5,7 @@
 - Enh #104, #168: Render exception class PHPDoc description with safe markdown links in HTML debug output (@dbuhonov, @vjik)
 - Chg #162: Replace deprecated `ThrowableResponseFactory` class usage to new one, and remove it (@vjik)
 - Enh #163: Explicitly import classes, functions, and constants in "use" section (@mspirkov)
+- Bug #194: Fix closure detection in call stack HTML output on PHP 8.4+ (@roxblnfk)
 - Chg #170: Make all parameters of `ErrorException` constructor required (@vjik)
 - New #171: Add `$traceFileMap` parameter to `HtmlRenderer` for mapping file paths in trace links (@WarLikeLaux)
 
